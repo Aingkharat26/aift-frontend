@@ -74,6 +74,18 @@ import { ExpenseService } from '../../services/expense.service';
 export class SummaryChartComponent implements OnInit {
   expenseService = inject(ExpenseService);
 
+  private categoryColors: Record<string, string> = {
+    'อาหาร': '#ef4444',
+    'เครื่องดื่ม': '#0ea5e9',
+    'เดินทาง': '#f59e0b',
+    'ช้อปปิ้ง': '#a855f7',
+    'บันเทิง': '#f97316',
+    'สุขภาพ': '#22c55e',
+    'บิล': '#64748b',
+    'สัตว์เลี้ยง': '#fb7185',
+    'อื่นๆ': '#94a3b8'
+  };
+
   public pieChartOptions: ChartConfiguration['options'] = {
     responsive: true,
     maintainAspectRatio: false,
@@ -92,16 +104,7 @@ export class SummaryChartComponent implements OnInit {
     labels: [],
     datasets: [ {
       data: [],
-      backgroundColor: [
-        '#ef4444', // อาหาร - red
-        '#0ea5e9', // เครื่องดื่ม - blue
-        '#f59e0b', // เดินทาง - yellow
-        '#a855f7', // ช้อปปิ้ง - purple
-        '#f97316', // บันเทิง - orange
-        '#22c55e', // สุขภาพ - green
-        '#64748b', // บิล - gray
-        '#94a3b8'  // อื่นๆ - slate
-      ],
+      backgroundColor: [],
       borderWidth: 0
     } ]
   };
@@ -113,12 +116,17 @@ export class SummaryChartComponent implements OnInit {
     this.expenseService.loadMonthlySummary();
     this.expenseService.summary$.subscribe(summary => {
       this.totalSpent = summary.reduce((sum, item) => sum + item.total, 0);
+
+      const chartLabels = summary.map(s => s.category);
+      const chartData = summary.map(s => s.total);
+      const chartColors = chartLabels.map(label => this.categoryColors[label as string] || '#94a3b8');
       
       this.pieChartData = {
-        labels: summary.map(s => s.category),
+        labels: chartLabels,
         datasets: [{
           ...this.pieChartData.datasets[0],
-          data: summary.map(s => s.total)
+          data: chartData,
+          backgroundColor: chartColors
         }]
       };
     });

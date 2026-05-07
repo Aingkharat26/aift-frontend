@@ -181,6 +181,7 @@ import { ExpenseService } from '../../services/expense.service';
     .cat-entertainment { background: #ffedd5; color: #f97316; }
     .cat-health { background: #dcfce7; color: #22c55e; }
     .cat-bills { background: #e2e8f0; color: #64748b; }
+    .cat-pet { background: #fff1f2; color: #ff66c4; }
     .cat-other { background: #f1f5f9; color: #94a3b8; }
 
     /*Dialog*/
@@ -275,6 +276,7 @@ export class DailyLogComponent implements OnInit {
       'บันเทิง': '🎬',
       'สุขภาพ': '💊',
       'บิล': '🧾',
+      'สัตว์เลี้ยง': '🐱',
       'อื่นๆ': '📦'
     };
     return icons[category] || '📦';
@@ -289,6 +291,7 @@ export class DailyLogComponent implements OnInit {
       'บันเทิง': 'cat-entertainment',
       'สุขภาพ': 'cat-health',
       'บิล': 'cat-bills',
+      'สัตว์เลี้ยง': 'cat-pet',
       'อื่นๆ': 'cat-other'
     };
     return classes[category] || 'cat-other';

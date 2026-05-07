@@ -13,7 +13,7 @@ import { ExpenseService } from '../../services/expense.service';
         type="text" 
         [(ngModel)]="text" 
         (keyup.enter)="onSubmit()" 
-        placeholder="พิมพ์รายจ่ายของคุณ (เช่น ข้าวแกง 50 บาท)"
+        placeholder="พิมพ์รายจ่ายของคุณ"
         [disabled]="isLoading"
         class="chat-input"
       />
