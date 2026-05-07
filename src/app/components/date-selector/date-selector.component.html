@@ -1,0 +1,81 @@
+<div class="datepicker-container" (click)="$event.stopPropagation()">
+  <!-- Toggle Button -->
+  <div class="datepicker-trigger" (click)="togglePicker()" [class.active]="showPicker">
+    <span class="icon">📅</span>
+    <span class="value">{{ getFormattedDate(selectedDate) }}</span>
+    <span class="chevron">▼</span>
+  </div>
+
+  <!-- Custom Calendar Dropdown -->
+  <div class="calendar-dropdown" *ngIf="showPicker">
+    <!-- Header: Month & Year Selector -->
+    <div class="calendar-header">
+      <button (click)="changeMonth(-1)" class="nav-btn">◀</button>
+      
+      <div class="header-labels">
+        <span class="month-label" (click)="viewMode = 'months'">{{ months[viewDate.getMonth()] }}</span>
+        <span class="year-label" (click)="viewMode = 'years'">{{ viewDate.getFullYear() + 543 }}</span>
+      </div>
+
+      <button (click)="changeMonth(1)" class="nav-btn">▶</button>
+    </div>
+
+    <!-- View: Days Grid (Main) -->
+    <div class="view-days" *ngIf="viewMode === 'days'">
+      <div class="day-names">
+        <span *ngFor="let day of dayNames">{{ day }}</span>
+      </div>
+      <div class="days-grid">
+        <!-- Empty slots for previous month -->
+        <div *ngFor="let p of paddingDays" class="day padding"></div>
+        
+        <!-- Actual days -->
+        <div 
+          *ngFor="let day of daysInMonth" 
+          class="day" 
+          [class.today]="isToday(day)"
+          [class.selected]="isSelected(day)"
+          (click)="selectDate(day)"
+        >
+          {{ day }}
+        </div>
+      </div>
+    </div>
+
+    <!-- View: Months Grid -->
+    <div class="view-months" *ngIf="viewMode === 'months'">
+      <div class="months-grid">
+        <button 
+          *ngFor="let m of months; let i = index" 
+          (click)="setMonth(i)"
+          [class.active]="viewDate.getMonth() === i"
+        >
+          {{ m }}
+        </button>
+      </div>
+    </div>
+
+    <!-- View: Years Grid -->
+    <div class="view-years" *ngIf="viewMode === 'years'">
+      <div class="years-header">
+        <button (click)="changeYearRange(-1)">«</button>
+        <span>{{ yearRangeStart + 543 }} - {{ yearRangeStart + 11 + 543 }}</span>
+        <button (click)="changeYearRange(1)">»</button>
+      </div>
+      <div class="years-grid">
+        <button 
+          *ngFor="let y of years" 
+          (click)="setYear(y)"
+          [class.active]="viewDate.getFullYear() === y"
+        >
+          {{ y + 543 }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="calendar-footer">
+      <button class="today-btn" (click)="setToday()">วันนี้</button>
+    </div>
+  </div>
+</div>

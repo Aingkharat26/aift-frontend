@@ -1,0 +1,28 @@
+<div class="dashboard-wrapper">
+  <header class="header">
+    <div class="header-top">
+      <div class="logo-group">
+        <div class="logo">AI Finance Tracker</div>
+        <div class="subtitle">บันทึกรายจ่ายด้วย AI ใน 3 วินาที</div>
+      </div>
+      <div class="date-group">
+        <app-date-selector></app-date-selector>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="top-section">
+      <div class="chart-section">
+        <app-summary-chart></app-summary-chart>
+      </div>
+      <div class="log-section">
+        <app-daily-log></app-daily-log>
+      </div>
+    </div>
+    
+    <div class="bottom-section">
+      <app-chat-input></app-chat-input>
+    </div>
+  </main>
+</div>

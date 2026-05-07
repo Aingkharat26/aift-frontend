@@ -1,0 +1,26 @@
+<div class="chat-input-container">
+  <input
+    type="text"
+    [(ngModel)]="text"
+    (keyup.enter)="onSubmit()"
+    placeholder="พิมพ์รายจ่ายของคุณ"
+    [disabled]="isLoading"
+    class="chat-input"
+  />
+  <button (click)="onSubmit()" [disabled]="isLoading || !text.trim()" class="send-btn">
+    {{ isLoading ? 'กำลังบันทึก...' : 'บันทึก' }}
+  </button>
+</div>
+
+<!-- Dialog สำหรับแจ้งสถานะ AI / Error -->
+<dialog #statusDialog class="modal-dialog">
+  <div class="dialog-content">
+    <div class="status-icon">{{ statusData.icon }}</div>
+    <h3>{{ statusData.title }}</h3>
+    <p>{{ statusData.message }}</p>
+
+    <div class="dialog-actions">
+      <button class="btn-confirm" (click)="statusDialog.close()">ตกลง</button>
+    </div>
+  </div>
+</dialog>

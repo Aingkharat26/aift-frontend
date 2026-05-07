@@ -1,0 +1,23 @@
+<div class="chart-container">
+  <h2 class="title">สรุปรายจ่ายเดือน {{ getMonthLabel() }}</h2>
+  <div class="total-spent" *ngIf="!loading">
+    ฿{{ getTotalSpent() | number:'1.0-0' }}
+  </div>
+  
+  <div class="empty-state" *ngIf="!loading && !hasData()">
+    ยังไม่มีข้อมูลสำหรับเดือนนี้
+  </div>
+
+  <div class="loading-state" *ngIf="loading">
+    <div class="spinner"></div>
+    <span>กำลังโหลดข้อมูล...</span>
+  </div>
+
+  <div class="chart-wrapper" *ngIf="!loading && hasData()">
+    <canvas baseChart #chart="base-chart"
+      [data]="pieChartData"
+      [options]="pieChartOptions"
+      [type]="pieChartType">
+    </canvas>
+  </div>
+</div>

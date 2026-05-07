@@ -1,0 +1,64 @@
+<div class="daily-log-container">
+  <h2 class="title">รายการของวันที่ {{ getSelectedDateLabel() }}</h2>
+
+  <div class="loading-state" *ngIf="loading">
+    <div class="spinner"></div>
+    <span>กำลังโหลดรายการ...</span>
+  </div>
+
+  <div class="empty-state" *ngIf="!loading && (expenseService.expenses$ | async)?.length === 0">
+    ยังไม่มีรายการใช้จ่ายสำหรับวันนี้ พิมพ์ด้านล่างเพื่อเริ่มบันทึกเลย!
+  </div>
+
+  <div class="expense-list" *ngIf="!loading && (expenseService.expenses$ | async) as expenses">
+    <div class="expense-item" *ngFor="let exp of expenses">
+      <div class="item-icon" [ngClass]="getCategoryClass(exp.category)">
+        {{ getCategoryIcon(exp.category) }}
+      </div>
+      <div class="item-details">
+        <div class="item-name">{{ exp.item }}</div>
+        <div class="item-category">{{ exp.category }}</div>
+      </div>
+      <div class="item-amount">-{{ exp.amount | currency: 'THB' : 'symbol' : '1.0-0' }}</div>
+      <button
+        class="delete-btn"
+        (click)="deleteExpense(exp, confirmDialog)"
+        title="ลบรายการนี้"
+      >
+        <span class="icon-wrapper">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M3 6h18"></path>
+            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+            <line x1="10" y1="11" x2="10" y2="17"></line>
+            <line x1="14" y1="11" x2="14" y2="17"></line>
+          </svg>
+        </span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<dialog #confirmDialog class="modal-dialog">
+  <div class="dialog-content">
+    <h3>ยืนยันการลบรายการ</h3>
+    <p>
+      คุณต้องการลบรายการ <strong>"{{ selectedExpense?.item }}"</strong> ใช่หรือไม่?
+    </p>
+
+    <div class="dialog-actions">
+      <button class="btn-cancel" (click)="confirmDialog.close()">ยกเลิก</button>
+      <button class="btn-confirm" (click)="onConfirmDelete(confirmDialog)">ยืนยัน</button>
+    </div>
+  </div>
+</dialog>
