@@ -3,16 +3,24 @@ import { CommonModule } from '@angular/common';
 import { ChatInputComponent } from '../chat-input/chat-input.component';
 import { DailyLogComponent } from '../daily-log/daily-log.component';
 import { SummaryChartComponent } from '../summary-chart/summary-chart.component';
+import { DateSelectorComponent } from '../date-selector/date-selector.component';
 
 @Component({
   selector: 'app-main-dashboard',
   standalone: true,
-  imports: [CommonModule, ChatInputComponent, DailyLogComponent, SummaryChartComponent],
+  imports: [CommonModule, ChatInputComponent, DailyLogComponent, SummaryChartComponent, DateSelectorComponent],
   template: `
     <div class="dashboard-wrapper">
       <header class="header">
-        <div class="logo">AI Finance Tracker</div>
-        <div class="subtitle">บันทึกรายจ่ายด้วย AI ใน 3 วินาที</div>
+        <div class="header-top">
+          <div class="logo-group">
+            <div class="logo">AI Finance Tracker</div>
+            <div class="subtitle">บันทึกรายจ่ายด้วย AI ใน 3 วินาที</div>
+          </div>
+          <div class="date-group">
+            <app-date-selector></app-date-selector>
+          </div>
+        </div>
       </header>
 
       <main class="main-content">
@@ -41,22 +49,31 @@ import { SummaryChartComponent } from '../summary-chart/summary-chart.component'
       flex-direction: column;
     }
     .header {
-      text-align: center;
       margin-bottom: 30px;
       padding-top: 20px;
     }
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .logo-group {
+      text-align: left;
+    }
     .logo {
-      font-size: 2.5rem;
+      font-size: 2rem;
       font-weight: 800;
       color: var(--text-color);
       background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      margin-bottom: 8px;
+      margin-bottom: 4px;
     }
     .subtitle {
       color: var(--text-muted);
-      font-size: 1.1rem;
+      font-size: 0.95rem;
     }
     .main-content {
       flex: 1;

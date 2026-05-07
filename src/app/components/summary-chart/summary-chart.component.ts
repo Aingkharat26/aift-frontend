@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
@@ -7,20 +7,25 @@ import { ExpenseService } from '../../services/expense.service';
 @Component({
   selector: 'app-summary-chart',
   standalone: true,
-  imports: [CommonModule, BaseChartDirective, CurrencyPipe],
+  imports: [CommonModule, BaseChartDirective],
   template: `
     <div class="chart-container">
-      <h2 class="title">สรุปรายจ่ายเดือนนี้</h2>
-      <div class="total-spent">
+      <h2 class="title">สรุปรายจ่ายเดือน {{ getMonthLabel() }}</h2>
+      <div class="total-spent" *ngIf="!loading">
         ฿{{ getTotalSpent() | number:'1.0-0' }}
       </div>
       
-      <div class="empty-state" *ngIf="!hasData()">
+      <div class="empty-state" *ngIf="!loading && !hasData()">
         ยังไม่มีข้อมูลสำหรับเดือนนี้
       </div>
 
-      <div class="chart-wrapper" *ngIf="hasData()">
-        <canvas baseChart
+      <div class="loading-state" *ngIf="loading">
+        <div class="spinner"></div>
+        <span>กำลังโหลดข้อมูล...</span>
+      </div>
+
+      <div class="chart-wrapper" *ngIf="!loading && hasData()">
+        <canvas baseChart #chart="base-chart"
           [data]="pieChartData"
           [options]="pieChartOptions"
           [type]="pieChartType">
@@ -69,10 +74,31 @@ import { ExpenseService } from '../../services/expense.service';
       justify-content: center;
       align-items: center;
     }
+    .loading-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      padding: 40px;
+      color: var(--text-muted);
+    }
+    .spinner {
+      width: 30px;
+      height: 30px;
+      border: 3px solid #f1f5f9;
+      border-top-color: #0ea5e9;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
   `]
 })
 export class SummaryChartComponent implements OnInit {
   expenseService = inject(ExpenseService);
+  
+  @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
 
   private categoryColors: Record<string, string> = {
     'อาหาร': '#ef4444',
@@ -111,11 +137,30 @@ export class SummaryChartComponent implements OnInit {
   public pieChartType: ChartType = 'doughnut';
   
   private totalSpent = 0;
+  private currentMonth = new Date();
+  public loading = true;
+
+  private lastLoadedMonth?: number;
+  private lastLoadedYear?: number;
 
   ngOnInit() {
-    this.expenseService.loadMonthlySummary();
+    this.expenseService.selectedDate$.subscribe(date => {
+      const m = date.getMonth();
+      const y = date.getFullYear();
+      
+      // Only show loading if we actually switched months
+      if (m !== this.lastLoadedMonth || y !== this.lastLoadedYear) {
+        this.loading = true;
+      }
+      this.currentMonth = date;
+    });
+
     this.expenseService.summary$.subscribe(summary => {
       this.totalSpent = summary.reduce((sum, item) => sum + item.total, 0);
+      
+      // Set these to track what's currently in the chart
+      this.lastLoadedMonth = this.currentMonth.getMonth();
+      this.lastLoadedYear = this.currentMonth.getFullYear();
 
       const chartLabels = summary.map(s => s.category);
       const chartData = summary.map(s => s.total);
@@ -129,6 +174,15 @@ export class SummaryChartComponent implements OnInit {
           backgroundColor: chartColors
         }]
       };
+
+      this.loading = false;
+
+      // Force chart update
+      setTimeout(() => {
+        if (this.chart) {
+          this.chart.update();
+        }
+      }, 0);
     });
   }
 
@@ -138,5 +192,12 @@ export class SummaryChartComponent implements OnInit {
 
   getTotalSpent(): number {
     return this.totalSpent;
+  }
+
+  getMonthLabel(): string {
+    return this.currentMonth.toLocaleDateString('th-TH', { 
+      month: 'long', 
+      year: 'numeric' 
+    });
   }
 }

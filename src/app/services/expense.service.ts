@@ -22,31 +22,81 @@ export class ExpenseService {
   private http = inject(HttpClient);
   private apiUrl = 'http://localhost:3000/expenses';
 
+  constructor() {
+    this.setSelectedDate(new Date());
+  }
+
   private expensesSubject = new BehaviorSubject<Expense[]>([]);
   public expenses$ = this.expensesSubject.asObservable();
 
   private summarySubject = new BehaviorSubject<CategorySummary[]>([]);
   public summary$ = this.summarySubject.asObservable();
 
-  loadDailyExpenses() {
-    this.http.get<{success: boolean, data: Expense[]}>(`${this.apiUrl}/daily`)
-      .subscribe(res => {
-        if (res.success) this.expensesSubject.next(res.data);
+  private selectedDateSubject = new BehaviorSubject<Date>(new Date());
+  public selectedDate$ = this.selectedDateSubject.asObservable();
+
+  private prevYear?: number;
+  private prevMonth?: number;
+
+
+  setSelectedDate(date: Date) {
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const dateStr = this.formatDate(date);
+
+    this.selectedDateSubject.next(date);
+    
+    // Trigger daily expenses load
+    this.loadDailyExpenses(dateStr);
+
+    // Trigger summary load if month/year changed
+    if (year !== this.prevYear || month !== this.prevMonth) {
+      this.prevYear = year;
+      this.prevMonth = month;
+      this.loadMonthlySummary(year, month);
+    }
+  }
+
+  // Use simple methods that just perform the HTTP call and update the subject.
+  // To really avoid race conditions with multiple clicks, we'll use a local 'latest' check.
+  private dailyReqCount = 0;
+  loadDailyExpenses(date: string) {
+    const reqId = ++this.dailyReqCount;
+    this.http.get<{success: boolean, data: Expense[]}>(`${this.apiUrl}/daily?date=${date}`)
+      .subscribe({
+        next: (res) => {
+          if (reqId === this.dailyReqCount && res.success) {
+            this.expensesSubject.next(res.data);
+          }
+        },
+        error: () => {
+          if (reqId === this.dailyReqCount) this.expensesSubject.next([]);
+        }
       });
   }
 
-  loadMonthlySummary() {
-    this.http.get<{success: boolean, data: CategorySummary[]}>(`${this.apiUrl}/summary`)
-      .subscribe(res => {
-        if (res.success) this.summarySubject.next(res.data);
+  private summaryReqCount = 0;
+  loadMonthlySummary(year: number, month: number) {
+    const reqId = ++this.summaryReqCount;
+    this.http.get<{success: boolean, data: CategorySummary[]}>(`${this.apiUrl}/summary?year=${year}&month=${month}`)
+      .subscribe({
+        next: (res) => {
+          if (reqId === this.summaryReqCount && res.success) {
+            this.summarySubject.next(res.data);
+          }
+        },
+        error: () => {
+          if (reqId === this.summaryReqCount) this.summarySubject.next([]);
+        }
       });
   }
 
   processChat(text: string): Observable<any> {
     return this.http.post<{success: boolean, data: Expense}>(`${this.apiUrl}/chat`, { text }).pipe(
       tap(() => {
-        this.loadDailyExpenses();
-        this.loadMonthlySummary();
+        const current = this.selectedDateSubject.value;
+        this.loadDailyExpenses(this.formatDate(current));
+        this.loadMonthlySummary(current.getFullYear(), current.getMonth() + 1);
       })
     );
   }
@@ -54,9 +104,14 @@ export class ExpenseService {
   deleteExpense(id: number): Observable<any> {
     return this.http.delete<{success: boolean}>(`${this.apiUrl}/${id}`).pipe(
       tap(() => {
-        this.loadDailyExpenses();
-        this.loadMonthlySummary();
+        const current = this.selectedDateSubject.value;
+        this.loadDailyExpenses(this.formatDate(current));
+        this.loadMonthlySummary(current.getFullYear(), current.getMonth() + 1);
       })
     );
+  }
+
+  private formatDate(date: Date): string {
+    return date.toISOString().split('T')[0];
   }
 }

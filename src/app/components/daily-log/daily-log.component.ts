@@ -8,13 +8,18 @@ import { ExpenseService } from '../../services/expense.service';
   imports: [CommonModule, CurrencyPipe],
   template: `
     <div class="daily-log-container">
-      <h2 class="title">รายการใช้จ่ายวันนี้</h2>
+      <h2 class="title">รายการของวันที่ {{ getSelectedDateLabel() }}</h2>
 
-      <div class="empty-state" *ngIf="(expenseService.expenses$ | async)?.length === 0">
+      <div class="loading-state" *ngIf="loading">
+        <div class="spinner"></div>
+        <span>กำลังโหลดรายการ...</span>
+      </div>
+
+      <div class="empty-state" *ngIf="!loading && (expenseService.expenses$ | async)?.length === 0">
         ยังไม่มีรายการใช้จ่ายสำหรับวันนี้ พิมพ์ด้านล่างเพื่อเริ่มบันทึกเลย!
       </div>
 
-      <div class="expense-list" *ngIf="expenseService.expenses$ | async as expenses">
+      <div class="expense-list" *ngIf="!loading && (expenseService.expenses$ | async) as expenses">
         <div class="expense-item" *ngFor="let exp of expenses">
           <div class="item-icon" [ngClass]="getCategoryClass(exp.category)">
             {{ getCategoryIcon(exp.category) }}
@@ -225,6 +230,27 @@ import { ExpenseService } from '../../services/expense.service';
         background: #f1f5f9;
         color: #94a3b8;
       }
+      .loading-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        padding: 40px;
+        color: var(--text-muted);
+      }
+      .spinner {
+        width: 30px;
+        height: 30px;
+        border: 3px solid #f1f5f9;
+        border-top-color: #0ea5e9;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
 
       /*Dialog*/
       .modal-dialog {
@@ -293,10 +319,31 @@ import { ExpenseService } from '../../services/expense.service';
 })
 export class DailyLogComponent implements OnInit {
   expenseService = inject(ExpenseService);
-  selectedExpense: any = null; // เก็บรายการที่เลือกจะลบ
+  selectedExpense: any = null;
+  currentDate = new Date();
+  public loading = true;
 
   ngOnInit() {
-    this.expenseService.loadDailyExpenses();
+    this.expenseService.selectedDate$.subscribe((date) => {
+      this.currentDate = date;
+      this.loading = true;
+    });
+
+    this.expenseService.expenses$.subscribe(() => {
+      this.loading = false;
+    });
+  }
+
+  getSelectedDateLabel(): string {
+    const today = new Date();
+    if (this.currentDate.toDateString() === today.toDateString()) {
+      return 'วันนี้';
+    }
+    return this.currentDate.toLocaleDateString('th-TH', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    });
   }
 
   deleteExpense(exp: any, dialog: HTMLDialogElement) {
@@ -309,7 +356,6 @@ export class DailyLogComponent implements OnInit {
 
     this.expenseService.deleteExpense(this.selectedExpense.id).subscribe({
       next: () => {
-        this.expenseService.loadDailyExpenses();
         dialog.close();
         this.selectedExpense = null;
       },
