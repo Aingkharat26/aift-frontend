@@ -26,9 +26,32 @@ import { ExpenseService } from '../../services/expense.service';
           <div class="item-amount">
             -{{ exp.amount | currency:'THB':'symbol':'1.0-0' }}
           </div>
+          <button class="delete-btn" (click)="deleteExpense(exp, confirmDialog)" title="ลบรายการนี้">
+            <span class="icon-wrapper">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 6h18"></path>
+                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                <line x1="10" y1="11" x2="10" y2="17"></line>
+                <line x1="14" y1="11" x2="14" y2="17"></line>
+              </svg>
+            </span>
+          </button>
         </div>
       </div>
     </div>
+
+    <dialog #confirmDialog class="modal-dialog">
+      <div class="dialog-content">
+        <h3>ยืนยันการลบรายการ</h3>
+        <p>คุณต้องการลบรายการ <strong>"{{ selectedExpense?.item }}"</strong> ใช่หรือไม่?</p>
+        
+        <div class="dialog-actions">
+          <button class="btn-cancel" (click)="confirmDialog.close()">ยกเลิก</button>
+          <button class="btn-confirm" (click)="onConfirmDelete(confirmDialog)">ยืนยัน</button>
+        </div>
+      </div>
+    </dialog>
   `,
   styles: [`
     .daily-log-container {
@@ -62,14 +85,10 @@ import { ExpenseService } from '../../services/expense.service';
     .expense-item {
       display: flex;
       align-items: center;
-      padding: 16px;
+      padding: 12px 16px;
       background: var(--bg-color);
       border-radius: 12px;
-      transition: transform 0.2s ease;
-      
-      &:hover {
-        transform: scale(1.02);
-      }
+      position: relative;
     }
     .item-icon {
       width: 48px;
@@ -97,7 +116,61 @@ import { ExpenseService } from '../../services/expense.service';
     .item-amount {
       font-weight: 700;
       font-size: 1.1rem;
-      color: #ef4444; /* red */
+      color: #ef4444;
+      margin-right: 8px;
+    }
+
+    .delete-btn {
+      opacity: 0;
+      pointer-events: auto;
+      background: #ffffff;
+      border: 1px solid #fecaca;
+      border-radius: 10px;
+      width: 35px;
+      height: 35px; 
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+      color: #ef4444;
+    }
+    .delete-btn:hover {
+      background: #ffffff;
+      border-color: #ef4444;  
+      transform: scale(1.15);
+    }
+
+    @media (hover: hover) {
+      .delete-btn {
+        opacity: 0;
+        pointer-events: none;
+      }
+      .expense-item:hover .delete-btn {
+        opacity: 1;
+        pointer-events: auto;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .delete-btn {
+        opacity: 1;
+        border-color: #fee2e2;
+        background: transparent;
+        width: 32px;
+        height: 32px;
+      }
+      
+      .item-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+      }
+      
+      .item-amount {
+        font-size: 1rem;
+      }
     }
 
     /* Category colors */
@@ -109,13 +182,88 @@ import { ExpenseService } from '../../services/expense.service';
     .cat-health { background: #dcfce7; color: #22c55e; }
     .cat-bills { background: #e2e8f0; color: #64748b; }
     .cat-other { background: #f1f5f9; color: #94a3b8; }
+
+    /*Dialog*/
+    .modal-dialog {
+      border: none;
+      border-radius: 20px;
+      padding: 0;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      max-width: 90%;
+      width: 320px;
+      margin: auto; 
+      position: fixed;
+      inset: 0;
+
+      &::backdrop {
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(4px);
+      }
+    }
+
+    .dialog-content {
+      padding: 24px;
+      text-align: center;
+
+      h3 { margin-top: 0; color: #1e293b; }
+      p { color: #334155; margin-bottom: 24px; }
+    }
+
+    .dialog-actions {
+      display: flex;
+      gap: 12px;
+
+      button {
+        flex: 1;
+        padding: 12px;
+        border-radius: 12px;
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+    }
+
+    .btn-cancel {
+      background: #f1f5f9;
+      color: #64748b;
+      &:hover { background: #e2e8f0; }
+    }
+
+    .btn-confirm {
+      background: #ef4444;
+      color: white;
+      &:hover { background: #dc2626; }
+    }
   `]
 })
 export class DailyLogComponent implements OnInit {
   expenseService = inject(ExpenseService);
-
+  selectedExpense: any = null; // เก็บรายการที่เลือกจะลบ
+  
   ngOnInit() {
     this.expenseService.loadDailyExpenses();
+  }
+
+  deleteExpense(exp: any, dialog: HTMLDialogElement) {
+    this.selectedExpense = exp;
+    dialog.showModal(); 
+  }
+
+  onConfirmDelete(dialog: HTMLDialogElement) {
+    if (!this.selectedExpense) return;
+    
+    this.expenseService.deleteExpense(this.selectedExpense.id).subscribe({
+      next: () => {
+        this.expenseService.loadDailyExpenses(); 
+        dialog.close();
+        this.selectedExpense = null;
+      },
+      error: (err) => {
+        console.error('Error deleting expense:', err);
+        alert('เกิดข้อผิดพลาดในการลบรายการ');
+      }
+    });
   }
 
   getCategoryIcon(category: string): string {

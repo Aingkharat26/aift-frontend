@@ -11,7 +11,7 @@ import { SummaryChartComponent } from '../summary-chart/summary-chart.component'
   template: `
     <div class="dashboard-wrapper">
       <header class="header">
-        <div class="logo">🏦 AI Finance Tracker</div>
+        <div class="logo">AI Finance Tracker</div>
         <div class="subtitle">บันทึกรายจ่ายด้วย AI ใน 3 วินาที</div>
       </header>
 

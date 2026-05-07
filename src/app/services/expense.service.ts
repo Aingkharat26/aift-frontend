@@ -50,4 +50,13 @@ export class ExpenseService {
       })
     );
   }
+
+  deleteExpense(id: number): Observable<any> {
+    return this.http.delete<{success: boolean}>(`${this.apiUrl}/${id}`).pipe(
+      tap(() => {
+        this.loadDailyExpenses();
+        this.loadMonthlySummary();
+      })
+    );
+  }
 }
