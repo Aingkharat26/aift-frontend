@@ -9,14 +9,14 @@ import { IncomeService } from '../../services/income.service';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './chat-input.component.html',
-  styleUrl: './chat-input.component.css'
+  styleUrl: './chat-input.component.css',
 })
 export class ChatInputComponent {
   text = '';
   incomeText = '';
   isLoading = false;
   isIncomeLoading = false;
-  
+
   private expenseService = inject(ExpenseService);
   private incomeService = inject(IncomeService);
   private cdr = inject(ChangeDetectorRef);
@@ -54,7 +54,9 @@ export class ChatInputComponent {
         this.isLoading = false;
         this.text = '';
         if (res?.amount === 0) {
-          this.showStatus('บันทึกแล้ว', 'แต่ระบบไม่พบจำนวนเงินในข้อความนี้', '⚠️');
+          this.showStatus('บันทึกเรียบร้อย', 'แต่ระบบไม่พบจำนวนเงินในข้อความนี้', '⚠️');
+        } else {
+          this.showStatus('บันทึกเรียบร้อย', 'เพิ่มรายการรายจ่ายสำเร็จ', '💸');
         }
       },
       error: (err) => {
@@ -87,14 +89,14 @@ export class ChatInputComponent {
       next: (res: any) => {
         this.isIncomeLoading = false;
         this.incomeText = '';
-        
+
         // Refresh all data
         this.expenseService.refreshDailyLogs();
-        
+
         if (res?.amount === 0) {
-          this.showStatus('บันทึกแล้ว', 'แต่ระบบไม่พบจำนวนเงินในข้อความนี้', '⚠️');
+          this.showStatus('บันทึกเรียบร้อย', 'แต่ระบบไม่พบจำนวนเงินในข้อความนี้', '⚠️');
         } else {
-          this.showStatus('บันทึกรายรับแล้ว', 'เพิ่มรายรับเรียบร้อยครับ', '💰');
+          this.showStatus('บันทึกเรียบร้อย', 'เพิ่มรายรับเรียบร้อย', '💰');
         }
       },
       error: (err) => {
@@ -103,13 +105,17 @@ export class ChatInputComponent {
         const status = err.status;
 
         if (errorMessage === 'AI_COULD_NOT_UNDERSTAND') {
-          this.showStatus('อ่านไม่ออก', 'รบกวนพิมพ์ใหม่อีกครั้ง เช่น "เงินเดือน 50000" นะครับ', '🤔');
+          this.showStatus(
+            'อ่านไม่ออก',
+            'รบกวนพิมพ์ใหม่อีกครั้ง เช่น "เงินเดือน 50000" นะครับ',
+            '🤔',
+          );
         } else if (status === 429) {
           this.showStatus('โควตาเต็ม', 'ตอนนี้ AI ยุ่งมาก รบกวนรอสักครู่ครับ', '⏳');
         } else {
           this.showStatus('เกิดข้อผิดพลาด', 'ไม่สามารถบันทึกรายรับได้', '❌');
         }
-      }
+      },
     });
   }
 
