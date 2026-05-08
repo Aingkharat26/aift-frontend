@@ -1,11 +1,12 @@
 :host {
-  --primary: #0ea5e9;
-  --primary-soft: #e0f2fe;
-  --text: #1e293b;
-  --text-muted: #64748b;
-  --bg: #ffffff;
-  --border: #e2e8f0;
-  --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  --primary: #38bdf8;
+  --primary-soft: rgba(56, 189, 248, 0.1);
+  --text: #f8fafc;
+  --text-muted: #94a3b8;
+  --bg: #0f172a; /* Deep Navy/Black */
+  --bg-card: #1e293b; /* Slate */
+  --border: rgba(255, 255, 255, 0.1);
+  --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
 }
 
 .datepicker-container {
@@ -17,19 +18,19 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  background: var(--bg);
+  background: var(--bg-card);
   padding: 10px 18px;
   border-radius: 14px;
   border: 1px solid var(--border);
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .datepicker-trigger:hover,
 .datepicker-trigger.active {
   border-color: var(--primary);
-  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.15);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
   transform: translateY(-1px);
 }
 
@@ -58,24 +59,25 @@
   position: absolute;
   top: calc(100% + 12px);
   right: 0;
-  width: 300px;
+  width: 310px;
   background: var(--bg);
-  border-radius: 20px;
+  border-radius: 24px;
   border: 1px solid var(--border);
   box-shadow: var(--shadow);
-  padding: 20px;
+  padding: 24px;
   z-index: 1000;
-  animation: slideIn 0.2s ease-out;
+  backdrop-filter: blur(20px);
+  animation: slideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 @keyframes slideIn {
   from {
     opacity: 0;
-    transform: translateY(-10px);
+    transform: translateY(-10px) scale(0.95);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -88,9 +90,9 @@
 
 .header-labels {
   display: flex;
-  gap: 8px;
+  gap: 4px;
   font-weight: 800;
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   color: var(--text);
 }
 
@@ -99,7 +101,7 @@
   cursor: pointer;
   padding: 4px 8px;
   border-radius: 8px;
-  transition: background 0.2s;
+  transition: all 0.2s;
 }
 
 .month-label:hover,
@@ -109,23 +111,23 @@
 }
 
 .nav-btn {
-  background: var(--primary-soft);
-  border: none;
-  width: 32px;
-  height: 32px;
-  border-radius: 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
   color: var(--primary);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.7rem;
   transition: all 0.2s;
 }
 
 .nav-btn:hover {
   background: var(--primary);
   color: white;
+  border-color: var(--primary);
 }
 
 /* Days View */
@@ -136,13 +138,13 @@
   font-weight: 700;
   font-size: 0.75rem;
   color: var(--text-muted);
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .days-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
+  gap: 6px;
 }
 
 .day {
@@ -151,41 +153,32 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  border-radius: 10px;
+  border-radius: 12px;
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   color: var(--text);
   transition: all 0.2s;
 }
 
 .day:hover:not(.padding) {
-  background: var(--primary-soft);
+  background: var(--bg-card);
   color: var(--primary);
 }
 
 .day.selected {
   background: var(--primary) !important;
   color: white !important;
-  box-shadow: 0 4px 10px rgba(14, 165, 233, 0.4);
+  box-shadow: 0 8px 16px rgba(56, 189, 248, 0.4);
 }
 
 .day.today {
   color: var(--primary);
-  position: relative;
-}
-
-.day.today::after {
-  content: '';
-  position: absolute;
-  bottom: 6px;
-  width: 4px;
-  height: 4px;
-  background: var(--primary);
-  border-radius: 50%;
+  background: var(--primary-soft);
 }
 
 .day.padding {
   cursor: default;
+  opacity: 0.2;
 }
 
 /* Month/Year Grids */
@@ -193,15 +186,15 @@
 .years-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  gap: 10px;
 }
 
 .months-grid button,
 .years-grid button {
-  padding: 12px 8px;
+  padding: 14px 8px;
   border: 1px solid var(--border);
-  background: white;
-  border-radius: 12px;
+  background: var(--bg-card);
+  border-radius: 14px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
@@ -222,43 +215,27 @@
   border-color: var(--primary);
 }
 
-.years-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-  font-weight: 700;
-  color: var(--text-muted);
-}
-
-.years-header button {
-  background: none;
-  border: none;
-  font-size: 1.2rem;
-  cursor: pointer;
-  color: var(--primary);
-}
-
 /* Footer */
 .calendar-footer {
-  margin-top: 20px;
-  padding-top: 15px;
+  margin-top: 24px;
+  padding-top: 16px;
   border-top: 1px solid var(--border);
   display: flex;
   justify-content: center;
 }
 
 .today-btn {
-  background: none;
-  border: none;
+  background: var(--primary-soft);
+  border: 1px solid var(--primary);
   color: var(--primary);
   font-weight: 700;
   cursor: pointer;
-  padding: 5px 15px;
-  border-radius: 8px;
-  transition: background 0.2s;
+  padding: 8px 20px;
+  border-radius: 12px;
+  transition: all 0.2s;
 }
 
 .today-btn:hover {
-  background: var(--primary-soft);
+  background: var(--primary);
+  color: white;
 }

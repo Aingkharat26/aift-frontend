@@ -1,15 +1,43 @@
-<div class="chat-input-container">
-  <input
-    type="text"
-    [(ngModel)]="text"
-    (keyup.enter)="onSubmit()"
-    placeholder="พิมพ์รายจ่ายของคุณ"
-    [disabled]="isLoading"
-    class="chat-input"
-  />
-  <button (click)="onSubmit()" [disabled]="isLoading || !text.trim()" class="send-btn">
-    {{ isLoading ? 'กำลังบันทึก...' : 'บันทึก' }}
-  </button>
+<div class="inputs-grid">
+  <!-- ส่วนรายจ่าย (AI) -->
+  <div class="input-card expense-section">
+    <div class="card-header">
+      <span class="icon">💸</span> รายจ่าย (AI)
+    </div>
+    <div class="chat-input-container">
+      <input
+        type="text"
+        [(ngModel)]="text"
+        (keyup.enter)="onSubmit()"
+        placeholder="พิมพ์รายจ่ายของคุณ (เช่น ข้าวผัด 50)"
+        [disabled]="isLoading"
+        class="chat-input"
+      />
+      <button (click)="onSubmit()" [disabled]="isLoading || !text.trim()" class="send-btn">
+        {{ isLoading ? '...' : 'บันทึก' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- ส่วนรายรับ -->
+  <div class="input-card income-section">
+    <div class="card-header">
+      <span class="icon">💰</span> รายรับ
+    </div>
+    <div class="income-input-container">
+      <input
+        type="text"
+        [(ngModel)]="incomeText"
+        (keyup.enter)="onAddIncome()"
+        placeholder="พิมพ์รายรับของคุณ (เช่น ขายของ 500)"
+        [disabled]="isIncomeLoading"
+        class="chat-input"
+      />
+      <button (click)="onAddIncome()" [disabled]="isIncomeLoading || !incomeText.trim()" class="send-btn income-btn">
+        {{ isIncomeLoading ? '...' : 'บันทึก' }}
+      </button>
+    </div>
+  </div>
 </div>
 
 <!-- Dialog สำหรับแจ้งสถานะ AI / Error -->

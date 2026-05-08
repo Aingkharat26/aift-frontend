@@ -29,6 +29,10 @@ export class ExpenseService {
   private expensesSubject = new BehaviorSubject<Expense[]>([]);
   public expenses$ = this.expensesSubject.asObservable();
 
+  get currentExpenses(): Expense[] {
+    return this.expensesSubject.value;
+  }
+
   private summarySubject = new BehaviorSubject<CategorySummary[]>([]);
   public summary$ = this.summarySubject.asObservable();
 
@@ -38,23 +42,24 @@ export class ExpenseService {
   private prevYear?: number;
   private prevMonth?: number;
 
+  getSelectedDate(): Date {
+    return this.selectedDateSubject.value;
+  }
+
+
+  refreshDailyLogs() {
+    const current = this.selectedDateSubject.value;
+    const dateStr = this.formatDate(current);
+    this.loadDailyExpenses(dateStr);
+    this.loadMonthlySummary(current.getFullYear(), current.getMonth() + 1);
+  }
 
   setSelectedDate(date: Date) {
     const year = date.getFullYear();
     const month = date.getMonth() + 1;
-    const dateStr = this.formatDate(date);
-
-    this.selectedDateSubject.next(date);
     
-    // Trigger daily expenses load
-    this.loadDailyExpenses(dateStr);
-
-    // Trigger summary load if month/year changed
-    if (year !== this.prevYear || month !== this.prevMonth) {
-      this.prevYear = year;
-      this.prevMonth = month;
-      this.loadMonthlySummary(year, month);
-    }
+    this.selectedDateSubject.next(date);
+    this.refreshDailyLogs();
   }
 
   // Use simple methods that just perform the HTTP call and update the subject.

@@ -1,6 +1,8 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { ExpenseService } from '../../services/expense.service';
+import { IncomeService } from '../../services/income.service';
+import { forkJoin, map, Observable, of } from 'rxjs';
 
 @Component({
   selector: 'app-daily-log',
@@ -11,18 +13,55 @@ import { ExpenseService } from '../../services/expense.service';
 })
 export class DailyLogComponent implements OnInit {
   expenseService = inject(ExpenseService);
-  selectedExpense: any = null;
+  incomeService = inject(IncomeService);
+  private cdr = inject(ChangeDetectorRef);
+  
+  combinedLogs: any[] = [];
+  selectedItem: any = null;
   currentDate = new Date();
   public loading = true;
 
   ngOnInit() {
     this.expenseService.selectedDate$.subscribe((date) => {
       this.currentDate = date;
-      this.loading = true;
+      this.loadCombinedLogs();
     });
 
+    // Refresh when expenses change (e.g. after adding via chat)
     this.expenseService.expenses$.subscribe(() => {
-      this.loading = false;
+      this.loadCombinedLogs();
+    });
+  }
+
+  loadCombinedLogs() {
+    this.loading = true;
+    
+    // Use local date parts instead of toISOString() to avoid UTC shift
+    const y = this.currentDate.getFullYear();
+    const m = String(this.currentDate.getMonth() + 1).padStart(2, '0');
+    const d = String(this.currentDate.getDate()).padStart(2, '0');
+    const dateStr = `${y}-${m}-${d}`;
+    
+    // Use of() to get current value of BehaviorSubject or pipe with take(1)
+    forkJoin({
+      expenses: of(this.expenseService.currentExpenses),
+      income: this.incomeService.getDailyIncome(dateStr)
+    }).subscribe({
+      next: (res: { expenses: any[], income: any[] }) => {
+        const expenses = res.expenses.map((e: any) => ({ ...e, type: 'expense' }));
+        const income = res.income.map((i: any) => ({ ...i, type: 'income', name: i.source, category: 'รายรับ' }));
+        
+        this.combinedLogs = [...expenses, ...income].sort((a, b) => 
+          new Date(b.date).getTime() - new Date(a.date).getTime()
+        );
+        this.loading = false;
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => {
+        console.error('Error loading logs:', err);
+        this.loading = false;
+        this.cdr.detectChanges();
+      }
     });
   }
 
@@ -38,21 +77,34 @@ export class DailyLogComponent implements OnInit {
     });
   }
 
-  deleteExpense(exp: any, dialog: HTMLDialogElement) {
-    this.selectedExpense = exp;
+  deleteItem(item: any, dialog: HTMLDialogElement) {
+    this.selectedItem = item;
     dialog.showModal();
   }
 
   onConfirmDelete(dialog: HTMLDialogElement) {
-    if (!this.selectedExpense) return;
+    if (!this.selectedItem) return;
 
-    this.expenseService.deleteExpense(this.selectedExpense.id).subscribe({
+    const isIncome = this.selectedItem.type === 'income';
+    const deleteObs = isIncome
+      ? this.incomeService.delete(this.selectedItem.id)
+      : this.expenseService.deleteExpense(this.selectedItem.id);
+
+    deleteObs.subscribe({
       next: () => {
         dialog.close();
-        this.selectedExpense = null;
+        
+        // Refresh summary if it was an income (balance changed)
+        if (isIncome) {
+          const current = this.expenseService.getSelectedDate();
+          this.expenseService.loadMonthlySummary(current.getFullYear(), current.getMonth() + 1);
+        }
+        
+        this.selectedItem = null;
+        this.loadCombinedLogs();
       },
-      error: (err) => {
-        console.error('Error deleting expense:', err);
+      error: (err: any) => {
+        console.error('Error deleting item:', err);
         alert('เกิดข้อผิดพลาดในการลบรายการ');
       },
     });

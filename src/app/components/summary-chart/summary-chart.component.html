@@ -1,11 +1,27 @@
 <div class="chart-container">
   <h2 class="title">สรุปรายจ่ายเดือน {{ getMonthLabel() }}</h2>
-  <div class="total-spent" *ngIf="!loading">
-    ฿{{ getTotalSpent() | number:'1.0-0' }}
+  <div class="stats-grid" *ngIf="!loading">
+    <div class="stat-card income">
+      <span class="label">รายรับ</span>
+      <span class="value">฿{{ incomeTotal | number:'1.0-0' }}</span>
+    </div>
+    <div class="stat-card expense">
+      <span class="label">รายจ่าย</span>
+      <span class="value">฿{{ getTotalSpent() | number:'1.0-0' }}</span>
+    </div>
+    <div class="stat-card balance" [class.negative]="getBalance() < 0" [class.positive]="getBalance() > 0">
+      <span class="label">คงเหลือ</span>
+      <span class="value">{{ getBalance() > 0 ? '+' : '' }}฿{{ getBalance() | number:'1.0-0' }}</span>
+    </div>
   </div>
-  
-  <div class="empty-state" *ngIf="!loading && !hasData()">
-    ยังไม่มีข้อมูลสำหรับเดือนนี้
+
+  <div class="top-list-section" *ngIf="topCategories.length > 0 && !loading">
+    <div class="section-title">3 อันดับที่จ่ายหนักสุด</div>
+    <div class="top-item" *ngFor="let cat of topCategories; let i = index">
+      <div class="rank">#{{ i + 1 }}</div>
+      <div class="cat-name">{{ cat.name }}</div>
+      <div class="cat-total">฿{{ cat.total | number:'1.0-0' }}</div>
+    </div>
   </div>
 
   <div class="loading-state" *ngIf="loading">

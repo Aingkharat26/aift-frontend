@@ -2,6 +2,7 @@ import { ChangeDetectorRef, Component, ElementRef, inject, ViewChild } from '@an
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ExpenseService } from '../../services/expense.service';
+import { IncomeService } from '../../services/income.service';
 
 @Component({
   selector: 'app-chat-input',
@@ -12,8 +13,12 @@ import { ExpenseService } from '../../services/expense.service';
 })
 export class ChatInputComponent {
   text = '';
+  incomeText = '';
   isLoading = false;
+  isIncomeLoading = false;
+  
   private expenseService = inject(ExpenseService);
+  private incomeService = inject(IncomeService);
   private cdr = inject(ChangeDetectorRef);
 
   @ViewChild('statusDialog') statusDialog!: ElementRef<HTMLDialogElement>;
@@ -71,6 +76,40 @@ export class ChatInputComponent {
           this.showStatus('เกิดข้อผิดพลาด', 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้', '❌');
         }
       },
+    });
+  }
+
+  onAddIncome() {
+    if (!this.incomeText.trim()) return;
+    this.isIncomeLoading = true;
+
+    this.incomeService.processChat(this.incomeText).subscribe({
+      next: (res: any) => {
+        this.isIncomeLoading = false;
+        this.incomeText = '';
+        
+        // Refresh all data
+        this.expenseService.refreshDailyLogs();
+        
+        if (res?.amount === 0) {
+          this.showStatus('บันทึกแล้ว', 'แต่ระบบไม่พบจำนวนเงินในข้อความนี้', '⚠️');
+        } else {
+          this.showStatus('บันทึกรายรับแล้ว', 'เพิ่มรายรับเรียบร้อยครับ', '💰');
+        }
+      },
+      error: (err) => {
+        this.isIncomeLoading = false;
+        const errorMessage = err.error?.message || err.message;
+        const status = err.status;
+
+        if (errorMessage === 'AI_COULD_NOT_UNDERSTAND') {
+          this.showStatus('อ่านไม่ออก', 'รบกวนพิมพ์ใหม่อีกครั้ง เช่น "เงินเดือน 50000" นะครับ', '🤔');
+        } else if (status === 429) {
+          this.showStatus('โควตาเต็ม', 'ตอนนี้ AI ยุ่งมาก รบกวนรอสักครู่ครับ', '⏳');
+        } else {
+          this.showStatus('เกิดข้อผิดพลาด', 'ไม่สามารถบันทึกรายรับได้', '❌');
+        }
+      }
     });
   }
 

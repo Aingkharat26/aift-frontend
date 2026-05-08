@@ -2,9 +2,10 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
-  height: 100vh;
+  height: 100vh; /* Fixed height again */
   display: flex;
   flex-direction: column;
+  overflow: hidden; /* Prevent whole page scroll */
 }
 
 .header {
@@ -51,21 +52,27 @@
 .top-section {
   display: flex;
   gap: 20px;
-  flex: 1;
-  min-height: 400px;
+  margin-bottom: 10px;
+  height: calc(100vh - 280px); /* Height adjusted to fit screen without overall scroll */
+  min-height: 480px;
 }
 
 .chart-section {
   flex: 1;
   min-width: 300px;
+  height: 100%;
 }
 
 .log-section {
   flex: 2;
+  height: 100%;
 }
 
 .bottom-section {
-  margin-bottom: 20px;
+  margin-top: auto;
+  padding-bottom: 20px;
+  background: var(--bg-color);
+  z-index: 10;
 }
 
 @media (max-width: 768px) {
