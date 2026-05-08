@@ -2,10 +2,19 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
-  height: 100vh; /* Fixed height again */
+  height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* Prevent whole page scroll */
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .dashboard-wrapper {
+    height: auto;
+    min-height: 100vh;
+    overflow-y: auto;
+    padding: 12px;
+  }
 }
 
 .header {
@@ -76,13 +85,40 @@
 }
 
 @media (max-width: 768px) {
-  .top-section {
-    flex-direction: column;
+  .header {
+    margin-bottom: 20px;
   }
 
-  .chart-section,
-  .log-section {
-    flex: none;
+  .logo {
+    font-size: 1.5rem;
+  }
+
+  .top-section {
+    flex-direction: column;
     height: auto;
+    min-height: 0;
+    gap: 16px;
+  }
+
+  .chart-section {
+    min-width: 0;
+    height: 320px; /* Fixed height for chart on mobile */
+  }
+
+  .log-section {
+    height: auto;
+    min-height: 400px; /* Give enough space for log */
+  }
+  
+  .bottom-section {
+    position: sticky;
+    bottom: 0;
+    padding: 12px 0;
+    margin: 0 -12px;
+    padding-left: 12px;
+    padding-right: 12px;
+    border-top: 1px solid var(--border-color);
+    background: var(--bg-surface);
+    backdrop-filter: blur(10px);
   }
 }
