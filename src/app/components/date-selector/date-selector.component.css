@@ -1,12 +1,12 @@
 :host {
-  --primary: #38bdf8;
-  --primary-soft: rgba(56, 189, 248, 0.1);
-  --text: #f8fafc;
-  --text-muted: #94a3b8;
-  --bg: #0f172a; /* Deep Navy/Black */
-  --bg-card: #1e293b; /* Slate */
-  --border: rgba(255, 255, 255, 0.1);
-  --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+  --primary: var(--primary-color);
+  --primary-soft: rgba(99, 102, 241, 0.1);
+  --text: var(--text-color);
+  --text-muted: var(--text-muted);
+  --bg: var(--bg-surface);
+  --bg-card: var(--bg-color);
+  --border: var(--border-color);
+  --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
 .datepicker-container {
