@@ -7,15 +7,15 @@ import { forkJoin, map, Observable, of } from 'rxjs';
 @Component({
   selector: 'app-daily-log',
   standalone: true,
-  imports: [CommonModule, CurrencyPipe],
+  imports: [CommonModule],
   templateUrl: './daily-log.component.html',
-  styleUrl: './daily-log.component.css'
+  styleUrl: './daily-log.component.css',
 })
 export class DailyLogComponent implements OnInit {
   expenseService = inject(ExpenseService);
   incomeService = inject(IncomeService);
   private cdr = inject(ChangeDetectorRef);
-  
+
   combinedLogs: any[] = [];
   selectedItem: any = null;
   currentDate = new Date();
@@ -35,24 +35,29 @@ export class DailyLogComponent implements OnInit {
 
   loadCombinedLogs() {
     this.loading = true;
-    
+
     // Use local date parts instead of toISOString() to avoid UTC shift
     const y = this.currentDate.getFullYear();
     const m = String(this.currentDate.getMonth() + 1).padStart(2, '0');
     const d = String(this.currentDate.getDate()).padStart(2, '0');
     const dateStr = `${y}-${m}-${d}`;
-    
+
     // Use of() to get current value of BehaviorSubject or pipe with take(1)
     forkJoin({
       expenses: of(this.expenseService.currentExpenses),
-      income: this.incomeService.getDailyIncome(dateStr)
+      income: this.incomeService.getDailyIncome(dateStr),
     }).subscribe({
-      next: (res: { expenses: any[], income: any[] }) => {
+      next: (res: { expenses: any[]; income: any[] }) => {
         const expenses = res.expenses.map((e: any) => ({ ...e, type: 'expense' }));
-        const income = res.income.map((i: any) => ({ ...i, type: 'income', name: i.source, category: 'รายรับ' }));
-        
-        this.combinedLogs = [...expenses, ...income].sort((a, b) => 
-          new Date(b.date).getTime() - new Date(a.date).getTime()
+        const income = res.income.map((i: any) => ({
+          ...i,
+          type: 'income',
+          name: i.source,
+          category: 'รายรับ',
+        }));
+
+        this.combinedLogs = [...expenses, ...income].sort(
+          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
         );
         this.loading = false;
         this.cdr.detectChanges();
@@ -61,7 +66,7 @@ export class DailyLogComponent implements OnInit {
         console.error('Error loading logs:', err);
         this.loading = false;
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 
@@ -93,13 +98,13 @@ export class DailyLogComponent implements OnInit {
     deleteObs.subscribe({
       next: () => {
         dialog.close();
-        
+
         // Refresh summary if it was an income (balance changed)
         if (isIncome) {
           const current = this.expenseService.getSelectedDate();
           this.expenseService.loadMonthlySummary(current.getFullYear(), current.getMonth() + 1);
         }
-        
+
         this.selectedItem = null;
         this.loadCombinedLogs();
       },
