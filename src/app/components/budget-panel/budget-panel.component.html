@@ -156,3 +156,26 @@
     </div>
   </div>
 </dialog>
+
+<!-- Dialog: ยืนยันการลบงบประมาณ -->
+<dialog #confirmDialog class="modal-dialog">
+  <div class="dialog-content">
+    <div class="dialog-icon dialog-icon-red">
+      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+        <line x1="12" y1="9" x2="12" y2="13"></line>
+        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+      </svg>
+    </div>
+    <h3>ยืนยันการลบงบประมาณ</h3>
+    <p>
+      คุณต้องการลบงบประมาณหมวด <br />
+      <span class="item-highlight">"{{ selectedForDelete?.category }}"</span> <br />
+      ใช่หรือไม่? ยืนยันแล้วจะไม่สามารถย้อนกลับได้
+    </p>
+    <div class="dialog-actions">
+      <button class="btn-cancel" (click)="confirmDialog.close()">ยกเลิก</button>
+      <button class="btn-confirm btn-danger" (click)="onConfirmDelete()">ยืนยันการลบ</button>
+    </div>
+  </div>
+</dialog>

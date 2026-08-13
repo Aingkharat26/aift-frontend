@@ -278,6 +278,22 @@
   font-size: 2rem;
 }
 
+.dialog-icon-red {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.item-highlight {
+  display: inline-block;
+  color: var(--text-color);
+  font-weight: 700;
+  padding: 4px 12px;
+  background: var(--bg-color);
+  border-radius: 8px;
+  margin: 8px 0;
+  font-size: 1.1rem;
+  border: 1px solid var(--border-color);
+}
+
 .dialog-content h3 {
   margin: 0 0 12px;
   color: var(--text-color);
@@ -328,6 +344,17 @@
 .btn-confirm:hover {
   background: var(--primary-hover);
   transform: translateY(-2px);
+}
+
+/* ปุ่มยืนยันการลบ — สีแดงเหมือนกล่องรายการ */
+.btn-danger {
+  background: #ef4444;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+}
+
+.btn-danger:hover {
+  background: #dc2626;
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.3);
 }
 
 .btn-confirm:active, .btn-cancel:active, .btn-save:active {

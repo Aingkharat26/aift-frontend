@@ -48,6 +48,9 @@ export class BudgetPanelComponent implements OnInit {
   @ViewChild('addDialog') addDialog!: ElementRef<HTMLDialogElement>;
   @ViewChild('recommendDialog')
   recommendDialog!: ElementRef<HTMLDialogElement>;
+  @ViewChild('confirmDialog') confirmDialog!: ElementRef<HTMLDialogElement>;
+
+  selectedForDelete: BudgetStatus | null = null;
 
   private currentDate = new Date();
   private prevStatuses: BudgetStatus[] = [];
@@ -186,8 +189,16 @@ export class BudgetPanelComponent implements OnInit {
   }
 
   deleteBudget(item: BudgetStatus) {
-    if (!confirm(`ลบงบประมาณหมวด ${item.category} ใช่หรือไม่?`)) return;
-    this.budgetService.deleteBudget(item.id).subscribe({
+    this.selectedForDelete = item;
+    this.confirmDialog.nativeElement.showModal();
+  }
+
+  onConfirmDelete() {
+    if (!this.selectedForDelete) return;
+
+    const id = this.selectedForDelete.id;
+    this.selectedForDelete = null;
+    this.budgetService.deleteBudget(id).subscribe({
       next: () => this.reloadStatus(),
       error: () => alert('เกิดข้อผิดพลาดในการลบงบประมาณ'),
     });
