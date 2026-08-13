@@ -107,6 +107,22 @@ export class ExpenseService {
       });
   }
 
+  processReceipt(imageBase64: string, mimeType: string): Observable<any> {
+    return this.http
+      .post<{ success: boolean; data: Expense }>(`${this.apiUrl}/receipt`, {
+        image: imageBase64,
+        mimeType,
+      })
+      .pipe(
+        tap(() => {
+          const current = this.selectedDateSubject.value;
+          this.loadDailyExpenses(this.formatDate(current));
+          this.loadMonthlySummary(current.getFullYear(), current.getMonth() + 1);
+          this.notifyDataChanged();
+        }),
+      );
+  }
+
   getAiMonthlySummary(year: number, month: number): Observable<{ summary: string; generated: boolean; hasData: boolean }> {
     // GET — อ่านจาก cache ไม่เรียก AI ใหม่
     return this.http

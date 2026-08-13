@@ -16,12 +16,14 @@ export class ChatInputComponent {
   incomeText = '';
   isLoading = false;
   isIncomeLoading = false;
+  isScanning = false;
 
   private expenseService = inject(ExpenseService);
   private incomeService = inject(IncomeService);
   private cdr = inject(ChangeDetectorRef);
 
   @ViewChild('statusDialog') statusDialog!: ElementRef<HTMLDialogElement>;
+  @ViewChild('receiptInput') receiptInput!: ElementRef<HTMLInputElement>;
 
   statusData = { title: '', message: '', icon: '' };
 
@@ -79,6 +81,63 @@ export class ChatInputComponent {
         }
       },
     });
+  }
+
+  onReceiptSelected(event: any) {
+    const file = event.target?.files?.[0];
+    if (!file) return;
+    this.scanReceipt(file);
+    // reset เพื่อให้เลือกไฟล์เดิมซ้ำได้
+    if (this.receiptInput) {
+      this.receiptInput.nativeElement.value = '';
+    }
+  }
+
+  scanReceipt(file: File) {
+    if (this.isScanning || this.isLoading) return;
+    this.isScanning = true;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = String(reader.result).split(',')[1] || '';
+      const mimeType = file.type || 'image/jpeg';
+
+      this.expenseService.processReceipt(base64, mimeType).subscribe({
+        next: (res: any) => {
+          this.isScanning = false;
+          const saved = res?.data || res;
+          if (saved?.amount === 0) {
+            this.showStatus('อ่านได้บางส่วน', 'ไม่พบยอดรวมในใบเสร็จนี้', '⚠️');
+          } else {
+            this.showStatus(
+              'สแกนใบเสร็จสำเร็จ',
+              `บันทึก "${saved.item}" จำนวน ${saved.amount} บาท หมวด ${saved.category}`,
+              '🧾',
+            );
+          }
+        },
+        error: (err) => {
+          this.isScanning = false;
+          const errorMessage = err.error?.message || err.message;
+          const status = err.status;
+
+          if (errorMessage === 'AI_COULD_NOT_UNDERSTAND') {
+            this.showStatus('อ่านไม่ออก', 'ไม่พบข้อมูลในรูปนี้ ลองถ่ายใบเสร็จให้ชัดแล้วลองใหม่', '🤔');
+          } else if (status === 413) {
+            this.showStatus('รูปใหญ่เกินไป', 'กรุณาใช้รูปที่มีขนาดเล็กลง (ไม่เกิน ~10MB)', '📏');
+          } else if (status === 429) {
+            this.showStatus('โควตาเต็ม', 'ตอนนี้ AI ยุ่งมาก รบกวนรอสักครู่ครับ', '⏳');
+          } else {
+            this.showStatus('เกิดข้อผิดพลาด', 'ไม่สามารถอ่านใบเสร็จได้ ลองใหม่อีกครั้ง', '❌');
+          }
+        },
+      });
+    };
+    reader.onerror = () => {
+      this.isScanning = false;
+      this.showStatus('เกิดข้อผิดพลาด', 'ไม่สามารถอ่านไฟล์รูปได้', '❌');
+    };
+    reader.readAsDataURL(file);
   }
 
   onAddIncome() {

@@ -6,14 +6,32 @@
     </div>
     <div class="chat-input-container">
       <input
+        type="file"
+        #receiptInput
+        accept="image/*"
+        hidden
+        (change)="onReceiptSelected($event)"
+      />
+      <button
+        class="scan-btn"
+        (click)="receiptInput.click()"
+        [disabled]="isLoading || isScanning"
+        title="สแกนใบเสร็จด้วยรูปถ่าย"
+      >
+        <span *ngIf="!isScanning" class="scan-icon">🧾</span>
+        <span *ngIf="isScanning" class="scan-loading">
+          <span class="scan-spinner"></span>
+        </span>
+      </button>
+      <input
         type="text"
         [(ngModel)]="text"
         (keyup.enter)="onSubmit()"
         placeholder="พิมพ์รายจ่ายของคุณ (เช่น ข้าวผัด 50)"
-        [disabled]="isLoading"
+        [disabled]="isLoading || isScanning"
         class="chat-input"
       />
-      <button (click)="onSubmit()" [disabled]="isLoading || !text.trim()" class="send-btn">
+      <button (click)="onSubmit()" [disabled]="isLoading || isScanning || !text.trim()" class="send-btn">
         {{ isLoading ? '...' : 'บันทึก' }}
       </button>
     </div>
