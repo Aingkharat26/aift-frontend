@@ -35,6 +35,10 @@ export class IncomeService {
     );
   }
 
+  update(id: number, data: { source?: string; amount?: number }): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/${id}`, data);
+  }
+
   delete(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }

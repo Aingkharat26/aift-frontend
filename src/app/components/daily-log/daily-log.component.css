@@ -93,8 +93,7 @@
   color: #10b981; /* Income color */
 }
 
-.delete-btn {
-  background: rgb(255, 255, 255); /* Subtle transparent red */
+.edit-btn, .delete-btn {
   border: none;
   border-radius: 10px;
   width: 36px;
@@ -105,6 +104,23 @@
   cursor: pointer;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   flex-shrink: 0;
+}
+
+.edit-btn {
+  background: rgb(255, 255, 255);
+  color: #0ea5e9;
+  margin-right: 4px;
+}
+
+.edit-btn:hover {
+  background: #0ea5e9;
+  color: #ffffff;
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2);
+}
+
+.delete-btn {
+  background: rgb(255, 255, 255); /* Subtle transparent red */
   color: #ef4444;
 }
 
@@ -115,26 +131,33 @@
   box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
 }
 
-.delete-btn:active {
+.edit-btn:active, .delete-btn:active {
   transform: scale(0.9);
 }
 
-/* Show delete button by default on devices without hover (mobile/touch) */
+/* Show action buttons by default on devices without hover (mobile/touch) */
 @media (hover: none) {
-  .delete-btn {
+  .edit-btn, .delete-btn {
     opacity: 1;
-    background: rgba(239, 68, 68, 0.05);
-    border: 1px solid rgba(239, 68, 68, 0.1);
     width: 40px; /* Larger touch target */
     height: 40px;
+  }
+  .edit-btn {
+    background: rgba(14, 165, 233, 0.05);
+    border: 1px solid rgba(14, 165, 233, 0.1);
+  }
+  .delete-btn {
+    background: rgba(239, 68, 68, 0.05);
+    border: 1px solid rgba(239, 68, 68, 0.1);
   }
 }
 
 @media (hover: hover) {
-  .delete-btn {
+  .edit-btn, .delete-btn {
     opacity: 0;
     pointer-events: none;
   }
+  .expense-item:hover .edit-btn,
   .expense-item:hover .delete-btn {
     opacity: 1;
     pointer-events: auto;
@@ -171,7 +194,7 @@
     white-space: nowrap;
   }
   
-  .delete-btn {
+  .edit-btn, .delete-btn {
     width: 38px;
     height: 38px;
   }
@@ -363,6 +386,79 @@
   box-shadow: 0 6px 20px rgba(239, 68, 68, 0.3);
 }
 
-.btn-confirm:active, .btn-cancel:active {
+.btn-confirm:active, .btn-cancel:active, .btn-save:active {
   transform: translateY(0);
+}
+
+/* Edit dialog form */
+.edit-dialog-content {
+  text-align: left;
+}
+
+.edit-dialog-content h3 {
+  text-align: center;
+}
+
+.edit-icon {
+  background: rgba(14, 165, 233, 0.1);
+}
+
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.form-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-color);
+  color: var(--text-color);
+  font-size: 1rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-input:focus {
+  border-color: #0ea5e9;
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
+}
+
+.form-input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.7;
+}
+
+.btn-save {
+  background: #10b981;
+  color: white;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
+
+.btn-save:hover:not(:disabled) {
+  background: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+}
+
+.btn-save:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
 }

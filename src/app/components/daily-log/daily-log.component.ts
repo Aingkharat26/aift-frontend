@@ -1,5 +1,6 @@
 import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ExpenseService } from '../../services/expense.service';
 import { IncomeService } from '../../services/income.service';
 import { forkJoin, map, Observable, of } from 'rxjs';
@@ -7,7 +8,7 @@ import { forkJoin, map, Observable, of } from 'rxjs';
 @Component({
   selector: 'app-daily-log',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './daily-log.component.html',
   styleUrl: './daily-log.component.css',
 })
@@ -18,6 +19,9 @@ export class DailyLogComponent implements OnInit {
 
   combinedLogs: any[] = [];
   selectedItem: any = null;
+  editingItem: any = null;
+  editForm = { name: '', amount: 0, category: 'อาหาร' };
+  categories = ['อาหาร', 'เครื่องดื่ม', 'เดินทาง', 'ช้อปปิ้ง', 'บันเทิง', 'สุขภาพ', 'บิล', 'สัตว์เลี้ยง', 'อื่นๆ'];
   currentDate = new Date();
   public loading = true;
 
@@ -79,6 +83,61 @@ export class DailyLogComponent implements OnInit {
       day: 'numeric',
       month: 'short',
       year: 'numeric',
+    });
+  }
+
+  editItem(item: any, dialog: HTMLDialogElement) {
+    this.editingItem = item;
+    this.editForm = {
+      name: item.type === 'income' ? item.source : item.item,
+      amount: Number(item.amount),
+      category: item.category === 'รายรับ' ? 'อาหาร' : item.category,
+    };
+    dialog.showModal();
+  }
+
+  isEditValid(): boolean {
+    const amount = this.editForm.amount;
+    return (
+      this.editForm.name.trim().length > 0 &&
+      !isNaN(amount) &&
+      amount >= 0
+    );
+  }
+
+  onConfirmEdit(dialog: HTMLDialogElement) {
+    if (!this.editingItem || !this.isEditValid()) return;
+
+    const isIncome = this.editingItem.type === 'income';
+    const data = isIncome
+      ? { source: this.editForm.name.trim(), amount: this.editForm.amount }
+      : {
+          item: this.editForm.name.trim(),
+          amount: this.editForm.amount,
+          category: this.editForm.category,
+        };
+
+    const updateObs = isIncome
+      ? this.incomeService.update(this.editingItem.id, data)
+      : this.expenseService.updateExpense(this.editingItem.id, data);
+
+    updateObs.subscribe({
+      next: () => {
+        dialog.close();
+
+        // Refresh summary if it was an income (balance changed)
+        if (isIncome) {
+          const current = this.expenseService.getSelectedDate();
+          this.expenseService.loadMonthlySummary(current.getFullYear(), current.getMonth() + 1);
+        }
+
+        this.editingItem = null;
+        this.loadCombinedLogs();
+      },
+      error: (err: any) => {
+        console.error('Error updating item:', err);
+        alert('เกิดข้อผิดพลาดในการแก้ไขรายการ');
+      },
     });
   }
 

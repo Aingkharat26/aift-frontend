@@ -106,6 +106,16 @@ export class ExpenseService {
     );
   }
 
+  updateExpense(id: number, data: { item?: string; amount?: number; category?: string }): Observable<any> {
+    return this.http.patch<{success: boolean, data: Expense}>(`${this.apiUrl}/${id}`, data).pipe(
+      tap(() => {
+        const current = this.selectedDateSubject.value;
+        this.loadDailyExpenses(this.formatDate(current));
+        this.loadMonthlySummary(current.getFullYear(), current.getMonth() + 1);
+      })
+    );
+  }
+
   deleteExpense(id: number): Observable<any> {
     return this.http.delete<{success: boolean}>(`${this.apiUrl}/${id}`).pipe(
       tap(() => {
