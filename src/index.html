@@ -6,6 +6,18 @@
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="aift_logo/aift_logo.png">
+  <script>
+    // ตั้งธีมก่อนแอปโหลด เพื่อไม่ให้จอวาบ (อ่านค่าที่ผู้ใช้เคยเลือกไว้)
+    (function () {
+      var t = localStorage.getItem('aift-theme');
+      if (t !== 'dark' && t !== 'light') {
+        t = window.matchMedia('(prefers-color-scheme: dark)').matches
+          ? 'dark'
+          : 'light';
+      }
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
 </head>
 <body>
   <app-root></app-root>
