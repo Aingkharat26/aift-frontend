@@ -8,7 +8,8 @@
   align-items: center;
   height: 100%;
   flex: 1;
-  min-height: 480px; /* Adjusted to balance fit and growth */
+  min-height: 0; /* หดตามพื้นที่จริง เพื่อไม่ให้ overflow จนบังส่วนอื่น */
+  overflow-y: auto; /* ถ้าหน้าจอสั้นมาก ให้เลื่อนดูภายในได้แทนการตัดทิ้ง */
 }
 
 .title {
@@ -164,6 +165,7 @@
   width: 100%;
   max-width: 320px; /* Increased to allow legend on the right */
   flex: 1;
+  min-height: 200px; /* กราฟไม่หดหายจนมองไม่เห็น */
   display: flex;
   justify-content: center;
   align-items: center;

@@ -62,18 +62,20 @@
   display: flex;
   gap: 20px;
   margin-bottom: 10px;
-  height: calc(100vh - 280px); /* Height adjusted to fit screen without overall scroll */
-  min-height: 480px;
+  flex: 1; /* ยืดหยุ่นตามพื้นที่เหลือ ไม่ใช่ความสูงตายตัว */
+  min-height: 0; /* หดได้ เพื่อไม่ให้ทับช่องกรอกรายรับรายจ่ายด้านล่าง */
 }
 
 .chart-section {
   flex: 1;
   min-width: 300px;
+  min-height: 0;
   height: 100%;
 }
 
 .log-section {
   flex: 2;
+  min-height: 0;
   height: 100%;
 }
 
