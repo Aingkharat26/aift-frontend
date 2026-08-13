@@ -15,15 +15,6 @@
     </div>
   </div>
 
-  <div class="top-list-section" *ngIf="topCategories.length > 0 && !loading">
-    <div class="section-title">3 อันดับที่จ่ายหนักสุด</div>
-    <div class="top-item" *ngFor="let cat of topCategories; let i = index">
-      <div class="rank">#{{ i + 1 }}</div>
-      <div class="cat-name">{{ cat.name }}</div>
-      <div class="cat-total">฿{{ cat.total | number:'1.0-0' }}</div>
-    </div>
-  </div>
-
   <div class="loading-state" *ngIf="loading">
     <div class="spinner"></div>
     <span>กำลังโหลดข้อมูล...</span>
@@ -37,18 +28,5 @@
     </canvas>
   </div>
 
-  <div class="ai-insight" *ngIf="!loading && (aiSummary || aiLoading || aiFailed)">
-    <div class="ai-header">
-      <span class="ai-robot">🤖</span>
-      <span class="ai-title">สรุปจาก AI</span>
-    </div>
-    <div class="ai-loading" *ngIf="aiLoading">
-      <div class="spinner ai-spinner"></div>
-      <span>AI กำลังวิเคราะห์การใช้จ่าย...</span>
-    </div>
-    <p class="ai-text" *ngIf="!aiLoading && aiSummary">{{ aiSummary }}</p>
-    <p class="ai-text ai-error" *ngIf="!aiLoading && aiFailed && !aiSummary">
-      AI ไม่ว่างในตอนนี้ ลองใหม่อีกครั้งภายหลังครับ
-    </p>
-  </div>
+  <app-ai-insight class="chart-insight"></app-ai-insight>
 </div>

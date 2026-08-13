@@ -2,7 +2,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
-  margin-top: 20px;
+  margin-top: 12px;
 }
 
 @media (max-width: 768px) {
@@ -20,20 +20,20 @@
 
 .input-card {
   background: var(--bg-surface);
-  border-radius: 20px;
-  padding: 20px;
+  border-radius: 16px;
+  padding: 12px 16px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .card-header {
   font-weight: 600;
-  margin-bottom: 15px;
+  margin-bottom: 8px;
   display: flex;
   align-items: center;
   gap: 8px;
   color: var(--text-color);
-  font-size: 0.95rem;
+  font-size: 0.85rem;
 }
 
 .chat-input-container, .income-input-container {
@@ -43,12 +43,12 @@
 
 .scan-btn {
   flex-shrink: 0;
-  width: 52px;
+  width: 46px;
   border: none;
   border-radius: 12px;
   background: linear-gradient(135deg, #6366f1, #8b5cf6);
   color: white;
-  font-size: 1.3rem;
+  font-size: 1.15rem;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
@@ -97,10 +97,10 @@
 
 .chat-input {
   flex: 1;
-  padding: 16px 20px;
+  padding: 11px 16px;
   border: 1px solid var(--border-color);
   border-radius: 12px;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-family: inherit;
   background: var(--bg-color);
   color: var(--text-color);
@@ -114,13 +114,13 @@
 }
 
 .send-btn {
-  padding: 0 24px;
+  padding: 0 20px;
   border: none;
   border-radius: 12px;
   background: var(--primary-color);
   color: white;
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 0.95rem;
   cursor: pointer;
   transition: all 0.3s ease;
 }

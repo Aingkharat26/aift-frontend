@@ -1,0 +1,158 @@
+<div class="budget-container">
+  <div class="budget-header">
+    <div class="header-actions">
+      <button class="btn-recommend" (click)="openRecommendDialog()" title="คำนวณงบจากพฤติกรรมการใช้จ่าย 3 เดือนล่าสุด">
+        ✨ แนะนำจากพฤติกรรม
+      </button>
+      <button class="btn-add" (click)="openAddDialog()">＋ ตั้งงบ</button>
+    </div>
+  </div>
+
+  <div class="budget-body">
+    <!-- แบนเนอร์แจ้งเตือนเมื่อใกล้เกิน / เกินงบ -->
+    <div class="alert-banner" *ngIf="alerts.length > 0">
+      <div
+        class="alert-item"
+        *ngFor="let alert of alerts"
+        [class.alert-exceeded]="alert.status === 'exceeded'"
+      >
+        <span class="alert-icon">{{ alert.status === 'exceeded' ? '⛔' : '⚠️' }}</span>
+        <span class="alert-text">
+          <strong>{{ alert.category }}</strong>
+          ใช้ไปแล้ว {{ formatNumber(alert.spent) }} จาก {{ formatNumber(alert.limit) }} บาท
+          ({{ alert.percentUsed }}%)
+          <span *ngIf="alert.status === 'exceeded'">— เกินงบแล้ว!</span>
+          <span *ngIf="alert.status === 'warning'">— เหลืออีก {{ formatNumber(alert.remaining) }} บาท</span>
+        </span>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="!hasBudgets">
+      ยังไม่ได้ตั้งงบประมาณรายหมวด
+      <button class="btn-add" (click)="openAddDialog()">＋ ตั้งงบเลย</button>
+      <span class="empty-hint">หรือกด "✨ แนะนำจากพฤติกรรม" ให้ระบบคำนวณจากประวัติการใช้จ่ายให้</span>
+    </div>
+
+    <div class="budget-list" *ngIf="hasBudgets">
+      <div class="budget-item" *ngFor="let item of statuses">
+        <div class="budget-top">
+          <span class="cat-icon">{{ getCategoryIcon(item.category) }}</span>
+          <span class="cat-name">{{ item.category }}</span>
+          <span class="percent-badge" [ngClass]="getStatusClass(item.status)">
+            {{ item.percentUsed }}%
+          </span>
+          <button class="delete-btn" (click)="deleteBudget(item)" title="ลบงบหมวดนี้">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 6h18"></path>
+              <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+              <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+              <line x1="10" y1="11" x2="10" y2="17"></line>
+              <line x1="14" y1="11" x2="14" y2="17"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="progress-track">
+          <div
+            class="progress-fill"
+            [ngClass]="getStatusClass(item.status)"
+            [style.width.%]="progressWidth(item)"
+          ></div>
+        </div>
+        <div class="budget-bottom">
+          <span>ใช้ไป ฿{{ formatNumber(item.spent) }} / ฿{{ formatNumber(item.limit) }}</span>
+          <span *ngIf="item.status === 'ok' && item.remaining > 0" class="remaining-text">
+            เหลือ ฿{{ formatNumber(item.remaining) }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Dialog: ตั้งงบประมาณ -->
+<dialog #addDialog class="modal-dialog">
+  <div class="dialog-content">
+    <div class="dialog-icon">🎯</div>
+    <h3>ตั้งงบประมาณรายหมวด</h3>
+
+    <form class="edit-form" (ngSubmit)="onAddBudget()">
+      <div class="form-group">
+        <label class="form-label">หมวดหมู่</label>
+        <select [(ngModel)]="newBudget.category" name="budgetCategory" class="form-input">
+          <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">งบประมาณต่อเดือน (บาท)</label>
+        <input
+          type="number"
+          [(ngModel)]="newBudget.limit"
+          name="budgetLimit"
+          min="1"
+          step="50"
+          class="form-input"
+          placeholder="เช่น 3000"
+        />
+      </div>
+
+      <div class="dialog-actions">
+        <button type="button" class="btn-cancel" (click)="addDialog.close()">ยกเลิก</button>
+        <button
+          type="submit"
+          class="btn-save"
+          [disabled]="!newBudget.category || !newBudget.limit || newBudget.limit <= 0"
+        >
+          บันทึกงบประมาณ
+        </button>
+      </div>
+    </form>
+  </div>
+</dialog>
+
+<!-- Dialog: แนะนำงบจากพฤติกรรม -->
+<dialog #recommendDialog class="modal-dialog">
+  <div class="dialog-content recommend-content">
+    <div class="dialog-icon">✨</div>
+    <h3>แนะนำงบประมาณจากพฤติกรรม</h3>
+    <p class="recommend-desc">
+      คำนวณจากค่าเฉลี่ยการใช้จ่ายจริงย้อนหลัง 3 เดือนล่าสุด ปัดขึ้นเป็นเลขกลม ๆ
+    </p>
+
+    <div class="recommend-loading" *ngIf="recommendationsLoading">
+      <div class="spinner"></div>
+      <span>กำลังวิเคราะห์พฤติกรรมการใช้จ่าย...</span>
+    </div>
+
+    <div class="recommend-empty" *ngIf="!recommendationsLoading && recommendations.length === 0">
+      ยังไม่มีข้อมูลการใช้จ่ายเพียงพอ ลองบันทึกรายจ่ายก่อน แล้วกลับมาดูอีกครั้งครับ
+    </div>
+
+    <div class="recommend-list" *ngIf="!recommendationsLoading && recommendations.length > 0">
+      <div class="recommend-item" *ngFor="let rec of recommendations">
+        <div class="rec-cat">
+          <span class="cat-icon">{{ getCategoryIcon(rec.category) }}</span>
+          <span class="rec-name">{{ rec.category }}</span>
+        </div>
+        <div class="rec-detail">
+          <span class="rec-avg">เฉลี่ย/เดือน ฿{{ formatNumber(rec.avgMonthly) }}</span>
+          <span class="rec-amount">แนะนำ ฿{{ formatNumber(rec.recommendedBudget) }}</span>
+          <span class="rec-current" *ngIf="rec.currentBudget">
+            (ปัจจุบัน ฿{{ formatNumber(rec.currentBudget) }})
+          </span>
+        </div>
+        <button
+          class="btn-apply"
+          (click)="applyRecommendation(rec)"
+          [disabled]="rec.currentBudget === rec.recommendedBudget"
+        >
+          {{ rec.currentBudget === rec.recommendedBudget ? 'ตั้งแล้ว ✓' : 'ใช้ค่านี้' }}
+        </button>
+      </div>
+    </div>
+
+    <div class="dialog-actions">
+      <button class="btn-confirm" (click)="recommendDialog.close()">ปิด</button>
+    </div>
+  </div>
+</dialog>

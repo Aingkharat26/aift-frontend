@@ -1,25 +1,24 @@
 .dashboard-wrapper {
-  max-width: 1200px;
-  margin: 0 auto;
+  width: 100%;
   padding: 20px;
-  height: 100vh;
+  height: calc(100vh - 61px); /* ลบความสูง Nav ด้านบน */
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: hidden; /* ยึดจอเดียว ไม่เลื่อนหน้าเพื่อหาช่องพิมพ์ */
 }
 
 @media (max-width: 768px) {
   .dashboard-wrapper {
     height: auto;
-    min-height: 100vh;
+    min-height: calc(100vh - 61px);
     overflow-y: auto;
     padding: 12px;
   }
 }
 
 .header {
-  margin-bottom: 30px;
-  padding-top: 20px;
+  margin-bottom: 16px;
+  padding-top: 10px;
 }
 
 .header-top {
@@ -36,37 +35,8 @@
   gap: 12px;
 }
 
-.theme-toggle {
-  width: 42px;
-  height: 42px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  border-radius: 10px;
-  cursor: pointer;
-  transition: background 0.2s, transform 0.2s;
-}
-
-.theme-toggle:hover {
-  background: var(--bg-color);
-  transform: scale(1.05);
-}
-
 .logo-group {
   text-align: left;
-}
-
-.logo {
-  font-size: 2rem;
-  font-weight: 800;
-  color: var(--text-color);
-  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 4px;
 }
 
 .subtitle {
@@ -78,37 +48,56 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 12px;
   min-height: 0;
-  /* Important for flex child scrolling */
 }
 
 .top-section {
   display: flex;
-  gap: 20px;
-  margin-bottom: 10px;
-  flex: 1; /* ยืดหยุ่นตามพื้นที่เหลือ ไม่ใช่ความสูงตายตัว */
-  min-height: 0; /* หดได้ เพื่อไม่ให้ทับช่องกรอกรายรับรายจ่ายด้านล่าง */
+  align-items: stretch; /* การ์ดทั้งสองสูงเท่ากัน */
+  gap: 16px;
+  margin-bottom: 4px;
+  flex: 1; /* เติมพื้นที่ที่เหลือ */
+  min-height: 0; /* ย่อได้ตามพื้นที่จริง */
 }
 
 .chart-section {
   flex: 1;
   min-width: 300px;
+  display: flex;
+  flex-direction: column;
   min-height: 0;
-  height: 100%;
+}
+
+/* host element ของ Angular คั่นอยู่ระหว่าง section กับตัวการ์ด
+   ต้องทำให้ host ยืดตาม section ด้วย การ์ดข้างในถึงจะเติมเต็ม */
+.chart-section app-summary-chart {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .log-section {
   flex: 2;
+  display: flex;
+  flex-direction: column;
   min-height: 0;
-  height: 100%;
+}
+
+.log-section app-daily-log {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .bottom-section {
   margin-top: auto;
-  padding-bottom: 20px;
+  padding-bottom: 12px;
   background: var(--bg-color);
   z-index: 10;
+  flex-shrink: 0;
 }
 
 @media (max-width: 768px) {
@@ -116,24 +105,16 @@
     margin-bottom: 20px;
   }
 
-  .logo {
-    font-size: 1.5rem;
-  }
-
   .top-section {
     flex-direction: column;
-    height: auto;
-    min-height: 0;
     gap: 16px;
   }
 
   .chart-section {
     min-width: 0;
-    height: 320px; /* Fixed height for chart on mobile */
   }
 
   .log-section {
-    height: auto;
     min-height: 400px; /* Give enough space for log */
   }
   

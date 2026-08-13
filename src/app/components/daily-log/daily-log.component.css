@@ -1,11 +1,11 @@
 .daily-log-container {
   background: var(--bg-surface);
   border-radius: 16px;
-  padding: 24px;
+  padding: 16px 20px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  height: 100%;
-  flex: 1;
-  overflow-y: auto;
+  flex: 1; /* เติมความสูง section ให้การ์ดสูงเท่ากันกับฝั่งกราฟ */
+  min-height: 0;
+  overflow-y: auto; /* list scroll ภายในกล่อง (ไม่เลื่อนทั้งหน้า) */
 }
 
 /* Custom Scrollbar */
@@ -16,11 +16,8 @@
   background: transparent;
 }
 .daily-log-container::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.05);
+  background: rgba(0, 0, 0, 0.08);
   border-radius: 10px;
-}
-.daily-log-container::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.1);
 }
 
 .title {
@@ -28,7 +25,7 @@
   font-weight: 700;
   color: var(--text-color);
   margin-top: 0;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
 }
 
 .empty-state {
@@ -153,14 +150,37 @@
 }
 
 @media (hover: hover) {
+  /* ตัวเลขจำนวนชิดขวา ไม่ถูกปุ่มที่ซ่อนอยู่ดัน */
+  .expense-item {
+    padding-right: 8px;
+  }
+  .item-amount {
+    margin-right: 0;
+    transition: margin-right 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  /* ปุ่มแก้ไข/ลบซ่อนไว้ด้านขวา แล้วสไลด์ออกมาเมื่อชี้เมาส์ */
   .edit-btn, .delete-btn {
+    position: absolute;
+    top: 50%;
     opacity: 0;
     pointer-events: none;
+    transform: translateY(-50%) translateX(24px);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .delete-btn {
+    right: 8px;
+  }
+  .edit-btn {
+    right: 48px;
   }
   .expense-item:hover .edit-btn,
   .expense-item:hover .delete-btn {
     opacity: 1;
     pointer-events: auto;
+    transform: translateY(-50%) translateX(0);
+  }
+  .expense-item:hover .item-amount {
+    margin-right: 88px; /* เลื่อนซ้ายให้ที่ปุ่ม */
   }
 }
 

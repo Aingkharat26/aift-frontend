@@ -1,0 +1,37 @@
+<div
+  class="ai-insight"
+  *ngIf="aiLoading || aiSummary || aiFailed"
+>
+  <div class="ai-loading" *ngIf="aiLoading">
+    <div class="spinner ai-spinner"></div>
+    <span>AI กำลังวิเคราะห์การใช้จ่าย...</span>
+  </div>
+
+  <button
+    class="ai-summary-btn"
+    *ngIf="!aiLoading && aiSummary"
+    (click)="readMoreDialog.showModal()"
+  >
+    <span class="ai-robot">🤖</span>
+    <span class="ai-label">สรุปจาก AI</span>
+    <span class="ai-month">{{ getMonthLabel() }}</span>
+    <span class="ai-arrow">ดู ▸</span>
+  </button>
+
+  <p class="ai-error" *ngIf="!aiLoading && aiFailed && !aiSummary">
+    AI ไม่ว่างในตอนนี้ ลองใหม่อีกครั้งภายหลังครับ
+  </p>
+</div>
+
+<!-- Dialog: ข้อความเต็มของสรุป AI -->
+<dialog #readMoreDialog class="modal-dialog">
+  <div class="dialog-content">
+    <div class="dialog-icon">🤖</div>
+    <h3>สรุปจาก AI</h3>
+    <span class="dialog-month">{{ getMonthLabel() }}</span>
+    <p class="full-text">{{ aiSummary }}</p>
+    <div class="dialog-actions">
+      <button class="btn-confirm" (click)="readMoreDialog.close()">ปิด</button>
+    </div>
+  </div>
+</dialog>

@@ -1,15 +1,13 @@
 .chart-container {
   background: var(--bg-surface);
   border-radius: 16px;
-  padding: 16px; /* Reduced padding */
+  padding: 14px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
   align-items: center;
-  height: 100%;
-  flex: 1;
-  min-height: 0; /* หดตามพื้นที่จริง เพื่อไม่ให้ overflow จนบังส่วนอื่น */
-  overflow-y: auto; /* ถ้าหน้าจอสั้นมาก ให้เลื่อนดูภายในได้แทนการตัดทิ้ง */
+  flex: 1; /* เติมความสูง section ให้การ์ดสูงเท่ากันกับฝั่งรายการ */
+  min-height: 0; /* ย่อได้ตามพื้นที่จริง ไม่มี scrollbar */
 }
 
 .title {
@@ -24,7 +22,7 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   width: 100%;
 }
 
@@ -54,121 +52,21 @@
 .balance.positive .value { color: #10b981; }
 .balance:not(.negative):not(.positive) .value { color: var(--text-color); }
 
-.ai-insight {
-  width: 100%;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  background: linear-gradient(135deg, rgba(14, 165, 233, 0.08), rgba(168, 85, 247, 0.08));
-  border: 1px solid rgba(14, 165, 233, 0.2);
-  padding: 10px 14px;
-  border-radius: 12px;
-}
-
-.ai-header {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 6px;
-}
-
-.ai-robot {
-  font-size: 1rem;
-}
-
-.ai-title {
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: #0ea5e9;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.ai-text {
-  margin: 0;
-  font-size: 0.85rem;
-  line-height: 1.6;
-  color: var(--text-color);
-  white-space: pre-line;
-}
-
-.ai-error {
-  color: var(--text-muted);
-}
-
-.ai-loading {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--text-muted);
-  font-size: 0.85rem;
-}
-
-.ai-spinner {
-  width: 16px;
-  height: 16px;
-  border-width: 2px;
-}
-
-.top-list-section {
-  width: 100%;
-  margin-bottom: 10px;
-  background: rgba(0, 0, 0, 0.02);
-  padding: 8px 12px;
-  border-radius: 12px;
-}
-
-.section-title {
-  font-size: 0.7rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  margin-bottom: 6px;
-}
-
-.top-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 4px 0;
-}
-
-.rank {
-  font-size: 0.75rem;
-  font-weight: 800;
-  color: var(--primary-color);
-  width: 20px;
-}
-
-.cat-name {
-  flex: 1;
-  font-size: 0.8rem;
-  color: var(--text-color);
-  font-weight: 500;
-}
-
-.cat-total {
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: #f43f5e;
-}
-
-.empty-state {
-  text-align: center;
-  padding: 20px;
-  color: var(--text-muted);
-  background: var(--bg-color);
-  border-radius: 12px;
-  font-size: 0.85rem;
-  width: 100%;
-}
-
 .chart-wrapper {
   width: 100%;
   max-width: 320px; /* Increased to allow legend on the right */
-  flex: 1;
-  min-height: 200px; /* กราฟไม่หดหายจนมองไม่เห็น */
+  flex: 1; /* ยืดเติมพื้นที่ที่เหลือในกล่อง ไม่มีช่องว่างใต้กราฟ */
+  min-height: 160px; /* กราฟไม่หดหายจนมองไม่เห็น */
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+/* สรุป AI อยู่ล่างสุดของกล่องกราฟ เติมพื้นที่ว่าง */
+.chart-insight {
+  width: 100%;
+  flex-shrink: 0;
+  margin-top: 8px;
 }
 
 .loading-state {
