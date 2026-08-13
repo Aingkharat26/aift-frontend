@@ -129,6 +129,7 @@ export class DailyLogComponent implements OnInit {
         if (isIncome) {
           const current = this.expenseService.getSelectedDate();
           this.expenseService.loadMonthlySummary(current.getFullYear(), current.getMonth() + 1);
+          this.expenseService.notifyDataChanged();
         }
 
         this.editingItem = null;
@@ -162,6 +163,7 @@ export class DailyLogComponent implements OnInit {
         if (isIncome) {
           const current = this.expenseService.getSelectedDate();
           this.expenseService.loadMonthlySummary(current.getFullYear(), current.getMonth() + 1);
+          this.expenseService.notifyDataChanged();
         }
 
         this.selectedItem = null;

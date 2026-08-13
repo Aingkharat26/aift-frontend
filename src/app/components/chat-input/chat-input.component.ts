@@ -92,6 +92,7 @@ export class ChatInputComponent {
 
         // Refresh all data
         this.expenseService.refreshDailyLogs();
+        this.expenseService.notifyDataChanged();
 
         if (res?.amount === 0) {
           this.showStatus('บันทึกเรียบร้อย', 'แต่ระบบไม่พบจำนวนเงินในข้อความนี้', '⚠️');

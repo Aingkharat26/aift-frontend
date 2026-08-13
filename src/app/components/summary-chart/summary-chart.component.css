@@ -53,6 +53,61 @@
 .balance.positive .value { color: #10b981; }
 .balance:not(.negative):not(.positive) .value { color: var(--text-color); }
 
+.ai-insight {
+  width: 100%;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.08), rgba(168, 85, 247, 0.08));
+  border: 1px solid rgba(14, 165, 233, 0.2);
+  padding: 10px 14px;
+  border-radius: 12px;
+}
+
+.ai-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.ai-robot {
+  font-size: 1rem;
+}
+
+.ai-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #0ea5e9;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ai-text {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--text-color);
+  white-space: pre-line;
+}
+
+.ai-error {
+  color: var(--text-muted);
+}
+
+.ai-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.ai-spinner {
+  width: 16px;
+  height: 16px;
+  border-width: 2px;
+}
+
 .top-list-section {
   width: 100%;
   margin-bottom: 10px;

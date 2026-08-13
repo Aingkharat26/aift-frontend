@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { BehaviorSubject, map, Observable, tap } from 'rxjs';
 
 export interface Expense {
   id: number;
@@ -41,6 +41,17 @@ export class ExpenseService {
 
   private prevYear?: number;
   private prevMonth?: number;
+
+  // ตัวนับเวอร์ชันข้อมูล — เพิ่มทุกครั้งที่มีการเพิ่ม/แก้ไข/ลบรายการ
+  // summary-chart ใช้บอกว่า AI ควรคำนวณใหม่หรืออ่านจาก cache
+  private aiDataVersion = 0;
+  getAiDataVersion(): number {
+    return this.aiDataVersion;
+  }
+
+  notifyDataChanged() {
+    this.aiDataVersion++;
+  }
 
   getSelectedDate(): Date {
     return this.selectedDateSubject.value;
@@ -96,12 +107,32 @@ export class ExpenseService {
       });
   }
 
+  getAiMonthlySummary(year: number, month: number): Observable<{ summary: string; generated: boolean; hasData: boolean }> {
+    // GET — อ่านจาก cache ไม่เรียก AI ใหม่
+    return this.http
+      .get<{ success: boolean; data: { summary: string; generated: boolean; hasData: boolean } }>(
+        `${this.apiUrl}/ai-summary?year=${year}&month=${month}`,
+      )
+      .pipe(map((res) => res.data));
+  }
+
+  refreshAiMonthlySummary(year: number, month: number): Observable<{ summary: string; generated: boolean; hasData: boolean }> {
+    // POST — บังคับให้ AI คำนวณใหม่แล้วเก็บ cache
+    return this.http
+      .post<{ success: boolean; data: { summary: string; generated: boolean; hasData: boolean } }>(
+        `${this.apiUrl}/ai-summary/refresh`,
+        { year, month },
+      )
+      .pipe(map((res) => res.data));
+  }
+
   processChat(text: string): Observable<any> {
     return this.http.post<{success: boolean, data: Expense}>(`${this.apiUrl}/chat`, { text }).pipe(
       tap(() => {
         const current = this.selectedDateSubject.value;
         this.loadDailyExpenses(this.formatDate(current));
         this.loadMonthlySummary(current.getFullYear(), current.getMonth() + 1);
+        this.notifyDataChanged();
       })
     );
   }
@@ -112,6 +143,7 @@ export class ExpenseService {
         const current = this.selectedDateSubject.value;
         this.loadDailyExpenses(this.formatDate(current));
         this.loadMonthlySummary(current.getFullYear(), current.getMonth() + 1);
+        this.notifyDataChanged();
       })
     );
   }
@@ -122,6 +154,7 @@ export class ExpenseService {
         const current = this.selectedDateSubject.value;
         this.loadDailyExpenses(this.formatDate(current));
         this.loadMonthlySummary(current.getFullYear(), current.getMonth() + 1);
+        this.notifyDataChanged();
       })
     );
   }

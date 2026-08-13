@@ -36,4 +36,19 @@
       [type]="pieChartType">
     </canvas>
   </div>
+
+  <div class="ai-insight" *ngIf="!loading && (aiSummary || aiLoading || aiFailed)">
+    <div class="ai-header">
+      <span class="ai-robot">🤖</span>
+      <span class="ai-title">สรุปจาก AI</span>
+    </div>
+    <div class="ai-loading" *ngIf="aiLoading">
+      <div class="spinner ai-spinner"></div>
+      <span>AI กำลังวิเคราะห์การใช้จ่าย...</span>
+    </div>
+    <p class="ai-text" *ngIf="!aiLoading && aiSummary">{{ aiSummary }}</p>
+    <p class="ai-text ai-error" *ngIf="!aiLoading && aiFailed && !aiSummary">
+      AI ไม่ว่างในตอนนี้ ลองใหม่อีกครั้งภายหลังครับ
+    </p>
+  </div>
 </div>
