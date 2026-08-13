@@ -86,6 +86,13 @@ export class DailyLogComponent implements OnInit {
     });
   }
 
+  getTitle(): string {
+    if (this.getSelectedDateLabel() === 'วันนี้') {
+      return 'รายการวันนี้';
+    }
+    return `รายการของวันที่ ${this.getSelectedDateLabel()}`;
+  }
+
   editItem(item: any, dialog: HTMLDialogElement) {
     this.editingItem = item;
     this.editForm = {
