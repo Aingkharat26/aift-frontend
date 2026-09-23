@@ -17,6 +17,11 @@ export class ChatInputComponent {
   isLoading = false;
   isIncomeLoading = false;
   isScanning = false;
+  activeTab: 'expense' | 'income' = 'expense';
+
+  setTab(tab: 'expense' | 'income') {
+    this.activeTab = tab;
+  }
 
   private expenseService = inject(ExpenseService);
   private incomeService = inject(IncomeService);

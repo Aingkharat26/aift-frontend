@@ -45,7 +45,7 @@
     <div class="ribbon-divider"></div>
 
     <!-- Middle: Category Chips -->
-    <div class="ribbon-chips">
+    <div class="ribbon-chips" *ngIf="sortedStatuses.length > 0">
       <div
         class="chip-item"
         *ngFor="let item of sortedStatuses.slice(0, 5)"

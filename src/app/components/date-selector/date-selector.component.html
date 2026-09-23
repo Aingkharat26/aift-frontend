@@ -1,4 +1,7 @@
 <div class="datepicker-container" (click)="$event.stopPropagation()">
+  <!-- Backdrop Overlay บนมือถือ -->
+  <div class="calendar-backdrop" *ngIf="showPicker" (click)="togglePicker()"></div>
+
   <!-- Toggle Button -->
   <div class="datepicker-trigger" (click)="togglePicker()" [class.active]="showPicker">
     <span class="icon">📅</span>

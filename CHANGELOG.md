@@ -14,6 +14,85 @@
 
 ## 🕒 บันทึกรายการเปลี่ยนแปลง (Change History)
 
+### 📅 2026-09-23 15:19:00 (Local Time)
+**ประเภท:** `[Fix]` `[Frontend / Mobile Responsive]`  
+**หัวข้อ:** แก้ไขปัญหาการแสดงผลและตัดขอบของแถบ Mini Budget Ribbon บนมือถือ  
+**ปัญหาหรือความต้องการ (Issue / Requirement):**
+- พบปัญหาใน Mini Budget Ribbon เมื่อเปิดบนหน้าจอมือถือ/หน้าจอแคบ:
+  - ปุ่ม `[จัดการงบ ->]` ไปอยู่ตรงกลาง และมีขอบของชิปหมวดหมู่โผล่มาตัดขอบที่มุมขวา (`(`) เนื่องจากข้อจำกัดของ Flexbox `order` ร่วมกับ `flex: 1`
+  - แถบ Progress bar มีความสว่างน้อยในโหมดมืด (Dark Mode) และเมื่อยอดใช้จ่ายน้อย (เช่น 1-2%) ตัวหลอดจะมองไม่เห็น
+**สิ่งที่แก้ไข (Changes Detail):**
+1. **CSS Grid Layout on Mobile (`mini-budget.component.scss`):**
+   - ปรับเลย์เอาต์บนมือถือ (`<= 900px`) ให้เป็น 2 แถวแบบ CSS Grid ชัดเจน:
+     - **แถวบน:** หัวข้อ "🎯 งบเดือน..." + ป้าย % (ซ้าย) จัดคู่กับปุ่ม `[จัดการงบ ->]` (ขวา) ชิดขอบอย่างลงตัว
+     - **แถวกลาง:** หลอด Progress bar เต็มความกว้าง พร้อมยอดเงิน `฿103 / ฿6,000` ชัดเจน
+     - **แถวล่าง:** ชิปหมวดหมู่งบประมาณเลื่อนแนวนอนได้อย่างอิสระ ไม่ดันหรือซ้อนทับปุ่มจัดการงบ
+2. **Dark Mode Visibility:**
+   - ปรับพื้นหลัง track ในโหมดมืดให้คมชัดขึ้น (`rgba(255, 255, 255, 0.16)`) และกำหนด `min-width: 4px` ให้กับ `progress-fill` เพื่อให้เห็นแถบสีสถานะเสมอแม้ยอดใช้จ่าย 1-2%
+3. **Template Condition (`mini-budget.component.html`):**
+   - เพิ่ม `*ngIf="sortedStatuses.length > 0"` ซ่อนโซนชิปอัตโนมัติเมื่อยังไม่มีข้อมูลหมวดหมู่ย่อย
+
+**ไฟล์ที่แก้ไข (Affected Files):**
+- `aift-frontend/src/app/components/mini-budget/mini-budget.component.html`
+- `aift-frontend/src/app/components/mini-budget/mini-budget.component.scss`
+- `CHANGELOG.md`
+
+---
+
+### 📅 2026-09-23 15:15:00 (Local Time)
+**ประเภท:** `[Feature]` `[Fix]` `[Frontend / Mobile Responsive]`  
+**หัวข้อ:** ปรับปรุงระบบ Mobile Responsive ครอบคลุมทั้งแอปพลิเคชัน (Mobile Responsive Overhaul)  
+**ปัญหาหรือความต้องการ (Issue / Requirement):**
+- ตรวจสอบพบปัญหาการแสดงผลบนหน้าจอมือถือ (320px - 768px):
+  - แถบ Chat Input Sticky ด้านล่างซ้อนกัน 2 กล่องสูง ~220px กินพื้นที่กว่า 40% ของจอ และบังเนื้อหาเมื่อพิมพ์
+  - แถบเมนูด้านบน (Top Nav) ตัดบรรทัด 3 แถว ปุ่ม Admin Model Limits ไม่ซ่อนข้อความ
+  - Modal Dialogs (แก้ไข/ลบรายการ, ตั้งงบประมาณ) ล้นขอบจอและเลื่อนไม่ได้เมื่อเปิดคีย์บอร์ดเสมือน
+  - หน้า Login/Register มี padding ซ้อนกันจนช่องกรอกข้อมูลแคบเกินไปบนจอ 360px - 390px
+  - ปุ่มแก้ไข/ลบใน Daily Log พึ่งพา hover state บน touch device บางประเภท
+
+**สิ่งที่แก้ไข (Changes Detail):**
+1. **Top Navigation (`app.scss`):**
+   - ออกแบบ Mobile Header เป็น 2 แถวกะทัดรัด แถวบนรวมโลโก้ + ปุ่มไอคอน + แบดจ์ผู้ใช้ + ธีม
+   - ซ่อนข้อความปุ่ม Admin Model Limits (`.admin-models-text { display: none }`) และปุ่ม Logout
+   - ปรับลิงก์นำทาง ("📊 แดชบอร์ด" / "🎯 งบประมาณ") เป็น Segmented Tabs เต็มความกว้างหน้าจอ แตะง่าย
+2. **Chat Input (`chat-input.component.*`):**
+   - เพิ่ม `mobile-tab-switcher` สำหรับมือถือ สลับระหว่าง "💸 รายจ่าย (AI)" กับ "💰 รายรับ"
+   - ซ่อนการ์ดที่ไม่ได้เลือกบนมือถือ ช่วยลดความสูงของแถบ Sticky จาก ~220px เหลือเพียง ~75px คืนพื้นที่หน้าจอ
+   - ปรับ touch targets ของปุ่มบันทึกและสแกนใบเสร็จให้ได้มาตรฐาน min 44px
+3. **Main Dashboard (`main-dashboard.component.css`):**
+   - ปรับ `.bottom-section` ให้ตรึงล่างจออย่างเรียบหรูพร้อม backdrop-filter
+   - เพิ่ม padding-bottom ให้กับเนื้อหาเพื่อป้องกันแถบพิมพ์ทับรายการด้านล่าง
+   - ปรับการจัดวาง Date Selector ให้กว้างเต็มจอสวยงาม
+4. **Daily Log & Modals (`daily-log.component.css`):**
+   - กำหนดให้ปุ่มแก้ไขและลบแสดงผลคงที่ ไม่พึ่งพา hover บนจอเล็ก
+   - ปรับ `.modal-dialog` ให้มี `max-height: 85vh` และ `overflow-y: auto` เลื่อนดูได้เสมอ
+5. **Budget Panel & Page (`budget-panel.component.css`, `budget-page.component.css`):**
+   - ปรับ `.modal-dialog` สำหรับตั้งงบและแนะนำงบให้ scrollable
+   - ปรับปุ่ม Header Actions ให้ยืดหยุ่นเต็มกว้างบนมือถือ
+6. **Authentication (`auth.component.scss`):**
+   - เพิ่ม mobile media query ลด padding จาก 120px รวมเหลือพื้นที่กรอกกว้างสบายตา
+7. **Date Selector (`date-selector.component.*`):**
+   - เพิ่ม `calendar-backdrop` เมื่อเปิดปฏิทินแบบ modal บนมือถือ
+8. **Mini Budget Ribbon (`mini-budget.component.scss`):**
+   - ย่อ progress bar และปุ่มจัดการงบให้พอดีกับจอแคบ < 480px
+
+**ไฟล์ที่แก้ไข (Affected Files):**
+- `aift-frontend/src/app/app.scss`
+- `aift-frontend/src/app/components/chat-input/chat-input.component.ts`
+- `aift-frontend/src/app/components/chat-input/chat-input.component.html`
+- `aift-frontend/src/app/components/chat-input/chat-input.component.css`
+- `aift-frontend/src/app/components/main-dashboard/main-dashboard.component.css`
+- `aift-frontend/src/app/components/daily-log/daily-log.component.css`
+- `aift-frontend/src/app/components/budget-panel/budget-panel.component.css`
+- `aift-frontend/src/app/components/budget-page/budget-page.component.css`
+- `aift-frontend/src/app/components/auth/auth.component.scss`
+- `aift-frontend/src/app/components/date-selector/date-selector.component.html`
+- `aift-frontend/src/app/components/date-selector/date-selector.component.css`
+- `aift-frontend/src/app/components/mini-budget/mini-budget.component.scss`
+- `CHANGELOG.md`
+
+---
+
 ### 📅 2026-09-23 14:58:00 (Local Time)
 **ประเภท:** `[Enhancement]` `[Frontend / UI / Redesign]`  
 **หัวข้อ:** ปรับเปลี่ยนการแสดงผลงบประมาณบน Dashboard เป็น "Slim Budget Ribbon" แนวนอนด้านบน  

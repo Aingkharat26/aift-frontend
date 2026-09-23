@@ -73,12 +73,14 @@
   }
 
   [data-theme='dark'] .progress-track {
-    background: rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.08);
   }
 
   .progress-fill {
     height: 100%;
     border-radius: 6px;
+    min-width: 4px;
     transition: width 0.3s ease;
 
     &.status-ok { background: linear-gradient(90deg, #10b981, #059669); }
@@ -304,15 +306,118 @@
 }
 
 @media (max-width: 900px) {
+  .budget-ribbon {
+    padding: 10px 14px;
+    border-radius: 14px;
+    margin-bottom: 10px;
+    min-height: auto;
+  }
+
   .ribbon-divider {
     display: none;
   }
+
   .ribbon-content {
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-  .ribbon-chips {
-    order: 3;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "header actions"
+      "progress progress"
+      "chips chips";
+    row-gap: 8px;
+    column-gap: 10px;
     width: 100%;
+    align-items: center;
+  }
+
+  .ribbon-overall {
+    display: contents;
+  }
+
+  .overall-label-group {
+    grid-area: header;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    .overall-title {
+      font-size: 0.85rem;
+    }
+  }
+
+  .ribbon-right {
+    grid-area: actions;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    justify-content: flex-end;
+  }
+
+  .overall-bar-group {
+    grid-area: progress;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+
+    .progress-track {
+      flex: 1;
+      width: auto;
+      height: 8px;
+      border-radius: 6px;
+    }
+
+    .overall-amounts {
+      font-size: 0.74rem;
+      font-weight: 700;
+    }
+  }
+
+  .ribbon-chips {
+    grid-area: chips;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 2px 0 2px;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  .chip-item {
+    flex-shrink: 0;
+    padding: 3px 8px;
+    font-size: 0.72rem;
+  }
+
+  .btn-manage {
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    border-radius: 8px;
+  }
+
+  .ribbon-alert-pill {
+    font-size: 0.65rem;
+    padding: 2px 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .budget-ribbon {
+    padding: 8px 10px;
+  }
+
+  .overall-label-group .overall-title {
+    font-size: 0.82rem;
+  }
+
+  .btn-manage {
+    padding: 3px 8px;
+    font-size: 0.72rem;
   }
 }

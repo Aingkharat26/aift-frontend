@@ -1,6 +1,26 @@
 <div class="inputs-grid">
+  <!-- Mobile Tab Switcher (ซ่อนบน Desktop แสดงเฉพาะ Mobile <= 768px) -->
+  <div class="mobile-tab-switcher">
+    <button
+      type="button"
+      class="mobile-tab-btn"
+      [class.active]="activeTab === 'expense'"
+      (click)="setTab('expense')"
+    >
+      💸 รายจ่าย (AI)
+    </button>
+    <button
+      type="button"
+      class="mobile-tab-btn"
+      [class.active]="activeTab === 'income'"
+      (click)="setTab('income')"
+    >
+      💰 รายรับ
+    </button>
+  </div>
+
   <!-- ส่วนรายจ่าย (AI) -->
-  <div class="input-card expense-section">
+  <div class="input-card expense-section" [class.mobile-hidden]="activeTab !== 'expense'">
     <div class="card-header">
       <span class="icon">💸</span> รายจ่าย (AI)
     </div>
@@ -38,7 +58,7 @@
   </div>
 
   <!-- ส่วนรายรับ -->
-  <div class="input-card income-section">
+  <div class="input-card income-section" [class.mobile-hidden]="activeTab !== 'income'">
     <div class="card-header">
       <span class="icon">💰</span> รายรับ
     </div>

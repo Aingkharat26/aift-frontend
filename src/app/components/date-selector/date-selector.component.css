@@ -64,6 +64,11 @@
   transform: rotate(180deg);
 }
 
+/* Backdrop Overlay */
+.calendar-backdrop {
+  display: none;
+}
+
 /* Dropdown */
 .calendar-dropdown {
   position: absolute;
@@ -81,6 +86,15 @@
 }
 
 @media (max-width: 480px) {
+  .calendar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(4px);
+    z-index: 999;
+  }
+
   .calendar-dropdown {
     position: fixed; /* Fix to screen on mobile */
     top: 50%;
@@ -90,6 +104,8 @@
     width: 90%;
     max-width: 340px;
     margin: 0;
+    z-index: 1000;
+    padding: 20px 16px;
     animation: modalFadeIn 0.3s ease;
   }
 }
