@@ -14,6 +14,25 @@
 
 ## 🕒 บันทึกรายการเปลี่ยนแปลง (Change History)
 
+### 📅 2026-09-23 17:40:00 (Local Time)
+**ประเภท:** `[Fix]` `[Frontend / Auth]`  
+**หัวข้อ:** แก้ไขปัญหารีเฟรชหน้าจอแล้วเด้งออกจากระบบ (Prevent Session Logout on Page Refresh)  
+**ปัญหาหรือความต้องการ (Issue / Requirement):**
+- ผู้ใช้แจ้งว่า "ทุกครั้งที่ Refresh มันเด้งออกตลอด" ทำให้น่ารำคาญและต้องล็อกอินใหม่อยู่เสมอ
+- สาเหตุเกิดจากใน `restoreSession()` ของ `AuthService` มีการเรียกเช็ค `/auth/me` และกำหนดว่าหากเกิดข้อผิดพลาดใดๆ ให้สั่ง `logout()` ทันที ประกอบกับ `authInterceptor` สั่ง logout เมื่อเกิด 401 ในจังหวะโหลดหน้าจอ ทำให้เวลาที่เกิด network jitter หรือการ refresh หน้าจอ ระบบจะล้าง Token และเตะผู้ใช้ออก
+**สิ่งที่แก้ไข (Changes Detail):**
+1. **ปรับปรุง `restoreSession()` ใน `auth.service.ts`:**
+   - โหลด Session จาก `localStorage` (`aift_token`, `aift_user`) มาใช้งานทันทีอย่างต่อเนื่อง
+   - ให้การซิงค์ข้อมูลโปรไฟล์ `/auth/me` ทำงานแบบ Background โดยหากตรวจสอบไม่สำเร็จหรือเน็ตกระตุก จะไม่เตะผู้ใช้ออก (คงสถานะล็อกอินเดิมไว้)
+2. **ปรับปรุง `authInterceptor` ใน `auth.interceptor.ts`:**
+   - ยกเว้น route `/auth/me` จากการทริกเกอร์ Auto-Logout ป้องกันการเด้งออกในจังหวะรีเฟรชหน้าจอ
+**ไฟล์ที่แก้ไข (Affected Files):**
+- `src/app/services/auth.service.ts`
+- `src/app/interceptors/auth.interceptor.ts`
+- `CHANGELOG.md`
+
+---
+
 ### 📅 2026-09-23 17:18:00 (Local Time)
 **ประเภท:** `[Fix]` `[Config / Infra]` `[Frontend]`  
 **หัวข้อ:** กำหนด Production Backend URL จริง (`https://aift-backend-hkbz.onrender.com`) ให้ Frontend บน Vercel  

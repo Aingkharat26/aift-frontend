@@ -50,14 +50,15 @@ export class AuthService {
       try {
         const parsed = JSON.parse(savedUser);
         this.currentUser.set(parsed);
-        // Verify with backend silently
+        // Sync profile from backend in background without kicking user out on refresh
         this.http.get<User>(`${this.apiUrl}/me`).subscribe({
           next: (user) => {
             this.currentUser.set(user);
             localStorage.setItem(this.userKey, JSON.stringify(user));
           },
-          error: () => {
-            this.logout(this.router.url, 'session_expired');
+          error: (err) => {
+            // Keep user logged in using cached profile; do not kick out on refresh or network glitches
+            console.warn('[Auth] Background profile check skipped:', err?.status);
           },
         });
       } catch {

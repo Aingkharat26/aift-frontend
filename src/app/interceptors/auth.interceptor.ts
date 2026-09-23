@@ -20,11 +20,12 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(authReq).pipe(
     catchError((err: HttpErrorResponse) => {
-      // If 401 on protected routes, log out with returnUrl and reason
+      // If 401 on protected operational routes (excluding login, register, and background me check), log out
       if (
         err.status === 401 &&
         !req.url.includes('/auth/login') &&
-        !req.url.includes('/auth/register')
+        !req.url.includes('/auth/register') &&
+        !req.url.includes('/auth/me')
       ) {
         authService.logout(router.url, 'session_expired');
       }
