@@ -144,7 +144,9 @@ export class ChatInputComponent {
     if (!this.incomeText.trim()) return;
     this.isIncomeLoading = true;
 
-    this.incomeService.processChat(this.incomeText).subscribe({
+    this.incomeService
+      .processChat(this.fixThaiKeyboard(this.incomeText))
+      .subscribe({
       next: (res: any) => {
         this.isIncomeLoading = false;
         this.incomeText = '';
