@@ -4,5 +4,5 @@ export const environment = {
   apiUrl:
     typeof window !== 'undefined' && (window as any).__env?.apiUrl
       ? (window as any).__env.apiUrl
-      : 'https://aift-backend.onrender.com',
+      : 'https://aift-backend-hkbz.onrender.com',
 };

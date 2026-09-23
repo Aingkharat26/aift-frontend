@@ -14,6 +14,24 @@
 
 ## 🕒 บันทึกรายการเปลี่ยนแปลง (Change History)
 
+### 📅 2026-09-23 17:18:00 (Local Time)
+**ประเภท:** `[Fix]` `[Config / Infra]` `[Frontend]`  
+**หัวข้อ:** กำหนด Production Backend URL จริง (`https://aift-backend-hkbz.onrender.com`) ให้ Frontend บน Vercel  
+**ปัญหาหรือความต้องการ (Issue / Requirement):**
+- เข้าใช้งานหน้าเว็บ `https://aift-frontend.vercel.app/login` แล้วกดสมัครสมาชิกไม่มีอะไรเกิดขึ้น
+- สาเหตุเกิดจากใน `public/env.js` ตัวแปร `window.__env.apiUrl` ยังคงเป็นค่าว่าง `''` และใน `environment.production.ts` ชี้ไปที่ URL เริ่มต้นซึ่งไม่ใช่ URL ของ Render Web Service ที่แท้จริง ทำให้ Frontend ส่งคำขอไปผิดเซิร์ฟเวอร์
+**สิ่งที่แก้ไข (Changes Detail):**
+1. **กำหนด Backend URL ใน `public/env.js`:**
+   - ตั้งค่า `window.__env.apiUrl = 'https://aift-backend-hkbz.onrender.com'`
+2. **อัปเดต Fallback URL ใน `environment.production.ts`:**
+   - ชี้ไปยัง `https://aift-backend-hkbz.onrender.com`
+**ไฟล์ที่แก้ไข (Affected Files):**
+- `public/env.js`
+- `src/environments/environment.production.ts`
+- `CHANGELOG.md`
+
+---
+
 ### 📅 2026-09-23 16:30:00 (Local Time)
 **ประเภท:** `[Fix]` `[Frontend / Auth]`  
 **หัวข้อ:** ปรับปรุงระบบแจ้งเตือนข้อผิดพลาดการเข้าสู่ระบบและสมัครสมาชิก แสดงสาเหตุชัดเจน พร้อมกลไก Timeout  
