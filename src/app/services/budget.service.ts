@@ -86,9 +86,21 @@ export class BudgetService {
 
   getStatus(year: number, month: number): Observable<BudgetStatus[]> {
     return this.http
-      .get<{ success: boolean; data: BudgetStatus[] }>(
+      .get<{ success: boolean; data: any }>(
         `${this.apiUrl}/status?year=${year}&month=${month}`,
       )
-      .pipe(map((res) => res.data));
+      .pipe(
+        map((res) => {
+          const rawItems = Array.isArray(res.data)
+            ? res.data
+            : res.data?.items || [];
+          return rawItems.map((item: any) => ({
+            ...item,
+            percentUsed: item.percentUsed ?? item.percent ?? 0,
+            percent: item.percent ?? item.percentUsed ?? 0,
+          }));
+        }),
+      );
   }
 }
+

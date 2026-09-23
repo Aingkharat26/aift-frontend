@@ -52,7 +52,7 @@ export class AuthService {
             localStorage.setItem(this.userKey, JSON.stringify(user));
           },
           error: () => {
-            this.logout();
+            this.logout(this.router.url, 'session_expired');
           },
         });
       } catch {
@@ -90,10 +90,18 @@ export class AuthService {
     this.currentUser.set(res.user);
   }
 
-  logout() {
+  logout(returnUrl?: string, reason?: string) {
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.userKey);
     this.currentUser.set(null);
-    this.router.navigate(['/login']);
+    const queryParams: Record<string, string> = {};
+    if (returnUrl && returnUrl !== '/login') {
+      queryParams['returnUrl'] = returnUrl;
+    }
+    if (reason) {
+      queryParams['reason'] = reason;
+    }
+    this.router.navigate(['/login'], { queryParams });
   }
 }
+

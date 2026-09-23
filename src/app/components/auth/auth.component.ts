@@ -1,7 +1,7 @@
-import { Component, inject, signal, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, signal, ChangeDetectorRef, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -11,21 +11,37 @@ import { AuthService } from '../../services/auth.service';
   templateUrl: './auth.component.html',
   styleUrls: ['./auth.component.scss'],
 })
-export class AuthComponent {
+export class AuthComponent implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   private cdr = inject(ChangeDetectorRef);
 
   isRegisterMode = signal<boolean>(false);
   isLoading = signal<boolean>(false);
   errorMessage = signal<string>('');
   successMessage = signal<string>('');
+  sessionExpired = signal<boolean>(false);
+  returnUrl = signal<string>('/');
 
   // Form Models
   username = '';
   password = '';
   confirmPassword = '';
   displayName = '';
+
+  ngOnInit() {
+    this.route.queryParamMap.subscribe((params) => {
+      const returnUrlParam = params.get('returnUrl');
+      if (returnUrlParam && returnUrlParam !== '/login') {
+        this.returnUrl.set(returnUrlParam);
+      }
+      if (params.get('reason') === 'session_expired') {
+        this.sessionExpired.set(true);
+      }
+      this.cdr.detectChanges();
+    });
+  }
 
   switchMode(isRegister: boolean) {
     this.isRegisterMode.set(isRegister);
@@ -85,7 +101,7 @@ export class AuthComponent {
           next: () => {
             this.isLoading.set(false);
             this.cdr.detectChanges();
-            this.router.navigate(['/']);
+            this.navigateAfterAuth();
           },
           error: (err) => {
             this.isLoading.set(false);
@@ -114,7 +130,7 @@ export class AuthComponent {
           next: () => {
             this.isLoading.set(false);
             this.cdr.detectChanges();
-            this.router.navigate(['/']);
+            this.navigateAfterAuth();
           },
           error: (err) => {
             this.isLoading.set(false);
@@ -129,5 +145,10 @@ export class AuthComponent {
           },
         });
     }
+  }
+
+  private navigateAfterAuth() {
+    const target = this.returnUrl() || '/';
+    this.router.navigateByUrl(target);
   }
 }

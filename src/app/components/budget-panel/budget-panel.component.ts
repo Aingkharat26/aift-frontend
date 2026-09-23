@@ -73,11 +73,12 @@ export class BudgetPanelComponent implements OnInit {
   }
 
   get alerts(): BudgetStatus[] {
+    if (!Array.isArray(this.statuses)) return [];
     return this.statuses.filter((s) => s.status !== 'ok');
   }
 
   get hasBudgets(): boolean {
-    return this.statuses.length > 0;
+    return Array.isArray(this.statuses) && this.statuses.length > 0;
   }
 
   reloadStatus() {
@@ -85,9 +86,9 @@ export class BudgetPanelComponent implements OnInit {
     const m = this.currentDate.getMonth() + 1;
     this.budgetService.getStatus(y, m).subscribe({
       next: (res) => {
-        this.statuses = res;
-        this.checkNotifications(res);
-        this.prevStatuses = res;
+        this.statuses = Array.isArray(res) ? res : [];
+        this.checkNotifications(this.statuses);
+        this.prevStatuses = this.statuses;
         this.cdr.detectChanges();
       },
       error: () => {
@@ -99,6 +100,7 @@ export class BudgetPanelComponent implements OnInit {
 
   // แจ้งเตือนเฉพาะตอน "ข้ามเกณฑ์" (ok → warning/exceeded) ในเดือนปัจจุบัน
   private checkNotifications(next: BudgetStatus[]) {
+    if (!Array.isArray(next)) return;
     if (!this.initialized) {
       this.initialized = true;
       this.prevStatuses = next;
@@ -164,7 +166,8 @@ export class BudgetPanelComponent implements OnInit {
 
   openAddDialog() {
     // ตั้งค่าเริ่มต้นเป็นหมวดที่ยังไม่มีงบ
-    const used = new Set(this.statuses.map((s) => s.category));
+    const list = Array.isArray(this.statuses) ? this.statuses : [];
+    const used = new Set(list.map((s) => s.category));
     const firstFree = this.categories.find((c) => !used.has(c));
     this.newBudget = {
       category: firstFree || this.categories[0],
@@ -182,8 +185,10 @@ export class BudgetPanelComponent implements OnInit {
         this.addDialog.nativeElement.close();
         this.reloadStatus();
       },
-      error: () => {
-        alert('เกิดข้อผิดพลาดในการตั้งงบประมาณ');
+      error: (err) => {
+        if (err?.status !== 401) {
+          alert('เกิดข้อผิดพลาดในการตั้งงบประมาณ');
+        }
       },
     });
   }
@@ -200,7 +205,11 @@ export class BudgetPanelComponent implements OnInit {
     this.selectedForDelete = null;
     this.budgetService.deleteBudget(id).subscribe({
       next: () => this.reloadStatus(),
-      error: () => alert('เกิดข้อผิดพลาดในการลบงบประมาณ'),
+      error: (err) => {
+        if (err?.status !== 401) {
+          alert('เกิดข้อผิดพลาดในการลบงบประมาณ');
+        }
+      },
     });
   }
 
@@ -232,7 +241,11 @@ export class BudgetPanelComponent implements OnInit {
           rec.currentBudget = rec.recommendedBudget;
           this.reloadStatus();
         },
-        error: () => alert('เกิดข้อผิดพลาดในการบันทึกงบประมาณ'),
+        error: (err) => {
+          if (err?.status !== 401) {
+            alert('เกิดข้อผิดพลาดในการบันทึกงบประมาณ');
+          }
+        },
       });
   }
 

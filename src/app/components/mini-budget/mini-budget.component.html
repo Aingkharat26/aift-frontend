@@ -1,0 +1,76 @@
+<div class="budget-ribbon" [class.empty-ribbon]="!loading && !hasBudgets">
+  <!-- Loading State -->
+  <div class="ribbon-loading" *ngIf="loading">
+    <div class="spinner"></div>
+    <span>กำลังโหลดงบประมาณ...</span>
+  </div>
+
+  <!-- Empty State -->
+  <div class="ribbon-empty" *ngIf="!loading && !hasBudgets">
+    <div class="empty-left">
+      <span class="ribbon-icon">🎯</span>
+      <span class="empty-text">ยังไม่ได้ตั้งงบประมาณประจำเดือน{{ getMonthLabel() }}</span>
+    </div>
+    <button class="btn-ribbon-action" (click)="navigateToBudgets()">
+      ＋ ตั้งงบประมาณเลย
+    </button>
+  </div>
+
+  <!-- Content State: Slim Ribbon -->
+  <div class="ribbon-content" *ngIf="!loading && hasBudgets">
+    <!-- Left: Overall Summary -->
+    <div class="ribbon-overall" (click)="navigateToBudgets()" title="คลิกเพื่อดูรายละเอียดงบประมาณ">
+      <div class="overall-label-group">
+        <span class="ribbon-icon">🎯</span>
+        <span class="overall-title">งบเดือน{{ getMonthLabel() }}</span>
+        <span class="overall-badge" [ngClass]="getStatusClass(overallStatus)">
+          {{ totalPercent }}%
+        </span>
+      </div>
+      <div class="overall-bar-group">
+        <div class="progress-track">
+          <div
+            class="progress-fill"
+            [ngClass]="getStatusClass(overallStatus)"
+            [style.width.%]="overallProgressWidth()"
+          ></div>
+        </div>
+        <span class="overall-amounts">
+          ฿{{ formatNumber(totalSpent) }} / ฿{{ formatNumber(totalBudget) }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Divider -->
+    <div class="ribbon-divider"></div>
+
+    <!-- Middle: Category Chips -->
+    <div class="ribbon-chips">
+      <div
+        class="chip-item"
+        *ngFor="let item of sortedStatuses.slice(0, 5)"
+        (click)="navigateToBudgets()"
+        [ngClass]="getStatusClass(item.status)"
+        [title]="item.category + ': ใช้ไป ฿' + formatNumber(item.spent) + ' จาก ฿' + formatNumber(item.limit)"
+      >
+        <span class="chip-icon">{{ getCategoryIcon(item.category) }}</span>
+        <span class="chip-name">{{ item.category }}</span>
+        <span class="chip-pct">{{ item.percentUsed }}%</span>
+      </div>
+      <span *ngIf="sortedStatuses.length > 5" class="chip-more" (click)="navigateToBudgets()">
+        +{{ sortedStatuses.length - 5 }} หมวด
+      </span>
+    </div>
+
+    <!-- Right: Alert & Manage Button -->
+    <div class="ribbon-right">
+      <span *ngIf="alertCount > 0" class="ribbon-alert-pill" (click)="navigateToBudgets()">
+        ⚠️ {{ alertCount }} หมวดเตือน
+      </span>
+      <button class="btn-manage" (click)="navigateToBudgets()" title="ไปที่หน้างบประมาณแบบเต็ม">
+        <span>จัดการงบ</span>
+        <span class="arrow-icon">→</span>
+      </button>
+    </div>
+  </div>
+</div>

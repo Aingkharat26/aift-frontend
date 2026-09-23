@@ -97,6 +97,12 @@
     border: 1px solid rgba(239, 68, 68, 0.25);
     color: #ef4444;
   }
+
+  &.alert-warning {
+    background: rgba(245, 158, 11, 0.12);
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    color: #d97706;
+  }
 }
 
 .auth-form {

@@ -1,0 +1,318 @@
+.budget-ribbon {
+  width: 100%;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color, rgba(0, 0, 0, 0.08));
+  border-radius: 12px;
+  padding: 8px 14px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  transition: all 0.2s ease;
+  margin-bottom: 12px;
+  flex-shrink: 0;
+
+  &.empty-ribbon {
+    padding: 7px 14px;
+  }
+}
+
+[data-theme='dark'] .budget-ribbon {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.ribbon-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 16px;
+}
+
+.ribbon-overall {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  flex-shrink: 0;
+
+  &:hover .overall-title {
+    color: var(--primary-color, #2563eb);
+  }
+}
+
+.overall-label-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  .ribbon-icon {
+    font-size: 1.1rem;
+  }
+
+  .overall-title {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text-color);
+    white-space: nowrap;
+    transition: color 0.2s ease;
+  }
+}
+
+.overall-bar-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .progress-track {
+    width: 95px;
+    height: 7px;
+    background: rgba(0, 0, 0, 0.08);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  [data-theme='dark'] .progress-track {
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 0.3s ease;
+
+    &.status-ok { background: linear-gradient(90deg, #10b981, #059669); }
+    &.status-warning { background: linear-gradient(90deg, #f59e0b, #d97706); }
+    &.status-exceeded { background: linear-gradient(90deg, #f43f5e, #e11d48); }
+  }
+
+  .overall-amounts {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+}
+
+.overall-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 10px;
+
+  &.status-ok { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+  &.status-warning { background: rgba(245, 158, 11, 0.15); color: #d97706; }
+  &.status-exceeded { background: rgba(244, 63, 94, 0.15); color: #f43f5e; }
+}
+
+.ribbon-divider {
+  width: 1px;
+  height: 22px;
+  background: var(--border-color, rgba(0, 0, 0, 0.1));
+  flex-shrink: 0;
+}
+
+/* Category Chips */
+.ribbon-chips {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  overflow-x: auto;
+  padding: 2px 0;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.chip-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(0, 0, 0, 0.025);
+  border: 1px solid var(--border-color, rgba(0, 0, 0, 0.08));
+  border-radius: 8px;
+  padding: 3px 8px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.05);
+    transform: translateY(-1px);
+  }
+
+  .chip-icon {
+    font-size: 0.8rem;
+  }
+
+  .chip-name {
+    color: var(--text-color);
+  }
+
+  .chip-pct {
+    font-weight: 700;
+  }
+
+  &.status-ok .chip-pct { color: #10b981; }
+  &.status-warning {
+    border-color: rgba(245, 158, 11, 0.35);
+    background: rgba(245, 158, 11, 0.08);
+    .chip-pct { color: #d97706; }
+  }
+  &.status-exceeded {
+    border-color: rgba(244, 63, 94, 0.35);
+    background: rgba(244, 63, 94, 0.08);
+    .chip-pct { color: #f43f5e; }
+  }
+}
+
+[data-theme='dark'] .chip-item {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+  }
+}
+
+.chip-more {
+  font-size: 0.7rem;
+  color: var(--primary-color, #2563eb);
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  padding: 2px 4px;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+/* Right Section */
+.ribbon-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.ribbon-alert-pill {
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: rgba(245, 158, 11, 0.15);
+  color: #d97706;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-manage {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  border: 1px solid var(--border-color, rgba(0, 0, 0, 0.12));
+  color: var(--primary-color, #2563eb);
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(37, 99, 235, 0.08);
+    border-color: var(--primary-color, #2563eb);
+  }
+
+  .arrow-icon {
+    font-size: 0.8rem;
+    transition: transform 0.2s ease;
+  }
+
+  &:hover .arrow-icon {
+    transform: translateX(2px);
+  }
+}
+
+/* Empty & Loading states */
+.ribbon-empty,
+.ribbon-loading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 12px;
+}
+
+.empty-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .ribbon-icon {
+    font-size: 1.1rem;
+  }
+
+  .empty-text {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+}
+
+.btn-ribbon-action {
+  background: var(--primary-color, #2563eb);
+  color: #ffffff;
+  border: none;
+  padding: 4px 12px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
+.ribbon-loading {
+  justify-content: flex-start;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+
+  .spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #e2e8f0;
+    border-top-color: #0ea5e9;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 900px) {
+  .ribbon-divider {
+    display: none;
+  }
+  .ribbon-content {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .ribbon-chips {
+    order: 3;
+    width: 100%;
+  }
+}

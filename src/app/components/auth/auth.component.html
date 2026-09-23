@@ -38,6 +38,19 @@
       </button>
     </div>
 
+    <!-- Session Expired Warning Box -->
+    @if (sessionExpired()) {
+      <div class="alert-box alert-warning">
+        <span class="alert-icon">⏰</span>
+        <span class="alert-text">
+          เซสชันการใช้งานหมดอายุ กรุณาเข้าสู่ระบบอีกครั้งเพื่อดำเนินการต่อ
+          @if (returnUrl() !== '/') {
+            (ระบบจะพากลับไปยังหน้างบประมาณหลังล็อกอิน)
+          }
+        </span>
+      </div>
+    }
+
     <!-- Alert Box -->
     @if (errorMessage()) {
       <div class="alert-box alert-error">
