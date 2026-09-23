@@ -1,0 +1,184 @@
+<div class="modal-backdrop" (click)="close.emit()">
+  <div class="modal-dialog" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="modal-header">
+      <div class="header-left">
+        <div class="title-row">
+          <h2>👑 สถานะและขีดจำกัดโมเดล AI</h2>
+          <span class="status-indicator" [class.is-active]="data()?.apiKeyConfigured">
+            <span class="dot"></span>
+            {{ data()?.apiKeyConfigured ? 'API พร้อมใช้งาน' : 'API ขัดข้อง' }}
+          </span>
+        </div>
+        <p class="subtitle">สิทธิ์ Admin: ตรวจสอบโควตาและระบบสลับโมเดลอัตโนมัติ (Waterfall)</p>
+      </div>
+      <button class="btn-close" (click)="close.emit()" title="ปิดหน้าต่าง">✕</button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body">
+      <!-- Loading State -->
+      <div *ngIf="loading()" class="loading-state">
+        <div class="spinner"></div>
+        <p>กำลังโหลดข้อมูลโมเดล...</p>
+      </div>
+
+      <!-- Error State -->
+      <div *ngIf="error()" class="error-banner">
+        <span>⚠️ {{ error() }}</span>
+        <button class="btn-retry" (click)="fetchData()">ลองใหม่</button>
+      </div>
+
+      <ng-container *ngIf="!loading() && data() as info">
+        <!-- Compact Quota Ribbon -->
+        <div class="quota-ribbon">
+          <div class="quota-pill">
+            <span class="pill-label">คำขอสูงสุด (RPM)</span>
+            <span class="pill-value">15 ครั้ง/นาที</span>
+          </div>
+          <div class="quota-divider"></div>
+          <div class="quota-pill">
+            <span class="pill-label">คำขอรายวัน (RPD)</span>
+            <span class="pill-value">1,500 ครั้ง/วัน</span>
+          </div>
+          <div class="quota-divider"></div>
+          <div class="quota-pill">
+            <span class="pill-label">โควตาโทเค็น (TPM)</span>
+            <span class="pill-value">1,000,000 TPM</span>
+          </div>
+          <div class="quota-divider"></div>
+          <div class="quota-pill">
+            <span class="pill-label">ขีดจำกัด Context</span>
+            <span class="pill-value">1M In / 65K Out</span>
+          </div>
+        </div>
+
+        <!-- Segmented Control Tabs -->
+        <div class="segmented-control">
+          <button
+            class="segment-btn"
+            [class.active]="activeTab() === 'waterfall'"
+            (click)="activeTab.set('waterfall')"
+          >
+            ลำดับโมเดลใช้งาน (Waterfall {{ info.activeModels.length }})
+          </button>
+          <button
+            class="segment-btn"
+            [class.active]="activeTab() === 'google-models'"
+            (click)="activeTab.set('google-models')"
+          >
+            โมเดลทั้งหมดในระบบ ({{ info.liveGoogleModels.length }})
+          </button>
+        </div>
+
+        <!-- TAB 1: Waterfall Models (Clean Row Layout) -->
+        <div *ngIf="activeTab() === 'waterfall'" class="waterfall-container">
+          <div class="models-clean-list">
+            <div
+              *ngFor="let model of info.activeModels"
+              class="model-row"
+              [class.is-primary]="model.priority === 1"
+              [class.is-expanded]="expandedModelId() === model.id"
+              (click)="toggleExpand(model.id)"
+            >
+              <div class="row-main">
+                <!-- Priority Badge -->
+                <div class="priority-num" [class.p1]="model.priority === 1">
+                  {{ model.priority }}
+                </div>
+
+                <!-- Model Info -->
+                <div class="model-info">
+                  <div class="model-top-line">
+                    <span class="model-name">{{ model.displayName }}</span>
+                    <span class="role-tag" [class.tag-primary]="model.priority === 1">
+                      {{ model.priority === 1 ? 'โมเดลหลัก (Primary)' : 'โมเดลสำรอง #' + (model.priority - 1) }}
+                    </span>
+                  </div>
+                  <div class="model-meta">
+                    <span>Input {{ formatTokens(model.inputTokenLimit) }}</span>
+                    <span class="meta-dot">•</span>
+                    <span>Output {{ formatTokens(model.outputTokenLimit) }}</span>
+                    <span class="meta-dot">•</span>
+                    <span>15 RPM</span>
+                  </div>
+                </div>
+
+                <!-- Right Action & Ping -->
+                <div class="row-actions">
+                  <!-- Latency display if pinged -->
+                  <div *ngIf="getPingResult(model.id) as ping" class="ping-pill" [class.ping-ok]="ping.success" [class.ping-fail]="!ping.success">
+                    <span *ngIf="ping.success">✓ {{ ping.latencyMs }} ms</span>
+                    <span *ngIf="!ping.success">✕ ล้มเหลว</span>
+                  </div>
+
+                  <!-- Ping button -->
+                  <button
+                    class="btn-ping"
+                    [disabled]="pingingModel() === model.id"
+                    (click)="testPing(model.id, $event)"
+                    title="ทดสอบการตอบสนองของโมเดลนี้"
+                  >
+                    <span *ngIf="pingingModel() === model.id" class="spinner-tiny"></span>
+                    <span *ngIf="pingingModel() !== model.id">⚡</span>
+                    {{ pingingModel() === model.id ? 'ทดสอบ...' : 'ทดสอบ' }}
+                  </button>
+
+                  <span class="chevron" [class.open]="expandedModelId() === model.id">▾</span>
+                </div>
+              </div>
+
+              <!-- Collapsible Details -->
+              <div *ngIf="expandedModelId() === model.id" class="row-details">
+                <p class="desc">{{ model.description }}</p>
+                <div class="details-bottom">
+                  <code class="raw-id">ID: {{ model.id }}</code>
+                  <span *ngIf="getPingResult(model.id)?.reply as reply" class="reply-text">
+                    ตอบกลับล่าสุด: "{{ reply }}"
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: Live Google Models Table -->
+        <div *ngIf="activeTab() === 'google-models'" class="google-models-view">
+          <div class="table-container">
+            <table class="clean-table">
+              <thead>
+                <tr>
+                  <th>โมเดล</th>
+                  <th>Input Limit</th>
+                  <th>Output Limit</th>
+                  <th>รายละเอียด</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let gm of info.liveGoogleModels">
+                  <td>
+                    <div class="gm-name">{{ gm.displayName }}</div>
+                    <code class="gm-code">{{ gm.name }}</code>
+                  </td>
+                  <td><span class="token-text">{{ formatTokens(gm.inputTokenLimit) }}</span></td>
+                  <td><span class="token-text">{{ formatTokens(gm.outputTokenLimit) }}</span></td>
+                  <td class="gm-desc">{{ gm.description || '-' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+      <button class="btn-refresh" (click)="fetchData()" [disabled]="loading()">
+        🔄 รีเฟรชสถานะ
+      </button>
+      <button class="btn-close-action" (click)="close.emit()">
+        ปิดหน้าต่าง
+      </button>
+    </div>
+  </div>
+</div>
