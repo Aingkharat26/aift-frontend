@@ -14,6 +14,27 @@
 
 ## 🕒 บันทึกรายการเปลี่ยนแปลง (Change History)
 
+### 📅 2026-09-23 16:30:00 (Local Time)
+**ประเภท:** `[Fix]` `[Frontend / Auth]`  
+**หัวข้อ:** ปรับปรุงระบบแจ้งเตือนข้อผิดพลาดการเข้าสู่ระบบและสมัครสมาชิก แสดงสาเหตุชัดเจน พร้อมกลไก Timeout  
+**ปัญหาหรือความต้องการ (Issue / Requirement):**
+- เข้าสู่ระบบไม่ผ่านแล้วไม่มีสาเหตุแจ้งเตือน ปุ่มหมุนค้าง "กำลังประมวลผล..." ไม่ทราบสาเหตุที่แท้จริง
+**สิ่งที่แก้ไข (Changes Detail):**
+1. **RxJS Timeout & Finalize (`auth.service.ts`, `auth.component.ts`):**
+   - กำหนด timeout 20 วินาที ป้องกันปุ่มค้างตลอดไป
+   - ใช้ `finalize()` รีเซ็ต `isLoading` เป็น false ทุกกรณี
+2. **Error Diagnostic Details (`auth.component.ts`, `auth.component.html`, `auth.component.scss`):**
+   - ตรวจจับ HTTP Status (0: Network / Mixed Content, 401: รหัสผ่านผิด, 404, 500, 502/503/504)
+   - เพิ่ม UI แสดงรายละเอียดทางเทคนิค พร้อมแจ้งเตือนหากเกิด Mixed Content หรือ Cold Start
+**ไฟล์ที่แก้ไข (Affected Files):**
+- `src/app/services/auth.service.ts`
+- `src/app/components/auth/auth.component.ts`
+- `src/app/components/auth/auth.component.html`
+- `src/app/components/auth/auth.component.scss`
+- `CHANGELOG.md`
+
+---
+
 ### 📅 2026-09-23 16:15:00 (Local Time)
 **ประเภท:** `[Feature]` `[Config / Infra]`  
 **หัวข้อ:** เพิ่ม Runtime Environment Configuration (public/env.js) สำหรับ Frontend  

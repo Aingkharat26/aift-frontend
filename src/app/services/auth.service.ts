@@ -1,7 +1,7 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { tap, Observable } from 'rxjs';
+import { tap, timeout, Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 export interface User {
@@ -23,6 +23,10 @@ export class AuthService {
   private apiUrl = `${environment.apiUrl}/auth`;
   private tokenKey = 'aift_token';
   private userKey = 'aift_user';
+
+  get currentApiUrl(): string {
+    return this.apiUrl;
+  }
 
   currentUser = signal<User | null>(null);
   isLoggedIn = computed(() => !!this.currentUser());
@@ -68,6 +72,7 @@ export class AuthService {
     displayName?: string;
   }): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/register`, data).pipe(
+      timeout(20000),
       tap((res) => {
         this.handleAuthSuccess(res);
       }),
@@ -79,6 +84,7 @@ export class AuthService {
     password: string;
   }): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, data).pipe(
+      timeout(20000),
       tap((res) => {
         this.handleAuthSuccess(res);
       }),

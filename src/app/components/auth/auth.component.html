@@ -55,7 +55,23 @@
     @if (errorMessage()) {
       <div class="alert-box alert-error">
         <span class="alert-icon">⚠️</span>
-        <span class="alert-text">{{ errorMessage() }}</span>
+        <div class="alert-content">
+          <span class="alert-text">{{ errorMessage() }}</span>
+          @if (errorDetail()) {
+            <div class="error-detail-wrapper">
+              <button
+                type="button"
+                class="error-detail-toggle"
+                (click)="toggleErrorDetail()"
+              >
+                {{ showErrorDetail() ? '▲ ซ่อนรายละเอียดทางเทคนิค' : '▼ ดูสาเหตุ / รายละเอียดทางเทคนิค' }}
+              </button>
+              @if (showErrorDetail()) {
+                <pre class="error-detail-text">{{ errorDetail() }}</pre>
+              }
+            </div>
+          }
+        </div>
       </div>
     }
 
