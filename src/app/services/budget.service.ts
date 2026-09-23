@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, map, Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface Budget {
   id: number;
@@ -33,7 +34,7 @@ export interface BudgetRecommendation {
 })
 export class BudgetService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:3000/budgets';
+  private apiUrl = `${environment.apiUrl}/budgets`;
 
   private budgetsSubject = new BehaviorSubject<Budget[]>([]);
   public budgets$ = this.budgetsSubject.asObservable();

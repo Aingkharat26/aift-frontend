@@ -1,0 +1,23 @@
+{
+  "name": "AI Finance Tracker",
+  "short_name": "AIFT",
+  "description": "ระบบบันทึกรายรับ-รายจ่ายอัจฉริยะด้วย AI สแกนใบเสร็จ และวางแผนงบประมาณ",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0f172a",
+  "theme_color": "#0ea5e9",
+  "icons": [
+    {
+      "src": "/aift_logo/aift_logo.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/aift_logo/aift_logo_dark.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png"
+    }
+  ]
+}

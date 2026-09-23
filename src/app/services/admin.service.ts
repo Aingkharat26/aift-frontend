@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface ModelLimitInfo {
   id: string;
@@ -53,7 +54,7 @@ export interface PingResult {
 })
 export class AdminService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:3000/admin';
+  private apiUrl = `${environment.apiUrl}/admin`;
 
   getModelLimits(): Observable<ModelLimitsResponse> {
     return this.http.get<ModelLimitsResponse>(`${this.apiUrl}/models`);

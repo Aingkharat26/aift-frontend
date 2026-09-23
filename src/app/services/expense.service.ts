@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, map, Observable, tap } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface Expense {
   id: number;
@@ -20,7 +21,7 @@ export interface CategorySummary {
 })
 export class ExpenseService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:3000/expenses';
+  private apiUrl = `${environment.apiUrl}/expenses`;
 
   constructor() {
     this.setSelectedDate(new Date());
