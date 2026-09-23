@@ -14,6 +14,33 @@
 
 ## 🕒 บันทึกรายการเปลี่ยนแปลง (Change History)
 
+### 📅 2026-09-23 15:36:00 (Local Time)
+**ประเภท:** `[Feature]` `[Config / Infra]` `[Mobile PWA]`  
+**หัวข้อ:** เพิ่มการรองรับ PWA (Add to Home Screen) และ Environment Config สำหรับ Cloud Deployment  
+**ปัญหาหรือความต้องการ (Issue / Requirement):**
+- เตรียมความพร้อม Frontend ให้สามารถ Deploy บน Vercel และติดตั้งบนมือถือได้
+**สิ่งที่แก้ไข (Changes Detail):**
+1. **PWA & Web App Manifest (`manifest.webmanifest`, `index.html`):**
+   - สร้างไฟล์ Web Manifest รองรับ standalone display, theme color, icons
+   - เพิ่ม iOS meta tags (`apple-mobile-web-app-capable`, `apple-touch-icon`, `viewport-fit=cover`)
+2. **Dynamic Environment (`src/environments/`):**
+   - สร้าง `environment.ts` และ `environment.production.ts`
+   - ปรับแต่ง `angular.json` เพิ่ม `fileReplacements`
+   - ปรับปรุง Service ทั้งหมด (`ExpenseService`, `IncomeService`, `BudgetService`, `AuthService`, `AdminService`) ให้เรียก API ผ่าน `environment.apiUrl`
+3. **Vercel SPA Rewrites (`vercel.json`):**
+   - เพิ่ม rewrite rules ป้องกัน 404 เมื่อ refresh หน้า Angular
+**ไฟล์ที่แก้ไข (Affected Files):**
+- `src/environments/environment.ts`
+- `src/environments/environment.production.ts`
+- `angular.json`
+- `public/manifest.webmanifest`
+- `src/index.html`
+- `vercel.json`
+- `src/app/services/`
+- `CHANGELOG.md`
+
+---
+
 ### 📅 2026-09-23 15:19:00 (Local Time)
 **ประเภท:** `[Fix]` `[Frontend / Mobile Responsive]`  
 **หัวข้อ:** แก้ไขปัญหาการแสดงผลและตัดขอบของแถบ Mini Budget Ribbon บนมือถือ  
