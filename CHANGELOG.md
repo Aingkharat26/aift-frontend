@@ -14,6 +14,27 @@
 
 ## 🕒 บันทึกรายการเปลี่ยนแปลง (Change History)
 
+### 📅 2026-09-23 16:15:00 (Local Time)
+**ประเภท:** `[Feature]` `[Config / Infra]`  
+**หัวข้อ:** เพิ่ม Runtime Environment Configuration (public/env.js) สำหรับ Frontend  
+**ปัญหาหรือความต้องการ (Issue / Requirement):**
+- ป้องกันการต้อง Rebuild หรือแก้ไขโค้ดเมื่อเปลี่ยน Backend URL ใน Production
+**สิ่งที่แก้ไข (Changes Detail):**
+1. **Runtime env.js:**
+   - สร้าง `public/env.js` สำหรับกำหนดค่า Backend URL ได้อย่างอิสระโดยไม่ต้องแตะโค้ด Angular
+   - โหลด `env.js` ใน `index.html` ก่อนที่ bundle จะเริ่มทำงาน
+2. **Environment Fallback:**
+   - ปรับปรุง `environment.ts` (Dev: fallback เป็น `http://localhost:3000`)
+   - ปรับปรุง `environment.production.ts` (Prod: ตรวจจับ `window.__env.apiUrl` หรือใช้ default Render URL)
+**ไฟล์ที่แก้ไข (Affected Files):**
+- `public/env.js`
+- `src/index.html`
+- `src/environments/environment.ts`
+- `src/environments/environment.production.ts`
+- `CHANGELOG.md`
+
+---
+
 ### 📅 2026-09-23 15:36:00 (Local Time)
 **ประเภท:** `[Feature]` `[Config / Infra]` `[Mobile PWA]`  
 **หัวข้อ:** เพิ่มการรองรับ PWA (Add to Home Screen) และ Environment Config สำหรับ Cloud Deployment  
