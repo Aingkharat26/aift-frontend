@@ -1,0 +1,401 @@
+<div class="transactions-container">
+  <!-- Toast Notification -->
+  <div *ngIf="toastMessage()" class="toast-banner" [ngClass]="'toast-' + toastType()">
+    <span>{{ toastMessage() }}</span>
+  </div>
+
+  <!-- Page Header -->
+  <header class="page-header">
+    <div class="header-titles">
+      <h1>📝 ประวัติและค้นหารายการธุรกรรม</h1>
+      <p>ค้นหา กรอง และส่งออกรายการรายรับ-รายจ่ายทั้งหมดของคุณได้อย่างสะดวกรวดเร็ว</p>
+    </div>
+    <div class="header-actions">
+      <button
+        class="export-btn"
+        (click)="exportCsv()"
+        [disabled]="exporting() || loading() || totalCount() === 0"
+        title="ส่งออกรายการทั้งหมดตามตัวกรองที่เลือกเป็นไฟล์ CSV (เปิดภาษาไทยใน Excel ได้ทันที)"
+      >
+        <span *ngIf="!exporting()">📥 ส่งออก CSV (Excel)</span>
+        <span *ngIf="exporting()" class="loading-spinner-inline">กำลังส่งออก...</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Summary Metric Cards -->
+  <section class="summary-cards">
+    <div class="metric-card income-card">
+      <div class="metric-icon">🟢</div>
+      <div class="metric-info">
+        <span class="metric-label">รายรับรวม</span>
+        <span class="metric-value">+฿{{ totalIncome() | number:'1.2-2' }}</span>
+      </div>
+    </div>
+
+    <div class="metric-card expense-card">
+      <div class="metric-icon">🔴</div>
+      <div class="metric-info">
+        <span class="metric-label">รายจ่ายรวม</span>
+        <span class="metric-value">-฿{{ totalExpense() | number:'1.2-2' }}</span>
+      </div>
+    </div>
+
+    <div class="metric-card balance-card">
+      <div class="metric-icon">💰</div>
+      <div class="metric-info">
+        <span class="metric-label">คงเหลือสุทธิ</span>
+        <span class="metric-value" [class.negative]="netBalance() < 0">
+          ฿{{ netBalance() | number:'1.2-2' }}
+        </span>
+      </div>
+    </div>
+
+    <div class="metric-card count-card">
+      <div class="metric-icon">🔢</div>
+      <div class="metric-info">
+        <span class="metric-label">รายการที่พบ</span>
+        <span class="metric-value">{{ totalCount() | number }} รายการ</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Filter & Search Toolbar -->
+  <section class="filter-panel">
+    <!-- Top Row: Search & Type Pills -->
+    <div class="filter-row-primary">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input
+          type="text"
+          [(ngModel)]="keyword"
+          (input)="onSearchInput()"
+          placeholder="ค้นหาชื่อรายการ, ร้านค้า, หรือแหล่งรายได้..."
+        />
+        <button *ngIf="keyword" class="clear-btn" (click)="clearSearch()" title="ล้างคำค้น">✕</button>
+      </div>
+
+      <div class="type-pills">
+        <button
+          [class.active]="selectedType === 'all'"
+          (click)="setType('all')"
+        >
+          ทั้งหมด
+        </button>
+        <button
+          [class.active]="selectedType === 'expense'"
+          (click)="setType('expense')"
+        >
+          เฉพาะรายจ่าย
+        </button>
+        <button
+          [class.active]="selectedType === 'income'"
+          (click)="setType('income')"
+        >
+          เฉพาะรายรับ
+        </button>
+      </div>
+
+      <!-- Category Filter -->
+      <div class="category-select-wrapper" *ngIf="selectedType !== 'income'">
+        <select
+          [(ngModel)]="selectedCategory"
+          (change)="onCategoryChange()"
+          class="category-select"
+        >
+          <option value="all">📁 ทุกหมวดหมู่</option>
+          <option *ngFor="let cat of categories()" [value]="cat">
+            {{ cat }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Bottom Row: Date Presets -->
+    <div class="filter-row-secondary">
+      <div class="date-presets">
+        <span class="date-label">ช่วงเวลา:</span>
+        <button
+          [class.active]="selectedDatePreset === 'this_month'"
+          (click)="applyDatePreset('this_month')"
+        >
+          เดือนนี้
+        </button>
+        <button
+          [class.active]="selectedDatePreset === 'last_month'"
+          (click)="applyDatePreset('last_month')"
+        >
+          เดือนก่อน
+        </button>
+        <button
+          [class.active]="selectedDatePreset === '7_days'"
+          (click)="applyDatePreset('7_days')"
+        >
+          7 วันล่าสุด
+        </button>
+        <button
+          [class.active]="selectedDatePreset === '30_days'"
+          (click)="applyDatePreset('30_days')"
+        >
+          30 วันล่าสุด
+        </button>
+        <button
+          [class.active]="selectedDatePreset === 'all'"
+          (click)="applyDatePreset('all')"
+        >
+          ทุกช่วงเวลา
+        </button>
+        <button
+          [class.active]="selectedDatePreset === 'custom'"
+          (click)="applyDatePreset('custom', false)"
+        >
+          กำหนดเอง 📅
+        </button>
+      </div>
+
+      <!-- Custom Date Pickers -->
+      <div class="custom-date-pickers" *ngIf="selectedDatePreset === 'custom'">
+        <div class="date-input-group">
+          <label>ตั้งแต่:</label>
+          <input type="date" [(ngModel)]="startDate" (change)="onCustomDateChange()" />
+        </div>
+        <div class="date-input-group">
+          <label>ถึง:</label>
+          <input type="date" [(ngModel)]="endDate" (change)="onCustomDateChange()" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Transactions Table / List -->
+  <section class="transactions-content">
+    <!-- Loading State -->
+    <div *ngIf="loading()" class="loading-state">
+      <div class="spinner"></div>
+      <p>กำลังค้นหาและดึงข้อมูลธุรกรรม...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading() && transactions().length === 0" class="empty-state">
+      <div class="empty-icon">📂</div>
+      <h3>ไม่พบรายการธุรกรรม</h3>
+      <p>ไม่มีข้อมูลที่ตรงกับเงื่อนไขการค้นหาหรือตัวกรองที่คุณเลือก</p>
+      <button class="reset-filter-btn" (click)="clearSearch(); applyDatePreset('all')">
+        ล้างตัวกรองทั้งหมด
+      </button>
+    </div>
+
+    <!-- Transactions List -->
+    <div *ngIf="!loading() && transactions().length > 0" class="transactions-list">
+      <!-- Desktop Table Header -->
+      <div class="list-header">
+        <div class="col-date">วัน / เวลา</div>
+        <div class="col-type">ประเภท</div>
+        <div class="col-category">หมวดหมู่</div>
+        <div class="col-title">รายการ</div>
+        <div class="col-amount">จำนวนเงิน</div>
+        <div class="col-actions">จัดการ</div>
+      </div>
+
+      <!-- Rows -->
+      <div
+        *ngFor="let item of transactions()"
+        class="transaction-row"
+        [class.is-income]="item.type === 'income'"
+        [class.is-expense]="item.type === 'expense'"
+      >
+        <div class="col-date">
+          <span class="date-text">{{ formatThaiDate(item.date) }}</span>
+          <span class="time-text">{{ formatThaiTime(item.date) }}</span>
+        </div>
+
+        <div class="col-type">
+          <span class="type-pill" [ngClass]="item.type">
+            {{ item.type === 'income' ? 'รายรับ' : 'รายจ่าย' }}
+          </span>
+        </div>
+
+        <div class="col-category">
+          <span class="category-badge">
+            {{ item.category }}
+          </span>
+        </div>
+
+        <div class="col-title">
+          <span class="item-title">{{ item.title }}</span>
+        </div>
+
+        <div class="col-amount" [ngClass]="item.type">
+          {{ item.type === 'income' ? '+' : '-' }}฿{{ item.amount | number:'1.2-2' }}
+        </div>
+
+        <div class="col-actions">
+          <button 
+            class="edit-btn" 
+            (click)="openEditModal(item)" 
+            title="แก้ไขรายการนี้"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
+            </svg>
+          </button>
+          <button 
+            class="delete-btn" 
+            (click)="openDeleteModal(item)" 
+            title="ลบรายการนี้"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 6h18"></path>
+              <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+              <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+              <line x1="10" y1="11" x2="10" y2="17"></line>
+              <line x1="14" y1="11" x2="14" y2="17"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination Controls -->
+    <div *ngIf="!loading() && totalCount() > 0" class="pagination-bar">
+      <div class="pagination-info">
+        แสดง {{ (page() - 1) * limit() + 1 }} - {{ (page() * limit() > totalCount()) ? totalCount() : (page() * limit()) }} 
+        จากทั้งหมด {{ totalCount() | number }} รายการ
+      </div>
+
+      <div class="pagination-controls">
+        <button
+          class="page-btn"
+          [disabled]="page() <= 1"
+          (click)="setPage(1)"
+          title="หน้าแรก"
+        >
+          «
+        </button>
+        <button
+          class="page-btn"
+          [disabled]="page() <= 1"
+          (click)="setPage(page() - 1)"
+          title="หน้าก่อนหน้า"
+        >
+          ‹ ก่อนหน้า
+        </button>
+
+        <span class="page-indicator">
+          หน้า {{ page() }} / {{ totalPages() }}
+        </span>
+
+        <button
+          class="page-btn"
+          [disabled]="page() >= totalPages()"
+          (click)="setPage(page() + 1)"
+          title="หน้าถัดไป"
+        >
+          ถัดไป ›
+        </button>
+        <button
+          class="page-btn"
+          [disabled]="page() >= totalPages()"
+          (click)="setPage(totalPages())"
+          title="หน้าสุดท้าย"
+        >
+          »
+        </button>
+      </div>
+
+      <div class="limit-selector">
+        <label>แสดง:</label>
+        <select [ngModel]="limit()" (ngModelChange)="onLimitChange($event)">
+          <option [ngValue]="20">20 / หน้า</option>
+          <option [ngValue]="50">50 / หน้า</option>
+          <option [ngValue]="100">100 / หน้า</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <!-- Edit Modal -->
+  <div class="modal-backdrop" *ngIf="editingItem()" (click)="closeEditModal()">
+    <div class="modal-dialog edit-dialog" (click)="$event.stopPropagation()">
+      <div class="dialog-content edit-dialog-content">
+        <div class="dialog-icon edit-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
+          </svg>
+        </div>
+
+        <h3>แก้ไขรายการ</h3>
+
+        <div class="form-group">
+          <label class="form-label">
+            {{ editingItem()?.type === 'income' ? 'แหล่งที่มาของรายรับ' : 'ชื่อรายการ' }}
+          </label>
+          <input
+            type="text"
+            [(ngModel)]="editFormTitle"
+            class="form-input"
+            placeholder="{{ editingItem()?.type === 'income' ? 'เช่น เงินเดือน' : 'เช่น ค่าอาหาร' }}"
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">จำนวนเงิน (บาท)</label>
+          <input
+            type="number"
+            [(ngModel)]="editFormAmount"
+            class="form-input"
+            step="0.01"
+            min="0.01"
+            placeholder="0.00"
+          />
+        </div>
+
+        <div class="form-group" *ngIf="editingItem()?.type === 'expense'">
+          <label class="form-label">หมวดหมู่</label>
+          <input
+            type="text"
+            [(ngModel)]="editFormCategory"
+            class="form-input"
+            placeholder="เช่น อาหาร, เดินทาง, ช้อปปิ้ง"
+          />
+        </div>
+
+        <div class="dialog-actions">
+          <button class="btn-cancel" (click)="closeEditModal()" [disabled]="isSavingEdit()">ยกเลิก</button>
+          <button class="btn-confirm edit-btn-confirm" (click)="saveEdit()" [disabled]="isSavingEdit()">
+            {{ isSavingEdit() ? 'กำลังบันทึก...' : 'บันทึกการแก้ไข' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal-backdrop" *ngIf="deletingItem()" (click)="closeDeleteModal()">
+    <div class="modal-dialog dialog-delete" (click)="$event.stopPropagation()">
+      <div class="dialog-content">
+        <div class="dialog-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+        </div>
+
+        <h3>ยืนยันการลบรายการ</h3>
+        <p>
+          คุณต้องการลบรายการ <br>
+          <span class="item-highlight">"{{ deletingItem()?.title }}"</span> <br>
+          ใช่หรือไม่? ยืนยันแล้วจะไม่สามารถย้อนกลับได้
+        </p>
+
+        <div class="dialog-actions">
+          <button class="btn-cancel" (click)="closeDeleteModal()" [disabled]="isDeleting()">ยกเลิก</button>
+          <button class="btn-confirm" (click)="confirmDelete()" [disabled]="isDeleting()">
+            {{ isDeleting() ? 'กำลังลบ...' : 'ยืนยันการลบ' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

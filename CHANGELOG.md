@@ -14,6 +14,58 @@
 
 ## 🕒 บันทึกรายการเปลี่ยนแปลง (Change History)
 
+### 📅 2026-09-24 13:41:00 (Local Time)
+**ประเภท:** `[UI / Refactor]` `[Frontend / UI]`  
+**หัวข้อ:** ปรับปรุงปุ่มแก้ไข (Edit) ปุ่มลบถังขยะ (Delete) และหน้าต่าง Modal ในหน้า `/transactions` ให้ตรงตามดีไซน์หลักของระบบ  
+**ปัญหาหรือความต้องการ (Issue / Requirement):**
+- ผู้ใช้ระบุว่าปุ่มแก้ไขและปุ่มลบถังขยะในหน้ารายการธุรกรรมต้องสวยงามและเป็นสไตล์เดียวกับหน้าอื่น (`daily-log`)
+**สิ่งที่แก้ไข (Changes Detail):**
+1. **`transactions.component.html`:**
+   - เปลี่ยนปุ่ม Emoji ✏️ และ 🗑️ มาใช้ SVG Feather/Lucide icons (Pencil และ Trash-2) เช่นเดียวกับใน `daily-log`
+   - ปรับปรุงโครงสร้าง Edit Modal และ Delete Confirmation Dialog ให้มี SVG Warning Icon ขนาดใหญ่, กล่องไฮไลต์ชื่อรายการ `.item-highlight`, และปุ่มแอคชัน `.dialog-actions` แบบโค้งมน
+2. **`transactions.component.css`:**
+   - ใช้คลาส `.edit-btn` (สีฟ้า `#0ea5e9` พื้นหลังจาง `rgba(14, 165, 233, 0.08)`) และ `.delete-btn` (สีแดง `#ef4444` พื้นหลังจาง `rgba(239, 68, 68, 0.08)`)
+   - ใส่ Hover effect นุ่มนวล `transform: scale(1.1)` พร้อมเงา Glow และ active animation `scale(0.92)`
+   - สไตล์ Modal Dialog โค้งมน (`border-radius: 24px`), มี Backdrop Blur, และปุ่ม `.btn-confirm` / `.btn-cancel` ตามมาตรฐานของระบบ
+3. **ทดสอบ Build:** สั่งรัน `npm run build` ผ่านสมบูรณ์ (Exit Code 0)
+**ไฟล์ที่แก้ไข (Affected Files):**
+- `src/app/components/transactions/transactions.component.html`
+- `src/app/components/transactions/transactions.component.css`
+- `CHANGELOG.md`
+
+---
+
+### 📅 2026-09-24 13:35:00 (Local Time)
+**ประเภท:** `[Feature]` `[Frontend / UI]`  
+**หัวข้อ:** เพิ่มหน้าประวัติและค้นหารายการธุรกรรม (`/transactions`) พร้อมฟังก์ชัน Export CSV รองรับ Excel ภาษาไทย  
+**ปัญหาหรือความต้องการ (Issue / Requirement):**
+- พัฒนาฟีเจอร์ที่ 1 ตาม Roadmap ให้ผู้ใช้สามารถค้นหารายการย้อนหลัง กรองตามหมวดหมู่/ช่วงเวลา สรุปยอด และดาวน์โหลด CSV ได้
+**สิ่งที่แก้ไข (Changes Detail):**
+1. **`TransactionService` (`src/app/services/transaction.service.ts`):**
+   - เชื่อมต่อ API `/transactions` เพื่อดึงข้อมูลพร้อม Filter & Pagination
+   - รองรับฟังก์ชันดาวน์โหลด Export CSV และคำสั่ง Update/Delete รายการ
+2. **`TransactionsComponent` (`src/app/components/transactions/`):**
+   - แดชบอร์ดสรุปยอด Realtime: รายรับรวม, รายจ่ายรวม, ยอดสุทธิ, จำนวนรายการ
+   - แถบเครื่องมือ Filter: ค้นหาคำแบบ Debounce, สลับประเภท (ทั้งหมด/รายจ่าย/รายรับ), เลือกหมวดหมู่, Quick Date Presets (เดือนนี้, เดือนก่อน, 7 วัน, 30 วัน, ทั้งหมด, กำหนดเอง)
+   - ตารางรายการธุรกรรมแบบ Responsive พร้อมปุ่มแก้ไข (Modal Popup) และปุ่มลบ (Confirmation Dialog)
+   - ปุ่ม `📥 ส่งออก CSV (Excel)` สำหรับดาวน์โหลดรายงานทันที
+3. **`App` & `app.routes.ts`:**
+   - ลงทะเบียนเส้นทาง `/transactions` ป้องกันด้วย `authGuard`
+   - เพิ่มลิงก์ `📝 รายการทั้งหมด` ในแถบเมนูหลักของแอป
+4. **`angular.json`:** ปรับงบประมาณ Component Style Warning ให้เหมาะสมกับหน้า Page Complex Component
+5. **ทดสอบ Build:** รัน `npm run build` ผ่านสมบูรณ์ ไร้ข้อผิดพลาดและไม่มีคำเตือน (0 Errors, 0 Warnings)
+**ไฟล์ที่แก้ไข (Affected Files):**
+- `src/app/services/transaction.service.ts`
+- `src/app/components/transactions/transactions.component.ts`
+- `src/app/components/transactions/transactions.component.html`
+- `src/app/components/transactions/transactions.component.css`
+- `src/app/app.routes.ts`
+- `src/app/app.ts`
+- `angular.json`
+- `CHANGELOG.md`
+
+---
+
 ### 📅 2026-09-24 11:32:00 (Local Time)
 **ประเภท:** `[UI / Refactor]` `[Frontend / Auth]`  
 **หัวข้อ:** นำฟิลด์ "ชื่อเล่น / ชื่อที่ต้องการให้แสดง" ออกจากฟอร์มสมัครสมาชิก (Register)  

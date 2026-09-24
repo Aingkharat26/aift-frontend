@@ -25,6 +25,7 @@ import { AdminModelLimitsComponent } from './components/admin-model-limits/admin
             [routerLinkActiveOptions]="{ exact: true }"
           >📊 แดชบอร์ด</a>
           <a routerLink="/budgets" routerLinkActive="nav-active">🎯 งบประมาณ</a>
+          <a routerLink="/transactions" routerLinkActive="nav-active">📝 รายการทั้งหมด</a>
         </div>
 
         <div class="nav-actions">
