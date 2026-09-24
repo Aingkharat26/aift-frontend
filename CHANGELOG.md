@@ -14,6 +14,26 @@
 
 ## 🕒 บันทึกรายการเปลี่ยนแปลง (Change History)
 
+### 📅 2026-09-24 10:52:00 (Local Time)
+**ประเภท:** `[Refactor]` `[Frontend / Config]`  
+**หัวข้อ:** ปรับระบบ Environment ให้เป็นไปตามมาตรฐาน Angular (Build-time Configuration) และยกเลิกการใช้ `env.js`  
+**ปัญหาหรือความต้องการ (Issue / Requirement):**
+- แยก Environment ให้เด็ดขาดและปลอดภัยตามมาตรฐาน Angular ไม่ต้องใช้ runtime check ผ่าน window property เพื่อไม่ให้เกิดความสับสนหรือมีปัญหากับ tunnel/LAN/domain ในอนาคต
+**สิ่งที่แก้ไข (Changes Detail):**
+1. **ลบ `public/env.js`:** ถอด script tag `<script src="env.js"></script>` ออกจาก `src/index.html` และลบไฟล์ `public/env.js` ออกจาก repository
+2. **แยกค่าอย่างเป็นระบบใน `environment.ts` และ `environment.production.ts`:**
+   - `src/environments/environment.ts` (Dev): กำหนด `apiUrl: 'http://localhost:3000'` สำหรับ Local Development 100%
+   - `src/environments/environment.production.ts` (Prod): กำหนด `apiUrl: 'https://aift-backend-hkbz.onrender.com'` สำหรับ Production Build (Vercel) 100%
+3. **ทดสอบ Build:** สั่งรัน `npm run build` ตรวจสอบแล้ว Bundle ทำงานได้สมบูรณ์และสลับไฟล์ด้วย `fileReplacements` ตามมาตรฐาน Angular CLI
+**ไฟล์ที่แก้ไข (Affected Files):**
+- `src/environments/environment.ts`
+- `src/environments/environment.production.ts`
+- `src/index.html`
+- `public/env.js` (Deleted)
+- `CHANGELOG.md`
+
+---
+
 ### 📅 2026-09-24 10:47:00 (Local Time)
 **ประเภท:** `[Fix]` `[Frontend / Config]`  
 **หัวข้อ:** แยกการเชื่อมต่อ Backend ระหว่าง Local (`http://localhost:3000`) และ Production (`onrender.com`) ป้องกันการยิงขึ้น Cloud ขณะพัฒนา  
