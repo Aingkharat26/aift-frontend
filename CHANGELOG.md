@@ -14,6 +14,25 @@
 
 ## 🕒 บันทึกรายการเปลี่ยนแปลง (Change History)
 
+### 📅 2026-09-24 10:47:00 (Local Time)
+**ประเภท:** `[Fix]` `[Frontend / Config]`  
+**หัวข้อ:** แยกการเชื่อมต่อ Backend ระหว่าง Local (`http://localhost:3000`) และ Production (`onrender.com`) ป้องกันการยิงขึ้น Cloud ขณะพัฒนา  
+**ปัญหาหรือความต้องการ (Issue / Requirement):**
+- การรัน Frontend ในโหมด Local Development ยิงคำขอ API ไปยัง Backend บน Production (Render) โดยไม่ได้ตั้งใจ
+- สาเหตุเกิดจากใน `public/env.js` มีการกำหนดค่า `window.__env.apiUrl = 'https://aift-backend-hkbz.onrender.com'` แบบตายตัว ทำให้เมื่อรันบนเครื่องตนเอง ค่านี้จะไปแทนที่ Default ของ `environment.ts`
+**สิ่งที่แก้ไข (Changes Detail):**
+1. **Dynamic Host Detection (`public/env.js`):**
+   - ตรวจสอบ `window.location.hostname` หากเข้าถึงผ่าน `localhost`, `127.0.0.1` หรือ IP ภายในเครื่อง ให้ชี้ไปที่ `http://localhost:3000`
+   - หากเปิดใช้งานบน Domain ภายนอก (เช่น Vercel) จะชี้ไปยัง `https://aift-backend-hkbz.onrender.com` อัตโนมัติ
+2. **Safe Fallback Guard (`environment.ts`):**
+   - เพิ่มเงื่อนไขป้องกันไม่ให้ค่าภายนอกมาเขียนทับ `http://localhost:3000` ขณะทดสอบบนเครื่อง Local
+**ไฟล์ที่แก้ไข (Affected Files):**
+- `public/env.js`
+- `src/environments/environment.ts`
+- `CHANGELOG.md`
+
+---
+
 ### 📅 2026-09-23 17:40:00 (Local Time)
 **ประเภท:** `[Fix]` `[Frontend / Auth]`  
 **หัวข้อ:** แก้ไขปัญหารีเฟรชหน้าจอแล้วเด้งออกจากระบบ (Prevent Session Logout on Page Refresh)  
