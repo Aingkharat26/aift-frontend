@@ -14,6 +14,32 @@
 
 ## 🕒 บันทึกรายการเปลี่ยนแปลง (Change History)
 
+### 📅 2026-09-24 16:55:00 (Local Time)
+**ประเภท:** `[Fix / UI / Theme]` `[Frontend]`  
+**หัวข้อ:** กู้คืนชุดสีธีมมืดเดิม (Slate Theme: Deep Midnight Navy) แทนที่สีดำสนิท (Pitch Black) ตามความต้องการของผู้ใช้  
+**ปัญหาหรือความต้องการ (Issue / Requirement):**
+- ผู้ใช้แจ้ง: "background theme มืดชอบเป็นสีแบบเดิมมากกว่าอะที่ไม่ใช่สีดำ" พร้อมแนบภาพหน้าจอธีมมืดเดิมที่มีโทนสีน้ำเงินกรมท่าเข้ม (Slate 900/800)
+- ในรอบก่อนหน้าที่มีการแมปเข้ากับ sic-ng default theme มีการใช้ค่าสีดำเทาเข้ม (#101215, #17191d) ทำให้สูญเสียเอกลักษณ์โทนสี Slate เดิมไป
+**สิ่งที่แก้ไข (Changes Detail):**
+1. **กู้คืน Color Tokens ใน `src/styles.scss`:**
+   - `--bg-color: #0f172a;` (Slate 900) สำหรับพื้นหลังหลักของแอป
+   - `--bg-surface: #1e293b;` (Slate 800) สำหรับการ์ดและพื้นผิวคอนเทนเนอร์
+   - `--border-color: #334155;` (Slate 700) สำหรับเส้นขอบตัด
+   - `--text-color: #f8fafc;` (Slate 50) และ `--text-muted: #94a3b8;` (Slate 400)
+   - แมปเข้ากับตัวแปร `--sic-color-*` ทุกตัวเพื่อให้คอมโพเนนต์ sic-card, sic-dialog, sic-button ซิงค์เป็นโทนสี Slate เดียวกันทั้งหมด
+2. **ปรับแต่ง Dropdown options & Stat-cards:**
+   - ปรับตัวเลือก `<option>` ในโหมดมืดให้ใช้พื้นหลัง `#1e293b`
+   - ปรับ `.stat-card` ใน `summary-chart` ให้ใช้ `var(--bg-color)` เพื่อให้กลืนเข้ากับการ์ดเหมือน `.expense-item` ใน `daily-log`
+3. **การตรวจสอบและ Build:**
+   - รันคำสั่ง `npm run build` ผ่านสมบูรณ์ (Exit Code 0)
+   - ตรวจสอบผ่าน Browser Subagent ยืนยันว่าค่าสีตรงตาม Slate Theme เดิม (`rgb(15, 23, 42)` และ `rgb(30, 41, 59)`) เหมือนภาพอ้างอิงของผู้ใช้ทุกประการ
+**ไฟล์ที่แก้ไข (Affected Files):**
+- `src/styles.scss`
+- `src/app/components/summary-chart/summary-chart.component.css`
+- `CHANGELOG.md`
+
+---
+
 ### 📅 2026-09-24 16:45:00 (Local Time)
 **ประเภท:** `[Fix / UI / Layout]` `[Frontend]`  
 **หัวข้อ:** แก้ไขขนาดและความสูงของการ์ดสรุปรายจ่ายเดือน (`app-summary-chart`) ให้เท่ากันพอดีกับการ์ดรายการวันนี้ (`app-daily-log`), นำการครอบกล่องซ้อนออก และลบคำว่า "ภาพรวม" พร้อม Emoji ทั้งหมด  
