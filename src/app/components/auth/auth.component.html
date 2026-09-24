@@ -1,7 +1,9 @@
 <div class="auth-page-container">
-  <div class="auth-card">
+  <sic-card [elevated]="true" class="auth-card">
     <div class="brand-header">
-      <div class="brand-badge">✨ AI Finance Tracker</div>
+      <div class="brand-badge">
+        <sic-badge color="primary" size="md">✨ AI Finance Tracker</sic-badge>
+      </div>
       <h1 class="auth-title">
         @if (isRegisterMode()) {
           สร้างบัญชีผู้ใช้ใหม่
@@ -20,24 +22,25 @@
 
     <!-- Mode Switch Tabs -->
     <div class="tab-switcher">
-      <button
+      <sic-button
         type="button"
-        class="tab-btn"
-        [class.active]="!isRegisterMode()"
+        [variant]="!isRegisterMode() ? 'solid' : 'ghost'"
+        [color]="!isRegisterMode() ? 'primary' : 'primary'"
+        size="sm"
         (click)="switchMode(false)"
       >
         🔑 เข้าสู่ระบบ
-      </button>
-      <button
+      </sic-button>
+      <sic-button
         type="button"
-        class="tab-btn"
-        [class.active]="isRegisterMode()"
+        [variant]="isRegisterMode() ? 'solid' : 'ghost'"
+        [color]="isRegisterMode() ? 'primary' : 'primary'"
+        size="sm"
         (click)="switchMode(true)"
       >
         ✨ สมัครสมาชิก
-      </button>
+      </sic-button>
     </div>
-
 
     <!-- Alert Box -->
     @if (errorMessage()) {
@@ -65,74 +68,58 @@
 
     <form (ngSubmit)="onSubmit()" class="auth-form">
       <!-- Username Field -->
-      <div class="form-group">
-        <label for="username">Username (ชื่อผู้ใช้)</label>
-        <div class="input-wrapper">
-          <span class="field-icon">👤</span>
-          <input
-            id="username"
-            name="username"
-            type="text"
-            [(ngModel)]="username"
-            placeholder="เช่น somchai หรือ john"
-            autocomplete="username"
-            required
-          />
-        </div>
-      </div>
-
+      <sic-input
+        id="username"
+        name="username"
+        label="Username (ชื่อผู้ใช้)"
+        [(ngModel)]="username"
+        placeholder="เช่น somchai หรือ john"
+        size="md"
+        required
+      ></sic-input>
 
       <!-- Password Field -->
-      <div class="form-group">
-        <label for="password">รหัสผ่าน</label>
-        <div class="input-wrapper">
-          <span class="field-icon">🔒</span>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            [(ngModel)]="password"
-            placeholder="••••••••"
-            autocomplete="current-password"
-            required
-          />
-        </div>
-      </div>
+      <sic-input-password
+        id="password"
+        name="password"
+        label="รหัสผ่าน"
+        [(ngModel)]="password"
+        placeholder="••••••••"
+        size="md"
+        required
+      ></sic-input-password>
 
       <!-- Confirm Password (Register only) -->
       @if (isRegisterMode()) {
-        <div class="form-group animate-fade-in">
-          <label for="confirmPassword">ยืนยันรหัสผ่านอีกครั้ง</label>
-          <div class="input-wrapper">
-            <span class="field-icon">🛡️</span>
-            <input
-              id="confirmPassword"
-              name="confirmPassword"
-              type="password"
-              [(ngModel)]="confirmPassword"
-              placeholder="••••••••"
-              required
-            />
-          </div>
-        </div>
+        <sic-input-password
+          id="confirmPassword"
+          name="confirmPassword"
+          label="ยืนยันรหัสผ่านอีกครั้ง"
+          [(ngModel)]="confirmPassword"
+          placeholder="••••••••"
+          size="md"
+          required
+        ></sic-input-password>
       }
 
       <!-- Submit Button -->
-      <button type="submit" class="submit-btn" [disabled]="isLoading()">
-        @if (!isLoading()) {
-          <span>
-            @if (isRegisterMode()) {
-              สร้างบัญชีและเริ่มต้นใช้งาน
-            } @else {
-              เข้าสู่ระบบ
-            }
-          </span>
-        } @else {
-          <span class="loading-state">
-            <span class="spinner"></span> กำลังประมวลผล...
-          </span>
-        }
-      </button>
+      <div class="submit-wrapper">
+        <sic-button
+          type="submit"
+          variant="solid"
+          color="primary"
+          size="md"
+          [block]="true"
+          [loading]="isLoading()"
+          [disabled]="isLoading()"
+        >
+          @if (isRegisterMode()) {
+            สร้างบัญชีและเริ่มต้นใช้งาน
+          } @else {
+            เข้าสู่ระบบ
+          }
+        </sic-button>
+      </div>
     </form>
 
     <!-- Footer switch link -->
@@ -149,5 +136,5 @@
         </span>
       }
     </div>
-  </div>
+  </sic-card>
 </div>

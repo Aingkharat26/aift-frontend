@@ -1,5 +1,8 @@
-<div class="daily-log-container">
-  <h2 class="title">{{ getTitle() }}</h2>
+<sic-card [elevated]="true" class="daily-log-container">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+    <h2 class="title" style="margin: 0;">{{ getTitle() }}</h2>
+    <sic-badge color="primary" size="sm">{{ combinedLogs.length }} รายการ</sic-badge>
+  </div>
 
   <div class="loading-state" *ngIf="loading">
     <div class="spinner"></div>
@@ -17,109 +20,99 @@
       </div>
       <div class="item-details">
         <div class="item-name">{{ item.type === 'income' ? item.source : item.item }}</div>
-        <div class="item-category">{{ item.category }}</div>
+        <div class="item-category">
+          <sic-badge [color]="item.type === 'income' ? 'success' : 'primary'" size="sm">{{ item.category }}</sic-badge>
+        </div>
       </div>
       <div class="item-amount" [class.income-text]="item.type === 'income'">
         {{ item.type === 'income' ? '+' : '-' }}฿{{ item.amount | number:'1.0-0' }}
       </div>
       <button 
+        type="button"
         class="edit-btn" 
-        (click)="editItem(item, editDialog)"
+        (click)="editItem(item)"
         title="แก้ไขรายการนี้"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
+          <path d="m15 5 4 4"/>
         </svg>
       </button>
       <button 
+        type="button"
         class="delete-btn" 
-        (click)="deleteItem(item, confirmDialog)"
+        (click)="deleteItem(item)"
         title="ลบรายการนี้"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M3 6h18"></path>
-          <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
-          <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
-          <line x1="10" y1="11" x2="10" y2="17"></line>
-          <line x1="14" y1="11" x2="14" y2="17"></line>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 6h18"/>
+          <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+          <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+          <line x1="10" y1="11" x2="10" y2="17"/>
+          <line x1="14" y1="11" x2="14" y2="17"/>
         </svg>
       </button>
     </div>
   </div>
-</div>
+</sic-card>
 
-<dialog #confirmDialog class="modal-dialog">
-  <div class="dialog-content">
-    <div class="dialog-icon">
-      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-        <line x1="12" y1="9" x2="12" y2="13"></line>
-        <line x1="12" y1="17" x2="12.01" y2="17"></line>
-      </svg>
-    </div>
-    
-    <h3>ยืนยันการลบรายการ</h3>
-    <p>
-      คุณต้องการลบรายการ <br>
-      <span class="item-highlight">"{{ selectedItem?.type === 'income' ? selectedItem?.source : selectedItem?.item }}"</span> <br>
-      ใช่หรือไม่? ยืนยันแล้วจะไม่สามารถย้อนกลับได้
-    </p>
-
-    <div class="dialog-actions">
-      <button class="btn-cancel" (click)="confirmDialog.close()">ยกเลิก</button>
-      <button class="btn-confirm" (click)="onConfirmDelete(confirmDialog)">ยืนยันการลบ</button>
-    </div>
+<!-- Confirm Delete Dialog -->
+<sic-dialog
+  [open]="showDeleteDialog()"
+  (closed)="showDeleteDialog.set(false)"
+  title="ยืนยันการลบรายการ"
+  width="420px"
+>
+  <div style="padding: 1rem 0; line-height: 1.6;">
+    <p>คุณต้องการลบรายการ <strong style="color: var(--sic-color-primary);">"{{ selectedItem?.type === 'income' ? selectedItem?.source : selectedItem?.item }}"</strong> ใช่หรือไม่?</p>
+    <p style="color: var(--sic-color-text-muted); font-size: 0.85rem; margin-top: 6px;">หากยืนยันแล้วจะไม่สามารถย้อนกลับได้</p>
   </div>
-</dialog>
+  <div sicDialogFooter style="display: flex; justify-content: flex-end; gap: 8px;">
+    <sic-button variant="outline" color="primary" size="sm" (click)="showDeleteDialog.set(false)">ยกเลิก</sic-button>
+    <sic-button variant="solid" color="danger" size="sm" (click)="onConfirmDelete()">ยืนยันการลบ</sic-button>
+  </div>
+</sic-dialog>
 
-<dialog #editDialog class="modal-dialog">
-  <div class="dialog-content edit-dialog-content">
-    <div class="dialog-icon edit-icon">
-      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
-      </svg>
+<!-- Edit Dialog -->
+<sic-dialog
+  [open]="showEditDialog()"
+  (closed)="showEditDialog.set(false)"
+  title="แก้ไขรายการ"
+  width="460px"
+>
+  <form (ngSubmit)="onConfirmEdit()" style="padding: 0.5rem 0; display: flex; flex-direction: column; gap: 12px;">
+    <sic-input
+      name="editName"
+      [label]="editingItem?.type === 'income' ? 'แหล่งที่มาของรายรับ' : 'ชื่อรายการ'"
+      [(ngModel)]="editForm.name"
+      placeholder="เช่น ข้าวผัด หรือ เงินเดือน"
+      size="md"
+      required
+    ></sic-input>
+
+    <div class="form-group">
+      <label style="display: block; font-size: 0.85rem; font-weight: 500; margin-bottom: 4px; color: var(--sic-color-text);">จำนวนเงิน (บาท)</label>
+      <input
+        type="number"
+        [(ngModel)]="editForm.amount"
+        name="editAmount"
+        min="0"
+        step="0.01"
+        style="width: 100%; padding: 8px 12px; border: 1px solid var(--sic-color-border); border-radius: 8px; background: var(--sic-color-surface); color: var(--sic-color-text);"
+        placeholder="0"
+      />
     </div>
 
-    <h3>แก้ไขรายการ</h3>
+    <div class="form-group" *ngIf="editingItem?.type !== 'income'">
+      <label style="display: block; font-size: 0.85rem; font-weight: 500; margin-bottom: 4px; color: var(--sic-color-text);">หมวดหมู่</label>
+      <select [(ngModel)]="editForm.category" name="editCategory" style="width: 100%; padding: 8px 12px; border: 1px solid var(--sic-color-border); border-radius: 8px; background: var(--sic-color-surface); color: var(--sic-color-text);">
+        <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+      </select>
+    </div>
 
-    <form class="edit-form" (ngSubmit)="onConfirmEdit(editDialog)">
-      <div class="form-group">
-        <label class="form-label">
-          {{ editingItem?.type === 'income' ? 'แหล่งที่มาของรายรับ' : 'ชื่อรายการ' }}
-        </label>
-        <input
-          type="text"
-          [(ngModel)]="editForm.name"
-          name="editName"
-          class="form-input"
-          placeholder="{{ editingItem?.type === 'income' ? 'เช่น เงินเดือน' : 'เช่น ข้าวผัด' }}"
-        />
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">จำนวนเงิน (บาท)</label>
-        <input
-          type="number"
-          [(ngModel)]="editForm.amount"
-          name="editAmount"
-          min="0"
-          step="0.01"
-          class="form-input"
-          placeholder="0"
-        />
-      </div>
-
-      <div class="form-group" *ngIf="editingItem?.type !== 'income'">
-        <label class="form-label">หมวดหมู่</label>
-        <select [(ngModel)]="editForm.category" name="editCategory" class="form-input">
-          <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
-        </select>
-      </div>
-
-      <div class="dialog-actions">
-        <button type="button" class="btn-cancel" (click)="editDialog.close()">ยกเลิก</button>
-        <button type="submit" class="btn-save" [disabled]="!isEditValid()">บันทึก</button>
-      </div>
-    </form>
-  </div>
-</dialog>
+    <div sicDialogFooter style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px;">
+      <sic-button variant="outline" color="primary" size="sm" type="button" (click)="showEditDialog.set(false)">ยกเลิก</sic-button>
+      <sic-button variant="solid" color="primary" size="sm" type="submit" [disabled]="!isEditValid()">บันทึก</sic-button>
+    </div>
+  </form>
+</sic-dialog>

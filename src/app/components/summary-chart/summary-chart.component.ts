@@ -5,11 +5,17 @@ import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
 import { ExpenseService } from '../../services/expense.service';
 import { IncomeService } from '../../services/income.service';
 import { AiInsightComponent } from '../ai-insight/ai-insight.component';
+import { SicCardComponent } from 'sic-ng';
 
 @Component({
   selector: 'app-summary-chart',
   standalone: true,
-  imports: [CommonModule, BaseChartDirective, AiInsightComponent],
+  imports: [
+    CommonModule,
+    BaseChartDirective,
+    AiInsightComponent,
+    SicCardComponent,
+  ],
   templateUrl: './summary-chart.component.html',
   styleUrl: './summary-chart.component.css'
 })

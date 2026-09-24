@@ -4,11 +4,26 @@ import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { finalize } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
+import {
+  SicCardComponent,
+  SicInputComponent,
+  SicInputPasswordComponent,
+  SicButtonComponent,
+  SicBadgeComponent,
+} from 'sic-ng';
 
 @Component({
   selector: 'app-auth',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    SicCardComponent,
+    SicInputComponent,
+    SicInputPasswordComponent,
+    SicButtonComponent,
+    SicBadgeComponent,
+  ],
   templateUrl: './auth.component.html',
   styleUrls: ['./auth.component.scss'],
 })

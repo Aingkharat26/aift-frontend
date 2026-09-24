@@ -14,6 +14,171 @@
 
 ## 🕒 บันทึกรายการเปลี่ยนแปลง (Change History)
 
+### 📅 2026-09-24 16:45:00 (Local Time)
+**ประเภท:** `[Fix / UI / Layout]` `[Frontend]`  
+**หัวข้อ:** แก้ไขขนาดและความสูงของการ์ดสรุปรายจ่ายเดือน (`app-summary-chart`) ให้เท่ากันพอดีกับการ์ดรายการวันนี้ (`app-daily-log`), นำการครอบกล่องซ้อนออก และลบคำว่า "ภาพรวม" พร้อม Emoji ทั้งหมด  
+**ปัญหาหรือความต้องการ (Issue / Requirement):**
+- ผู้ใช้แจ้ง: "เช็คกล่อง สรุปรายจ่ายเดือน ด้วย กล่องมันใหญ่ไม่ตรงกล่องอื่น คำว่าภาพรวมก็เอาออก"
+- สาเหตุของขนาดกล่องไม่ตรงและดูใหญ่เทอะทะ: ใน `summary-chart.component.html` มีการนำ `<sic-card>` มาครอบทับ `<div class="chart-container">` ซ้ำซ้อน ทำให้เกิดกรอบซ้อนสองชั้น (Double card) และมี padding ซ้อนกันถึง 38px
+- ความสูงไม่เท่ากัน: การ์ดฝั่งซ้าย (`summary-chart`) หยุดอยู่ที่ 508px ขณะที่การ์ดฝั่งขวา (`daily-log`) ยืดไปถึง 598px ทำให้ขอบล่างไม่เสมอกัน
+- ปัญหาข้อความ: มี Badge คำว่า "ภาพรวม" และอีโมจิ `📊` ติดอยู่บนหัวข้อการ์ด
+**สิ่งที่แก้ไข (Changes Detail):**
+1. **`summary-chart` Component (`summary-chart.component.html`, `summary-chart.component.css`, `summary-chart.component.ts`):**
+   - นำ `<div class="chart-container">` ที่ครอบซ้อนออก ให้ `<sic-card [elevated]="true" class="summary-card">` เป็นการ์ดชั้นเดียวมาตรฐาน
+   - ลบอีโมจิ `📊` และ Badge `<sic-badge>ภาพรวม</sic-badge>` ออกจากหัวข้อ
+   - ปรับ `:host` และ `.summary-card` ให้ใช้ `flex: 1; height: 100%; min-height: 0;` ยืดเต็มความสูงของแถว `.top-section` เสมอกันกับฝั่ง `daily-log` พอดีทุกพิกเซล (598px)
+   - ปรับขนาดและอัตราส่วน Doughnut Chart ให้สมดุล (`max-width: 270px; max-height: 250px;`) จัดกึ่งกลางแนวตั้ง ไม่ล้นและไม่ดันการ์ด
+   - นำการ import `SicBadgeComponent` ที่ไม่ได้ใช้ออก
+2. **`daily-log` Component (`daily-log.component.css`):**
+   - เชื่อมโยง `:host` และ `.daily-log-container` ให้ยืดความสูงเต็ม `height: 100%` และจัดการ Scrollbar ภายใน `.sic-card__content` อย่างสมบูรณ์
+3. **`ai-insight` Component (`ai-insight.component.html`):**
+   - ลบอีโมจิ `🤖` และคำว่า "ภาพรวม" ออกจากปุ่มและหัวข้อ Dialog ("บทวิเคราะห์การเงินจาก AI")
+4. **`mini-budget` Component & `app.ts`:**
+   - เปลี่ยนอีโมจิ `🎯` และ `⚠️` ใน Mini Budget เป็นไอคอนเวกเตอร์ SVG
+   - ลบอีโมจิ `📊`, `🎯`, `📝`, `👑` ในแถบนำทาง Navigation Bar
+5. **การตรวจสอบและ Build:**
+   - รันคำสั่ง `npm run build` ผ่านสมบูรณ์ (Exit Code 0)
+   - ตรวจสอบผ่าน Browser Subagent ทั้ง Light และ Dark Mode ยืนยันว่าขอบบน-ล่างของการ์ดทั้งสองฝั่งตรงกัน 100%, ไม่มีกรอบซ้อน และไม่มีคำว่า "ภาพรวม"
+**ไฟล์ที่แก้ไข (Affected Files):**
+- `src/app/components/summary-chart/summary-chart.component.html`
+- `src/app/components/summary-chart/summary-chart.component.css`
+- `src/app/components/summary-chart/summary-chart.component.ts`
+- `src/app/components/daily-log/daily-log.component.css`
+- `src/app/components/ai-insight/ai-insight.component.html`
+- `src/app/components/mini-budget/mini-budget.component.html`
+- `src/app/app.ts`
+- `CHANGELOG.md`
+
+---
+
+### 📅 2026-09-24 16:25:00 (Local Time)
+**ประเภท:** `[Fix / UI / Refactor]` `[Frontend]`  
+**หัวข้อ:** ยกเลิกการใช้ Emoji ทั้งหมด (Zero-Emoji UI) และปรับปรุงระบบปุ่มจัดการ (Edit & Delete Action Buttons) ให้เป็น SVG Vector พร้อมพื้นหลังและกรอบตัดตามมาตรฐานระบบครบทุกหน้า  
+**ปัญหาหรือความต้องการ (Issue / Requirement):**
+- ผู้ใช้ตักเตือน: "ปุ่มแก้ไขกับปุ่มลบอีกละไม่จำไม่รอบคอบเลยเคยบอกแล้วว่าไม่ใช้รูปนี้มันดูมักง่ายไป"
+- ในรอบก่อนหน้าที่อัปเกรดคอมโพเนนต์ มีการใส่ Emoji ✏️, 🗑️, ⚠️, 🎯, 🟢, 🔴, 💰, 🔢 ลงในปุ่ม หัวข้อ Modal และ Metric Cards ซึ่งดูไม่เรียบร้อยและไม่ตรงตามมาตรฐาน SaaS ดีไซน์ระบบ
+- ปุ่มใน `daily-log` เคยมีปัญหาเลย์เอาต์จากการครอบ `div` ซ้อน ทำให้แอนิเมชันเลื่อนสไลด์ (Hover Slide-in) หลุดหาย และปุ่มกลายเป็นปุ่มลอยโปร่งใสไม่มีกรอบ
+**สิ่งที่แก้ไข (Changes Detail):**
+1. **`daily-log` Component (`daily-log.component.html`, `daily-log.component.css`):**
+   - นำ `div` ที่ครอบปุ่มออกเพื่อคืนโครงสร้าง Flexbox ที่ถูกต้องให้ `.expense-item`
+   - ปรับใช้ปุ่ม `.edit-btn` และ `.delete-btn` ด้วยไอคอน Feather/Lucide SVG ขนาด 16x16px (Pencil & Trash-2)
+   - ใส่พื้นหลังโปร่งแสงและเส้นขอบประณีต: ปุ่มแก้ไข (Sky Blue tint `#0284c7`, border `#bae6fd`), ปุ่มลบ (Red tint `#dc2626`, border `#fecaca`) พร้อมรองรับ Dark Mode
+   - กู้คืน Desktop Hover Slide-in Animation ให้เลื่อนเข้ามาจากขวาอย่างนุ่มนวล พร้อมผลักตัวเลขยอดเงินหลบอัตโนมัติ และแสดงผลปกติบน Touch/Mobile
+   - ปรับหัวข้อ Modal ยืนยันการลบให้สะอาด ลบอีโมจิ `⚠️` ออก
+2. **`budget-panel` Component (`budget-panel.component.html`, `budget-panel.component.css`):**
+   - ลบอีโมจิออกจากหัวข้อ Dialog ทั้งหมด (`ตั้งงบประมาณรายหมวด`, `แนะนำงบประมาณจากพฤติกรรม`, `ยืนยันการลบงบประมาณ`)
+   - ลบอีโมจิจากปุ่มด้านบน (`แนะนำจากพฤติกรรม`, `＋ ตั้งงบประมาณ`)
+   - สไตล์ปุ่มลบ `.delete-btn` ให้มีขนาด 32px โค้งมน พื้นหลังสีแดงอ่อน และมีกรอบชัดเจนสวยงาม
+3. **`transactions` Component (`transactions.component.html`, `transactions.component.css`):**
+   - เปลี่ยน Metric Cards ทั้ง 4 ใบ จาก Emoji `🟢`, `🔴`, `💰`, `🔢` มาใช้ไอคอนเวกเตอร์ SVG (ArrowUpRight, ArrowDownRight, Wallet, List) บรรจุในกล่อง `.metric-icon` สีพาสเทล
+   - เปลี่ยนไอคอนช่องค้นหาจาก `🔍` มาเป็น Search SVG
+   - ปรับปรุงตารางคอลัมน์จัดการให้ใช้ปุ่ม `.edit-btn` และ `.delete-btn` สไตล์เดียวกับ `daily-log`
+   - ปรับ Empty State จาก `📂` มาเป็น Folder SVG
+   - ปรับหัวข้อ Dialog ลบรายการให้สะอาด ไม่มีอีโมจิตกค้าง
+4. **`admin-model-limits` Component (`admin-model-limits.component.html`):**
+   - ลบอีโมจิ `👑` ออกจากหัวข้อ Modal
+5. **Universal Styles (`src/styles.scss`):**
+   - กำหนดคลาส `.edit-btn` และ `.delete-btn` ไว้เป็นมาตรฐานกลางระดับ Global
+6. **การตรวจสอบและ Build:**
+   - รันคำสั่ง `npm run build` ผ่านสมบูรณ์ (Exit Code 0)
+   - ทดสอบจำลองหน้าเว็บผ่าน Browser Subagent ในทั้งโหมด Light และ Dark Mode บันทึกภาพ Screenshot ตรวจสอบเรียบร้อยทุกจุด
+**ไฟล์ที่แก้ไข (Affected Files):**
+- `src/app/components/daily-log/daily-log.component.html`
+- `src/app/components/daily-log/daily-log.component.css`
+- `src/app/components/budget-panel/budget-panel.component.html`
+- `src/app/components/budget-panel/budget-panel.component.css`
+- `src/app/components/transactions/transactions.component.html`
+- `src/app/components/transactions/transactions.component.css`
+- `src/app/components/admin-model-limits/admin-model-limits.component.html`
+- `src/styles.scss`
+- `CHANGELOG.md`
+
+---
+
+### 📅 2026-09-24 15:25:00 (Local Time)
+**ประเภท:** `[Fix / UI / UX]` `[Frontend]`  
+**หัวข้อ:** แก้ไขบั๊กธีมมืด/สว่างค้าง (Dark/Light Sync), ดีไซน์ Custom Dropdowns ใหม่ทั้งหมด และยกเครื่อง Pagination Bar ให้สวยงามทันสมัย  
+**ปัญหาหรือความต้องการ (Issue / Requirement):**
+- ผู้ใช้แจ้งปัญหา: "ธีมดำสว่างบัค dropdown ไม่โอเคไม่สวย paging ก็บัคไม่สวย"
+- สาเหตุของบั๊กธีม: `SicThemeService` สลับคลาส `.dark` แต่ `data-theme` บน `<html>` ไม่ถูกอัปเดต และมี CSS override โหมดมืดแบบฮาร์ดโค้ดค้าง ทำให้สลับไปสว่างแล้วพื้นหลังยังเป็นสีดำ หรือสลับไปมืดแล้วพื้นหลังขาว
+- สาเหตุของ Dropdown: ใช้ `<select>` พื้นฐานของเบราว์เซอร์ ทำให้ดูหยาบ ลูกศรแข็ง และในโหมดมืดกล่องตัวเลือกแสดงผลผิดเพี้ยน
+- สาเหตุของ Paging: แสดงผลปุ่มข้อความภาษาอังกฤษ First/Prev/Next/Last ที่ถูก disabled ทั้งหมดเมื่อมี 1 หน้า และวางโครงสร้าง layout แยกกระจัดกระจาย
+**สิ่งที่แก้ไข (Changes Detail):**
+1. **แก้บั๊กและเชื่อมต่อ Theme System ให้สมบูรณ์แบบ:**
+   - ใน `src/app/app.ts`: เพิ่ม `effect()` เชื่อมโยงสถานะ `isDark()` ของ `SicThemeService` เข้ากับทั้งคลาส `.dark`, แอตทริบิวต์ `data-theme`, และจัดเก็บลง `localStorage` ทั้งสองคีย์ (`aift-theme`, `sic-ng-theme-mode`) อัตโนมัติทุกครั้งที่กดสลับ
+   - ใน `src/index.html`: อัปเดตสคริปต์ Pre-bootstrap ให้อ่านค่าและซิงค์ทั้งคลาส `.dark` และ `data-theme` ป้องกันหน้าจอวาบ (FOUC)
+   - ใน `src/styles.scss`: ลบ CSS Overrides สี Slate ที่ขัดแย้งออก เชื่อมโยงตัวแปร `--bg-color`, `--bg-surface`, `--text-color`, `--text-muted`, `--border-color` เข้ากับ Design Tokens `--sic-color-*` โดยตรง ทั้งโหมดสว่างและมืด
+2. **ออกแบบและตกแต่ง Dropdown ใหม่ทั้งระบบ (Universal High-End Select):**
+   - เพิ่ม Custom SVG Chevron สีม่วงคราม (Indigo) สำหรับโหมดสว่าง และสี Lavender สำหรับโหมดมืด
+   - กำหนดขอบโค้งมน `var(--sic-radius-md)` พร้อมพื้นผิว Glass/Surface ที่เข้ากับโทนสี
+   - เพิ่ม Hover & Focus Ring Effect ด้วย `box-shadow` นุ่มนวล
+   - รองรับการแสดงผลของ `<option>` ในโหมดมืดด้วยพื้นหลังสีเข้ม ไม่หลุดขาว
+3. **ยกเครื่อง Pagination Bar หน้า Transactions ให้สวยงามสไตล์ Modern SaaS:**
+   - เปลี่ยนจากปุ่มข้อความอังกฤษ "First/Prev/Next/Last" เป็นชุดปุ่มนำทางพร้อมสัญลักษณ์สากล `«`, `‹`, ตัวเลขหน้า, `›`, `»`
+   - ไฮไลต์หน้าปัจจุบันด้วยสี Primary Solid และ Soft Glow Shadow
+   - หากมีหน้าเดียว (`totalPages <= 1`) จะแสดงป้ายสถานะ `หน้า 1 / 1` แทนการแสดงปุ่ม disable ที่ดูเหมือนฟังก์ชันพัง
+   - รวมยอดสรุปรายการ (แสดง X - Y จาก Z รายการ), ชุดปุ่มเปลี่ยนหน้า, และกล่องเลือกจำนวนรายการต่อหน้า (20, 50, 100) ให้อยู่ในแถบ Card Bar แถวเดียวกันอย่างสวยงาม รองรับ Responsive บนมือถือ
+4. **การตรวจสอบและ Build:**
+   - รันคำสั่ง `npm run build` ผ่านสมบูรณ์ (0 Errors, 0 Warnings)
+   - ตรวจสอบผ่าน Browser ทั้งโหมดมืดและสว่าง ผลการแสดงผลสอดคล้อง นุ่มนวล และอ่านง่าย
+**ไฟล์ที่แก้ไข (Affected Files):**
+- `src/index.html`
+- `src/styles.scss`
+- `src/app/app.ts`
+- `src/app/components/transactions/transactions.component.ts`
+- `src/app/components/transactions/transactions.component.html`
+- `src/app/components/transactions/transactions.component.css`
+- `CHANGELOG.md`
+
+---
+
+### 📅 2026-09-24 14:35:00 (Local Time)
+**ประเภท:** `[Feature / Upgrade / UI]` `[Frontend]`  
+**หัวข้อ:** อัปเกรดระบบเป็น Angular 22 และเปลี่ยนผ่าน UI/Design System ทั้งระบบเข้าสู่ `sic-ng` (v22.2.5)  
+**ปัญหาหรือความต้องการ (Issue / Requirement):**
+- ผู้ใช้ต้องการนำ Component Framework `sic-ng` (จาก https://github.com/softinter-chiangrai/sic-ng.git) มาใช้งานในโปรเจกต์ AIFT และปรับปรุงแก้ไขทุกหน้าให้สอดคล้องกัน
+**สิ่งที่แก้ไข (Changes Detail):**
+1. **Core Upgrade & Dependencies:**
+   - ติดตั้ง Agent Skills สำหรับ `sic-ng` จำนวน 8 ชุด (`sic-ng`, `sic-theme`, `sic-provide-config`, `sic-layout`, `sic-generate`, `sic-project-setup`, `sic-update`, `sic-figma`)
+   - อัปเกรด Angular Core, Compiler, Forms, Router, CDK และ CLI สู่เวอร์ชัน 22 (`@angular/*@^22.2.0`)
+   - อัปเกรด TypeScript เป็น `~6.0.2` เพื่อรองรับ Angular 22 เต็มรูปแบบ
+   - ติดตั้งแพ็กเกจ `sic-ng` จาก Release branch `github:softinter-chiangrai/sic-ng#release/22` (v22.2.5)
+2. **Global Styles & Providers Configuration:**
+   - ใน `src/styles.scss`: Import CSS Theme กลาง `sic-ng/theme/all-themes.css` พร้อม Map Design Tokens (`--sic-color-*`, `--sic-radius-*`, `--sic-font-family`) เชื่อมกับธีมเดิมของ AIFT
+   - ใน `src/app/app.config.ts`: ติดตั้ง `provideSicTheme({ theme: 'default', mode: 'light' })` และ `provideSicConfig()`
+3. **Refactor ทุกหน้าและคอมโพเนนต์สู่ `sic-ng` Components:**
+   - **App Shell (`app.ts`):** ใช้งาน `SicThemeService`, `SicButtonComponent`, `SicBadgeComponent` และปุ่มสลับธีม sic-ng
+   - **Authentication (`auth`):** เปลี่ยนมาใช้ `SicCardComponent`, `SicInputComponent`, `SicInputPasswordComponent`, `SicButtonComponent`, `SicBadgeComponent`
+   - **Date Selector (`date-selector`):** ใช้ `SicButtonComponent` ในการสลับมุมมองวัน/เดือน/ปี
+   - **Mini Budget (`mini-budget`):** ใช้ `SicProgressBarComponent`, `SicBadgeComponent`, `SicButtonComponent`
+   - **AI Insight (`ai-insight`):** ใช้ `SicDialogComponent` และ `SicButtonComponent`
+   - **Summary Chart (`summary-chart`):** ครอบการแสดงผลด้วย `SicCardComponent` และ `SicBadgeComponent`
+   - **Daily Log (`daily-log`):** ใช้ `SicCardComponent`, `SicBadgeComponent`, `SicButtonComponent`, `SicDialogComponent`, `SicInputComponent` สำหรับการดู แก้ไข และลบรายการ
+   - **Chat Input (`chat-input`):** ปรับปุ่มแท็บ ปุ่มส่งเสียง/ส่งข้อความ และ Dialog สถานะด้วย `SicButtonComponent` และ `SicDialogComponent`
+   - **Budget Panel (`budget-panel`):** ปรับการแสดงผลการ์ดงบประมาณ, Progress bar, Modal เพิ่มงบ, Modal ขอคำแนะนำ AI และ Modal ยืนยันการลบ ด้วยชุดคอมโพเนนต์ `sic-ng`
+   - **Transactions (`transactions`):** ปรับการ์ดสรุปยอด, แถบตัวกรอง, ตารางรายการ, ป้ายสถานะ, Pagination (`SicPaginationComponent`), และ Dialogs แก้ไข/ลบ ด้วย `sic-ng`
+   - **Admin Model Limits (`admin-model-limits`):** ปรับเปลี่ยน Modal Backdrop มาเป็น `SicDialogComponent`, `SicBadgeComponent`, `SicButtonComponent`
+4. **Build Verification:**
+   - ทดสอบคอมไพล์โปรเจกต์ด้วย `npm run build` ผ่านสมบูรณ์ 100% ไร้ข้อผิดพลาด (0 Errors)
+**ไฟล์ที่แก้ไข (Affected Files):**
+- `package.json`
+- `src/styles.scss`
+- `src/app/app.config.ts`
+- `src/app/app.ts`
+- `src/app/components/auth/auth.component.ts` & `html`
+- `src/app/components/date-selector/date-selector.component.ts` & `html`
+- `src/app/components/mini-budget/mini-budget.component.ts` & `html`
+- `src/app/components/ai-insight/ai-insight.component.ts` & `html`
+- `src/app/components/summary-chart/summary-chart.component.ts` & `html`
+- `src/app/components/daily-log/daily-log.component.ts` & `html`
+- `src/app/components/chat-input/chat-input.component.ts` & `html`
+- `src/app/components/budget-panel/budget-panel.component.ts` & `html`
+- `src/app/components/transactions/transactions.component.ts` & `html`
+- `src/app/components/admin-model-limits/admin-model-limits.component.ts` & `html`
+- `CHANGELOG.md`
+
+---
+
 ### 📅 2026-09-24 13:41:00 (Local Time)
 **ประเภท:** `[UI / Refactor]` `[Frontend / UI]`  
 **หัวข้อ:** ปรับปรุงปุ่มแก้ไข (Edit) ปุ่มลบถังขยะ (Delete) และหน้าต่าง Modal ในหน้า `/transactions` ให้ตรงตามดีไซน์หลักของระบบ  

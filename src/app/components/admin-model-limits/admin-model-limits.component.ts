@@ -1,11 +1,12 @@
 import { Component, OnInit, inject, signal, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AdminService, ModelLimitsResponse, PingResult } from '../../services/admin.service';
+import { SicDialogComponent, SicButtonComponent, SicBadgeComponent } from 'sic-ng';
 
 @Component({
   selector: 'app-admin-model-limits',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, SicDialogComponent, SicButtonComponent, SicBadgeComponent],
   templateUrl: './admin-model-limits.component.html',
   styleUrl: './admin-model-limits.component.scss',
 })

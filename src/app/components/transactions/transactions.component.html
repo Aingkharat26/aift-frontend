@@ -7,65 +7,97 @@
   <!-- Page Header -->
   <header class="page-header">
     <div class="header-titles">
-      <h1>📝 ประวัติและค้นหารายการธุรกรรม</h1>
+      <h1>ประวัติและค้นหารายการธุรกรรม</h1>
       <p>ค้นหา กรอง และส่งออกรายการรายรับ-รายจ่ายทั้งหมดของคุณได้อย่างสะดวกรวดเร็ว</p>
     </div>
     <div class="header-actions">
-      <button
-        class="export-btn"
+      <sic-button
+        variant="solid"
+        color="primary"
+        size="sm"
         (click)="exportCsv()"
         [disabled]="exporting() || loading() || totalCount() === 0"
+        [loading]="exporting()"
         title="ส่งออกรายการทั้งหมดตามตัวกรองที่เลือกเป็นไฟล์ CSV (เปิดภาษาไทยใน Excel ได้ทันที)"
       >
-        <span *ngIf="!exporting()">📥 ส่งออก CSV (Excel)</span>
-        <span *ngIf="exporting()" class="loading-spinner-inline">กำลังส่งออก...</span>
-      </button>
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; vertical-align: -2px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>ส่งออก CSV (Excel)
+      </sic-button>
     </div>
   </header>
 
   <!-- Summary Metric Cards -->
   <section class="summary-cards">
-    <div class="metric-card income-card">
-      <div class="metric-icon">🟢</div>
+    <sic-card [elevated]="true" class="metric-card income-card">
+      <div class="metric-icon income-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="7" y1="17" x2="17" y2="7"></line>
+          <polyline points="7 7 17 7 17 17"></polyline>
+        </svg>
+      </div>
       <div class="metric-info">
         <span class="metric-label">รายรับรวม</span>
         <span class="metric-value">+฿{{ totalIncome() | number:'1.2-2' }}</span>
       </div>
-    </div>
+    </sic-card>
 
-    <div class="metric-card expense-card">
-      <div class="metric-icon">🔴</div>
+    <sic-card [elevated]="true" class="metric-card expense-card">
+      <div class="metric-icon expense-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="7" y1="7" x2="17" y2="17"></line>
+          <polyline points="17 7 17 17 7 17"></polyline>
+        </svg>
+      </div>
       <div class="metric-info">
         <span class="metric-label">รายจ่ายรวม</span>
         <span class="metric-value">-฿{{ totalExpense() | number:'1.2-2' }}</span>
       </div>
-    </div>
+    </sic-card>
 
-    <div class="metric-card balance-card">
-      <div class="metric-icon">💰</div>
+    <sic-card [elevated]="true" class="metric-card balance-card">
+      <div class="metric-icon balance-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"></path>
+          <path d="M3 5v14a2 2 0 0 0 2 2h16v-5"></path>
+          <path d="M18 12a2 2 0 0 0 0 4h4v-4Z"></path>
+        </svg>
+      </div>
       <div class="metric-info">
         <span class="metric-label">คงเหลือสุทธิ</span>
         <span class="metric-value" [class.negative]="netBalance() < 0">
           ฿{{ netBalance() | number:'1.2-2' }}
         </span>
       </div>
-    </div>
+    </sic-card>
 
-    <div class="metric-card count-card">
-      <div class="metric-icon">🔢</div>
+    <sic-card [elevated]="true" class="metric-card count-card">
+      <div class="metric-icon count-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="8" y1="6" x2="21" y2="6"></line>
+          <line x1="8" y1="12" x2="21" y2="12"></line>
+          <line x1="8" y1="18" x2="21" y2="18"></line>
+          <line x1="3" y1="6" x2="3.01" y2="6"></line>
+          <line x1="3" y1="12" x2="3.01" y2="12"></line>
+          <line x1="3" y1="18" x2="3.01" y2="18"></line>
+        </svg>
+      </div>
       <div class="metric-info">
         <span class="metric-label">รายการที่พบ</span>
         <span class="metric-value">{{ totalCount() | number }} รายการ</span>
       </div>
-    </div>
+    </sic-card>
   </section>
 
   <!-- Filter & Search Toolbar -->
-  <section class="filter-panel">
+  <sic-card [elevated]="true" class="filter-panel">
     <!-- Top Row: Search & Type Pills -->
     <div class="filter-row-primary">
       <div class="search-box">
-        <span class="search-icon">🔍</span>
+        <span class="search-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </span>
         <input
           type="text"
           [(ngModel)]="keyword"
@@ -75,25 +107,31 @@
         <button *ngIf="keyword" class="clear-btn" (click)="clearSearch()" title="ล้างคำค้น">✕</button>
       </div>
 
-      <div class="type-pills">
-        <button
-          [class.active]="selectedType === 'all'"
+      <div class="type-pills" style="display: flex; gap: 4px;">
+        <sic-button
+          [variant]="selectedType === 'all' ? 'solid' : 'ghost'"
+          color="primary"
+          size="sm"
           (click)="setType('all')"
         >
           ทั้งหมด
-        </button>
-        <button
-          [class.active]="selectedType === 'expense'"
+        </sic-button>
+        <sic-button
+          [variant]="selectedType === 'expense' ? 'solid' : 'ghost'"
+          color="danger"
+          size="sm"
           (click)="setType('expense')"
         >
           เฉพาะรายจ่าย
-        </button>
-        <button
-          [class.active]="selectedType === 'income'"
+        </sic-button>
+        <sic-button
+          [variant]="selectedType === 'income' ? 'solid' : 'ghost'"
+          color="success"
+          size="sm"
           (click)="setType('income')"
         >
           เฉพาะรายรับ
-        </button>
+        </sic-button>
       </div>
 
       <!-- Category Filter -->
@@ -113,44 +151,56 @@
 
     <!-- Bottom Row: Date Presets -->
     <div class="filter-row-secondary">
-      <div class="date-presets">
+      <div class="date-presets" style="display: flex; flex-wrap: wrap; gap: 4px; align-items: center;">
         <span class="date-label">ช่วงเวลา:</span>
-        <button
-          [class.active]="selectedDatePreset === 'this_month'"
+        <sic-button
+          [variant]="selectedDatePreset === 'this_month' ? 'solid' : 'ghost'"
+          color="primary"
+          size="sm"
           (click)="applyDatePreset('this_month')"
         >
           เดือนนี้
-        </button>
-        <button
-          [class.active]="selectedDatePreset === 'last_month'"
+        </sic-button>
+        <sic-button
+          [variant]="selectedDatePreset === 'last_month' ? 'solid' : 'ghost'"
+          color="primary"
+          size="sm"
           (click)="applyDatePreset('last_month')"
         >
           เดือนก่อน
-        </button>
-        <button
-          [class.active]="selectedDatePreset === '7_days'"
+        </sic-button>
+        <sic-button
+          [variant]="selectedDatePreset === '7_days' ? 'solid' : 'ghost'"
+          color="primary"
+          size="sm"
           (click)="applyDatePreset('7_days')"
         >
           7 วันล่าสุด
-        </button>
-        <button
-          [class.active]="selectedDatePreset === '30_days'"
+        </sic-button>
+        <sic-button
+          [variant]="selectedDatePreset === '30_days' ? 'solid' : 'ghost'"
+          color="primary"
+          size="sm"
           (click)="applyDatePreset('30_days')"
         >
           30 วันล่าสุด
-        </button>
-        <button
-          [class.active]="selectedDatePreset === 'all'"
+        </sic-button>
+        <sic-button
+          [variant]="selectedDatePreset === 'all' ? 'solid' : 'ghost'"
+          color="primary"
+          size="sm"
           (click)="applyDatePreset('all')"
         >
           ทุกช่วงเวลา
-        </button>
-        <button
-          [class.active]="selectedDatePreset === 'custom'"
+        </sic-button>
+        <sic-button
+          [variant]="selectedDatePreset === 'custom' ? 'solid' : 'ghost'"
+          color="primary"
+          size="sm"
           (click)="applyDatePreset('custom', false)"
         >
           กำหนดเอง 📅
-        </button>
+        </sic-button>
       </div>
 
       <!-- Custom Date Pickers -->
@@ -165,7 +215,7 @@
         </div>
       </div>
     </div>
-  </section>
+  </sic-card>
 
   <!-- Transactions Table / List -->
   <section class="transactions-content">
@@ -177,7 +227,11 @@
 
     <!-- Empty State -->
     <div *ngIf="!loading() && transactions().length === 0" class="empty-state">
-      <div class="empty-icon">📂</div>
+      <div class="empty-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+        </svg>
+      </div>
       <h3>ไม่พบรายการธุรกรรม</h3>
       <p>ไม่มีข้อมูลที่ตรงกับเงื่อนไขการค้นหาหรือตัวกรองที่คุณเลือก</p>
       <button class="reset-filter-btn" (click)="clearSearch(); applyDatePreset('all')">
@@ -210,15 +264,15 @@
         </div>
 
         <div class="col-type">
-          <span class="type-pill" [ngClass]="item.type">
+          <sic-badge [color]="item.type === 'income' ? 'success' : 'danger'" size="sm">
             {{ item.type === 'income' ? 'รายรับ' : 'รายจ่าย' }}
-          </span>
+          </sic-badge>
         </div>
 
         <div class="col-category">
-          <span class="category-badge">
+          <sic-badge color="primary" size="sm">
             {{ item.category }}
-          </span>
+          </sic-badge>
         </div>
 
         <div class="col-title">
@@ -231,41 +285,47 @@
 
         <div class="col-actions">
           <button 
+            type="button"
             class="edit-btn" 
             (click)="openEditModal(item)" 
             title="แก้ไขรายการนี้"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
+              <path d="m15 5 4 4"/>
             </svg>
           </button>
           <button 
+            type="button"
             class="delete-btn" 
             (click)="openDeleteModal(item)" 
             title="ลบรายการนี้"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M3 6h18"></path>
-              <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
-              <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
-              <line x1="10" y1="11" x2="10" y2="17"></line>
-              <line x1="14" y1="11" x2="14" y2="17"></line>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 6h18"/>
+              <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+              <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+              <line x1="10" y1="11" x2="10" y2="17"/>
+              <line x1="14" y1="11" x2="14" y2="17"/>
             </svg>
           </button>
         </div>
       </div>
     </div>
 
-    <!-- Pagination Controls -->
+    <!-- Modern Pagination Bar -->
     <div *ngIf="!loading() && totalCount() > 0" class="pagination-bar">
+      <!-- Left: Total Info -->
       <div class="pagination-info">
-        แสดง {{ (page() - 1) * limit() + 1 }} - {{ (page() * limit() > totalCount()) ? totalCount() : (page() * limit()) }} 
-        จากทั้งหมด {{ totalCount() | number }} รายการ
+        แสดง <span class="highlight">{{ (page() - 1) * limit() + 1 }} - {{ (page() * limit() > totalCount()) ? totalCount() : (page() * limit()) }}</span> 
+        จากทั้งหมด <span class="highlight">{{ totalCount() | number }}</span> รายการ
       </div>
 
-      <div class="pagination-controls">
+      <!-- Center: Pagination Controls (when more than 1 page) -->
+      <div class="pagination-controls" *ngIf="totalPages() > 1">
         <button
-          class="page-btn"
+          type="button"
+          class="pager-btn nav-btn"
           [disabled]="page() <= 1"
           (click)="setPage(1)"
           title="หน้าแรก"
@@ -273,28 +333,42 @@
           «
         </button>
         <button
-          class="page-btn"
+          type="button"
+          class="pager-btn nav-btn"
           [disabled]="page() <= 1"
           (click)="setPage(page() - 1)"
           title="หน้าก่อนหน้า"
         >
-          ‹ ก่อนหน้า
+          ‹
         </button>
 
-        <span class="page-indicator">
-          หน้า {{ page() }} / {{ totalPages() }}
-        </span>
+        <div class="pager-numbers">
+          <ng-container *ngFor="let p of visiblePages">
+            <span *ngIf="p === '...'" class="pager-ellipsis">…</span>
+            <button
+              *ngIf="p !== '...'"
+              type="button"
+              class="pager-btn page-num"
+              [class.active]="p === page()"
+              (click)="setPage(+p)"
+            >
+              {{ p }}
+            </button>
+          </ng-container>
+        </div>
 
         <button
-          class="page-btn"
+          type="button"
+          class="pager-btn nav-btn"
           [disabled]="page() >= totalPages()"
           (click)="setPage(page() + 1)"
           title="หน้าถัดไป"
         >
-          ถัดไป ›
+          ›
         </button>
         <button
-          class="page-btn"
+          type="button"
+          class="pager-btn nav-btn"
           [disabled]="page() >= totalPages()"
           (click)="setPage(totalPages())"
           title="หน้าสุดท้าย"
@@ -303,99 +377,108 @@
         </button>
       </div>
 
+      <!-- Single Page Badge when totalPages <= 1 -->
+      <div class="single-page-badge" *ngIf="totalPages() <= 1">
+        <sic-badge color="primary" variant="soft" size="sm">หน้า 1 / 1</sic-badge>
+      </div>
+
+      <!-- Right: Limit Selector -->
       <div class="limit-selector">
-        <label>แสดง:</label>
-        <select [ngModel]="limit()" (ngModelChange)="onLimitChange($event)">
-          <option [ngValue]="20">20 / หน้า</option>
-          <option [ngValue]="50">50 / หน้า</option>
-          <option [ngValue]="100">100 / หน้า</option>
+        <span class="limit-label">แสดงต่อหน้า:</span>
+        <select
+          [ngModel]="limit()"
+          (ngModelChange)="onLimitChange($event)"
+          class="limit-select"
+        >
+          <option [ngValue]="20">20 รายการ</option>
+          <option [ngValue]="50">50 รายการ</option>
+          <option [ngValue]="100">100 รายการ</option>
         </select>
       </div>
     </div>
   </section>
 
-  <!-- Edit Modal -->
-  <div class="modal-backdrop" *ngIf="editingItem()" (click)="closeEditModal()">
-    <div class="modal-dialog edit-dialog" (click)="$event.stopPropagation()">
-      <div class="dialog-content edit-dialog-content">
-        <div class="dialog-icon edit-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
-          </svg>
-        </div>
+  <!-- Edit Modal with SicDialog -->
+  <sic-dialog
+    [open]="!!editingItem()"
+    (closed)="closeEditModal()"
+    title="แก้ไขรายการ"
+    width="460px"
+  >
+    <div style="padding: 0.5rem 0; display: flex; flex-direction: column; gap: 12px;">
+      <sic-input
+        name="editTitle"
+        [label]="editingItem()?.type === 'income' ? 'แหล่งที่มาของรายรับ' : 'ชื่อรายการ'"
+        [(ngModel)]="editFormTitle"
+        placeholder="{{ editingItem()?.type === 'income' ? 'เช่น เงินเดือน' : 'เช่น ค่าอาหาร' }}"
+        size="md"
+        required
+      ></sic-input>
 
-        <h3>แก้ไขรายการ</h3>
+      <div class="form-group">
+        <label style="display: block; font-size: 0.85rem; font-weight: 500; margin-bottom: 4px; color: var(--sic-color-text);">จำนวนเงิน (บาท)</label>
+        <input
+          type="number"
+          [(ngModel)]="editFormAmount"
+          class="form-input"
+          step="0.01"
+          min="0.01"
+          placeholder="0.00"
+          style="width: 100%; padding: 8px 12px; border: 1px solid var(--sic-color-border); border-radius: 8px; background: var(--sic-color-surface); color: var(--sic-color-text);"
+        />
+      </div>
 
-        <div class="form-group">
-          <label class="form-label">
-            {{ editingItem()?.type === 'income' ? 'แหล่งที่มาของรายรับ' : 'ชื่อรายการ' }}
-          </label>
-          <input
-            type="text"
-            [(ngModel)]="editFormTitle"
-            class="form-input"
-            placeholder="{{ editingItem()?.type === 'income' ? 'เช่น เงินเดือน' : 'เช่น ค่าอาหาร' }}"
-          />
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">จำนวนเงิน (บาท)</label>
-          <input
-            type="number"
-            [(ngModel)]="editFormAmount"
-            class="form-input"
-            step="0.01"
-            min="0.01"
-            placeholder="0.00"
-          />
-        </div>
-
-        <div class="form-group" *ngIf="editingItem()?.type === 'expense'">
-          <label class="form-label">หมวดหมู่</label>
-          <input
-            type="text"
-            [(ngModel)]="editFormCategory"
-            class="form-input"
-            placeholder="เช่น อาหาร, เดินทาง, ช้อปปิ้ง"
-          />
-        </div>
-
-        <div class="dialog-actions">
-          <button class="btn-cancel" (click)="closeEditModal()" [disabled]="isSavingEdit()">ยกเลิก</button>
-          <button class="btn-confirm edit-btn-confirm" (click)="saveEdit()" [disabled]="isSavingEdit()">
-            {{ isSavingEdit() ? 'กำลังบันทึก...' : 'บันทึกการแก้ไข' }}
-          </button>
-        </div>
+      <div class="form-group" *ngIf="editingItem()?.type === 'expense'">
+        <sic-input
+          name="editCategory"
+          label="หมวดหมู่"
+          [(ngModel)]="editFormCategory"
+          placeholder="เช่น อาหาร, เดินทาง, ช้อปปิ้ง"
+          size="md"
+        ></sic-input>
       </div>
     </div>
-  </div>
 
-  <!-- Delete Confirmation Modal -->
-  <div class="modal-backdrop" *ngIf="deletingItem()" (click)="closeDeleteModal()">
-    <div class="modal-dialog dialog-delete" (click)="$event.stopPropagation()">
-      <div class="dialog-content">
-        <div class="dialog-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-            <line x1="12" y1="9" x2="12" y2="13"></line>
-            <line x1="12" y1="17" x2="12.01" y2="17"></line>
-          </svg>
-        </div>
-
-        <h3>ยืนยันการลบรายการ</h3>
-        <p>
-          คุณต้องการลบรายการ <br>
-          <span class="item-highlight">"{{ deletingItem()?.title }}"</span> <br>
-          ใช่หรือไม่? ยืนยันแล้วจะไม่สามารถย้อนกลับได้
-        </p>
-
-        <div class="dialog-actions">
-          <button class="btn-cancel" (click)="closeDeleteModal()" [disabled]="isDeleting()">ยกเลิก</button>
-          <button class="btn-confirm" (click)="confirmDelete()" [disabled]="isDeleting()">
-            {{ isDeleting() ? 'กำลังลบ...' : 'ยืนยันการลบ' }}
-          </button>
-        </div>
-      </div>
+    <div sicDialogFooter style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px;">
+      <sic-button variant="outline" color="primary" size="sm" (click)="closeEditModal()" [disabled]="isSavingEdit()">ยกเลิก</sic-button>
+      <sic-button
+        variant="solid"
+        color="primary"
+        size="sm"
+        (click)="saveEdit()"
+        [disabled]="isSavingEdit()"
+        [loading]="isSavingEdit()"
+      >
+        บันทึกการแก้ไข
+      </sic-button>
     </div>
-  </div>
+  </sic-dialog>
+
+  <!-- Delete Confirmation Modal with SicDialog -->
+  <sic-dialog
+    [open]="!!deletingItem()"
+    (closed)="closeDeleteModal()"
+    title="ยืนยันการลบรายการ"
+    width="420px"
+  >
+    <div style="padding: 1rem 0; line-height: 1.6;">
+      <p>
+        คุณต้องการลบรายการ <strong style="color: var(--sic-color-primary);">"{{ deletingItem()?.title }}"</strong> ใช่หรือไม่?
+      </p>
+      <p style="color: var(--sic-color-text-muted); font-size: 0.85rem; margin-top: 6px;">หากยืนยันแล้วจะไม่สามารถย้อนกลับได้</p>
+    </div>
+    <div sicDialogFooter style="display: flex; justify-content: flex-end; gap: 8px;">
+      <sic-button variant="outline" color="primary" size="sm" (click)="closeDeleteModal()" [disabled]="isDeleting()">ยกเลิก</sic-button>
+      <sic-button
+        variant="solid"
+        color="danger"
+        size="sm"
+        (click)="confirmDelete()"
+        [disabled]="isDeleting()"
+        [loading]="isDeleting()"
+      >
+        ยืนยันการลบ
+      </sic-button>
+    </div>
+  </sic-dialog>
 </div>

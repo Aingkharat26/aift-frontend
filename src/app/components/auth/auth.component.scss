@@ -8,14 +8,8 @@
 
 .auth-card {
   width: 100%;
-  max-width: 460px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  border-radius: 20px;
-  padding: 2.25rem;
-  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.08);
-  backdrop-filter: blur(8px);
-  transition: all 0.3s ease;
+  max-width: 480px;
+  display: block;
 }
 
 .brand-header {

@@ -1,10 +1,9 @@
 import {
   ChangeDetectorRef,
   Component,
-  ElementRef,
   inject,
   OnInit,
-  ViewChild,
+  signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -14,11 +13,26 @@ import {
   BudgetStatus,
 } from '../../services/budget.service';
 import { ExpenseService } from '../../services/expense.service';
+import {
+  SicButtonComponent,
+  SicBadgeComponent,
+  SicProgressBarComponent,
+  SicDialogComponent,
+  SicCardComponent,
+} from 'sic-ng';
 
 @Component({
   selector: 'app-budget-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    SicButtonComponent,
+    SicBadgeComponent,
+    SicProgressBarComponent,
+    SicDialogComponent,
+    SicCardComponent,
+  ],
   templateUrl: './budget-panel.component.html',
   styleUrl: './budget-panel.component.css',
 })
@@ -26,6 +40,10 @@ export class BudgetPanelComponent implements OnInit {
   private budgetService = inject(BudgetService);
   private expenseService = inject(ExpenseService);
   private cdr = inject(ChangeDetectorRef);
+
+  showAddDialog = signal<boolean>(false);
+  showRecommendDialog = signal<boolean>(false);
+  showConfirmDialog = signal<boolean>(false);
 
   categories = [
     'อาหาร',
@@ -44,11 +62,6 @@ export class BudgetPanelComponent implements OnInit {
   recommendationsLoading = false;
 
   newBudget = { category: 'อาหาร', limit: 1000 };
-
-  @ViewChild('addDialog') addDialog!: ElementRef<HTMLDialogElement>;
-  @ViewChild('recommendDialog')
-  recommendDialog!: ElementRef<HTMLDialogElement>;
-  @ViewChild('confirmDialog') confirmDialog!: ElementRef<HTMLDialogElement>;
 
   selectedForDelete: BudgetStatus | null = null;
 
@@ -173,7 +186,7 @@ export class BudgetPanelComponent implements OnInit {
       category: firstFree || this.categories[0],
       limit: 1000,
     };
-    this.addDialog.nativeElement.showModal();
+    this.showAddDialog.set(true);
   }
 
   onAddBudget() {
@@ -182,7 +195,7 @@ export class BudgetPanelComponent implements OnInit {
 
     this.budgetService.saveBudget(this.newBudget.category, limit).subscribe({
       next: () => {
-        this.addDialog.nativeElement.close();
+        this.showAddDialog.set(false);
         this.reloadStatus();
       },
       error: (err) => {
@@ -195,7 +208,7 @@ export class BudgetPanelComponent implements OnInit {
 
   deleteBudget(item: BudgetStatus) {
     this.selectedForDelete = item;
-    this.confirmDialog.nativeElement.showModal();
+    this.showConfirmDialog.set(true);
   }
 
   onConfirmDelete() {
@@ -203,6 +216,7 @@ export class BudgetPanelComponent implements OnInit {
 
     const id = this.selectedForDelete.id;
     this.selectedForDelete = null;
+    this.showConfirmDialog.set(false);
     this.budgetService.deleteBudget(id).subscribe({
       next: () => this.reloadStatus(),
       error: (err) => {
@@ -214,7 +228,7 @@ export class BudgetPanelComponent implements OnInit {
   }
 
   openRecommendDialog() {
-    this.recommendDialog.nativeElement.showModal();
+    this.showRecommendDialog.set(true);
     this.recommendationsLoading = true;
     this.recommendations = [];
     this.cdr.detectChanges();

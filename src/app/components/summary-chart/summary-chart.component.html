@@ -1,5 +1,8 @@
-<div class="chart-container">
-  <h2 class="title">สรุปรายจ่ายเดือน {{ getMonthLabel() }}</h2>
+<sic-card [elevated]="true" class="summary-card">
+  <div class="chart-header">
+    <h2 class="title">สรุปรายจ่ายเดือน {{ getMonthLabel() }}</h2>
+  </div>
+
   <div class="stats-grid" *ngIf="!loading">
     <div class="stat-card income">
       <span class="label">รายรับ</span>
@@ -28,5 +31,10 @@
     </canvas>
   </div>
 
+  <div class="empty-chart" *ngIf="!loading && !hasData()">
+    <span>ยังไม่มีข้อมูลการใช้จ่ายในเดือนนี้</span>
+  </div>
+
   <app-ai-insight class="chart-insight"></app-ai-insight>
-</div>
+</sic-card>
+

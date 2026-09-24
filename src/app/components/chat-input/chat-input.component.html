@@ -1,22 +1,24 @@
 <div class="inputs-grid">
   <!-- Mobile Tab Switcher (ซ่อนบน Desktop แสดงเฉพาะ Mobile <= 768px) -->
   <div class="mobile-tab-switcher">
-    <button
+    <sic-button
       type="button"
-      class="mobile-tab-btn"
-      [class.active]="activeTab === 'expense'"
+      [variant]="activeTab === 'expense' ? 'solid' : 'ghost'"
+      color="primary"
+      size="sm"
       (click)="setTab('expense')"
     >
       💸 รายจ่าย (AI)
-    </button>
-    <button
+    </sic-button>
+    <sic-button
       type="button"
-      class="mobile-tab-btn"
-      [class.active]="activeTab === 'income'"
+      [variant]="activeTab === 'income' ? 'solid' : 'ghost'"
+      color="success"
+      size="sm"
       (click)="setTab('income')"
     >
       💰 รายรับ
-    </button>
+    </sic-button>
   </div>
 
   <!-- ส่วนรายจ่าย (AI) -->
@@ -32,17 +34,17 @@
         hidden
         (change)="onReceiptSelected($event)"
       />
-      <button
-        class="scan-btn"
+      <sic-button
+        variant="outline"
+        color="primary"
+        size="md"
         (click)="receiptInput.click()"
         [disabled]="isLoading || isScanning"
+        [loading]="isScanning"
         title="สแกนใบเสร็จด้วยรูปถ่าย"
       >
-        <span *ngIf="!isScanning" class="scan-icon">🧾</span>
-        <span *ngIf="isScanning" class="scan-loading">
-          <span class="scan-spinner"></span>
-        </span>
-      </button>
+        🧾
+      </sic-button>
       <input
         type="text"
         [(ngModel)]="text"
@@ -51,9 +53,16 @@
         [disabled]="isLoading || isScanning"
         class="chat-input"
       />
-      <button (click)="onSubmit()" [disabled]="isLoading || isScanning || !text.trim()" class="send-btn">
-        {{ isLoading ? '...' : 'บันทึก' }}
-      </button>
+      <sic-button
+        variant="solid"
+        color="primary"
+        size="md"
+        (click)="onSubmit()"
+        [disabled]="isLoading || isScanning || !text.trim()"
+        [loading]="isLoading"
+      >
+        บันทึก
+      </sic-button>
     </div>
   </div>
 
@@ -71,22 +80,32 @@
         [disabled]="isIncomeLoading"
         class="chat-input"
       />
-      <button (click)="onAddIncome()" [disabled]="isIncomeLoading || !incomeText.trim()" class="send-btn income-btn">
-        {{ isIncomeLoading ? '...' : 'บันทึก' }}
-      </button>
+      <sic-button
+        variant="solid"
+        color="success"
+        size="md"
+        (click)="onAddIncome()"
+        [disabled]="isIncomeLoading || !incomeText.trim()"
+        [loading]="isIncomeLoading"
+      >
+        บันทึก
+      </sic-button>
     </div>
   </div>
 </div>
 
-<!-- Dialog สำหรับแจ้งสถานะ AI / Error -->
-<dialog #statusDialog class="modal-dialog">
-  <div class="dialog-content">
-    <div class="status-icon">{{ statusData.icon }}</div>
-    <h3>{{ statusData.title }}</h3>
-    <p>{{ statusData.message }}</p>
-
-    <div class="dialog-actions">
-      <button class="btn-confirm" (click)="statusDialog.close()">ตกลง</button>
-    </div>
+<!-- SicDialog สำหรับแจ้งสถานะ AI / Error -->
+<sic-dialog
+  [open]="showStatusModal()"
+  (closed)="showStatusModal.set(false)"
+  [title]="statusData.title"
+  width="400px"
+>
+  <div style="padding: 1rem 0; text-align: center;">
+    <div style="font-size: 2.5rem; margin-bottom: 8px;">{{ statusData.icon }}</div>
+    <p style="font-size: 1rem; color: var(--sic-color-text); line-height: 1.5;">{{ statusData.message }}</p>
   </div>
-</dialog>
+  <div sicDialogFooter style="display: flex; justify-content: flex-end;">
+    <sic-button variant="solid" color="primary" size="sm" (click)="showStatusModal.set(false)">ตกลง</sic-button>
+  </div>
+</sic-dialog>

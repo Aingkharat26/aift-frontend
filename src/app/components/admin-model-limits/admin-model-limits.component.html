@@ -1,27 +1,28 @@
-<div class="modal-backdrop" (click)="close.emit()">
-  <div class="modal-dialog" (click)="$event.stopPropagation()">
-    <!-- Header -->
-    <div class="modal-header">
-      <div class="header-left">
-        <div class="title-row">
-          <h2>👑 สถานะและขีดจำกัดโมเดล AI</h2>
-          <span class="status-indicator" [class.is-active]="data()?.apiKeyConfigured">
-            <span class="dot"></span>
-            {{ data()?.apiKeyConfigured ? 'API พร้อมใช้งาน' : 'API ขัดข้อง' }}
-          </span>
-        </div>
-        <p class="subtitle">สิทธิ์ Admin: ตรวจสอบโควตาและระบบสลับโมเดลอัตโนมัติ (Waterfall)</p>
-      </div>
-      <button class="btn-close" (click)="close.emit()" title="ปิดหน้าต่าง">✕</button>
-    </div>
+<sic-dialog
+  [open]="true"
+  (closed)="close.emit()"
+  title="สถานะและขีดจำกัดโมเดล AI"
+  width="780px"
+>
+  <div style="margin-top: -8px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+    <p style="margin: 0; color: var(--sic-color-text-muted); font-size: 0.85rem;">
+      สิทธิ์ Admin: ตรวจสอบโควตาและระบบสลับโมเดลอัตโนมัติ (Waterfall)
+    </p>
+    <sic-badge
+      [color]="data()?.apiKeyConfigured ? 'success' : 'danger'"
+      variant="soft"
+      size="sm"
+    >
+      {{ data()?.apiKeyConfigured ? 'API พร้อมใช้งาน' : 'API ขัดข้อง' }}
+    </sic-badge>
+  </div>
 
-    <!-- Body -->
-    <div class="modal-body">
-      <!-- Loading State -->
-      <div *ngIf="loading()" class="loading-state">
-        <div class="spinner"></div>
-        <p>กำลังโหลดข้อมูลโมเดล...</p>
-      </div>
+  <div class="modal-body-content">
+    <!-- Loading State -->
+    <div *ngIf="loading()" class="loading-state">
+      <div class="spinner"></div>
+      <p>กำลังโหลดข้อมูลโมเดล...</p>
+    </div>
 
       <!-- Error State -->
       <div *ngIf="error()" class="error-banner">
@@ -171,14 +172,24 @@
       </ng-container>
     </div>
 
-    <!-- Footer -->
-    <div class="modal-footer">
-      <button class="btn-refresh" (click)="fetchData()" [disabled]="loading()">
-        🔄 รีเฟรชสถานะ
-      </button>
-      <button class="btn-close-action" (click)="close.emit()">
-        ปิดหน้าต่าง
-      </button>
-    </div>
+  <!-- Footer -->
+  <div sicDialogFooter style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-top: 8px;">
+    <sic-button
+      variant="outline"
+      color="primary"
+      size="sm"
+      (click)="fetchData()"
+      [disabled]="loading()"
+    >
+      🔄 รีเฟรชสถานะ
+    </sic-button>
+    <sic-button
+      variant="solid"
+      color="primary"
+      size="sm"
+      (click)="close.emit()"
+    >
+      ปิดหน้าต่าง
+    </sic-button>
   </div>
-</div>
+</sic-dialog>

@@ -10,11 +10,21 @@ import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { BudgetService, BudgetStatus } from '../../services/budget.service';
 import { ExpenseService } from '../../services/expense.service';
+import {
+  SicButtonComponent,
+  SicBadgeComponent,
+  SicProgressBarComponent,
+} from 'sic-ng';
 
 @Component({
   selector: 'app-mini-budget',
   standalone: true,
-  imports: [CommonModule],
+  imports: [
+    CommonModule,
+    SicButtonComponent,
+    SicBadgeComponent,
+    SicProgressBarComponent,
+  ],
   templateUrl: './mini-budget.component.html',
   styleUrls: ['./mini-budget.component.scss'],
 })

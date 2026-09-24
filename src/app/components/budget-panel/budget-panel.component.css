@@ -166,29 +166,52 @@
 }
 
 .delete-btn {
-  border: none;
   border-radius: 8px;
-  width: 30px;
-  height: 30px;
-  display: flex;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  background: var(--bg-surface);
-  color: #ef4444;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  background: rgba(239, 68, 68, 0.08);
+  color: #dc2626;
+  border: 1px solid rgba(239, 68, 68, 0.22);
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
   flex-shrink: 0;
+  outline: none;
+  padding: 0;
+
+  svg {
+    width: 15px;
+    height: 15px;
+    display: block;
+    transition: transform 0.2s ease;
+  }
+
+  &:hover {
+    background: #ef4444;
+    border-color: #ef4444;
+    color: #ffffff;
+    transform: translateY(-1px) scale(1.08);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  }
+
+  &:active {
+    transform: scale(0.92);
+  }
 }
 
-.delete-btn:hover {
-  background: #ef4444;
-  color: #ffffff;
-  transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
-}
+:host-context(.dark) .delete-btn,
+:host-context([data-theme='dark']) .delete-btn {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border-color: rgba(248, 113, 113, 0.3);
 
-.delete-btn:active {
-  transform: scale(0.9);
+  &:hover {
+    background: #dc2626;
+    border-color: #dc2626;
+    color: #ffffff;
+  }
 }
 
 .progress-track {

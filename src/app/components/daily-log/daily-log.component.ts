@@ -1,14 +1,29 @@
-import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ExpenseService } from '../../services/expense.service';
 import { IncomeService } from '../../services/income.service';
 import { forkJoin, map, Observable, of } from 'rxjs';
+import {
+  SicCardComponent,
+  SicBadgeComponent,
+  SicButtonComponent,
+  SicDialogComponent,
+  SicInputComponent,
+} from 'sic-ng';
 
 @Component({
   selector: 'app-daily-log',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    SicCardComponent,
+    SicBadgeComponent,
+    SicButtonComponent,
+    SicDialogComponent,
+    SicInputComponent,
+  ],
   templateUrl: './daily-log.component.html',
   styleUrl: './daily-log.component.css',
 })
@@ -16,6 +31,9 @@ export class DailyLogComponent implements OnInit {
   expenseService = inject(ExpenseService);
   incomeService = inject(IncomeService);
   private cdr = inject(ChangeDetectorRef);
+
+  showEditDialog = signal<boolean>(false);
+  showDeleteDialog = signal<boolean>(false);
 
   combinedLogs: any[] = [];
   selectedItem: any = null;
@@ -93,14 +111,14 @@ export class DailyLogComponent implements OnInit {
     return `รายการของวันที่ ${this.getSelectedDateLabel()}`;
   }
 
-  editItem(item: any, dialog: HTMLDialogElement) {
+  editItem(item: any) {
     this.editingItem = item;
     this.editForm = {
       name: item.type === 'income' ? item.source : item.item,
       amount: Number(item.amount),
       category: item.category === 'รายรับ' ? 'อาหาร' : item.category,
     };
-    dialog.showModal();
+    this.showEditDialog.set(true);
   }
 
   isEditValid(): boolean {
@@ -112,7 +130,7 @@ export class DailyLogComponent implements OnInit {
     );
   }
 
-  onConfirmEdit(dialog: HTMLDialogElement) {
+  onConfirmEdit() {
     if (!this.editingItem || !this.isEditValid()) return;
 
     const isIncome = this.editingItem.type === 'income';
@@ -130,7 +148,7 @@ export class DailyLogComponent implements OnInit {
 
     updateObs.subscribe({
       next: () => {
-        dialog.close();
+        this.showEditDialog.set(false);
 
         // Refresh summary if it was an income (balance changed)
         if (isIncome) {
@@ -149,12 +167,12 @@ export class DailyLogComponent implements OnInit {
     });
   }
 
-  deleteItem(item: any, dialog: HTMLDialogElement) {
+  deleteItem(item: any) {
     this.selectedItem = item;
-    dialog.showModal();
+    this.showDeleteDialog.set(true);
   }
 
-  onConfirmDelete(dialog: HTMLDialogElement) {
+  onConfirmDelete() {
     if (!this.selectedItem) return;
 
     const isIncome = this.selectedItem.type === 'income';
@@ -164,7 +182,7 @@ export class DailyLogComponent implements OnInit {
 
     deleteObs.subscribe({
       next: () => {
-        dialog.close();
+        this.showDeleteDialog.set(false);
 
         // Refresh summary if it was an income (balance changed)
         if (isIncome) {

@@ -1,11 +1,12 @@
 import { Component, inject, OnInit, HostListener, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ExpenseService } from '../../services/expense.service';
+import { SicButtonComponent } from 'sic-ng';
 
 @Component({
   selector: 'app-date-selector',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, SicButtonComponent],
   templateUrl: './date-selector.component.html',
   styleUrl: './date-selector.component.css'
 })

@@ -1,18 +1,27 @@
 import {
   ChangeDetectorRef,
   Component,
-  ElementRef,
   inject,
   OnInit,
-  ViewChild,
+  signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ExpenseService } from '../../services/expense.service';
+import {
+  SicButtonComponent,
+  SicBadgeComponent,
+  SicDialogComponent,
+} from 'sic-ng';
 
 @Component({
   selector: 'app-ai-insight',
   standalone: true,
-  imports: [CommonModule],
+  imports: [
+    CommonModule,
+    SicButtonComponent,
+    SicBadgeComponent,
+    SicDialogComponent,
+  ],
   templateUrl: './ai-insight.component.html',
   styleUrl: './ai-insight.component.css',
 })
@@ -20,7 +29,7 @@ export class AiInsightComponent implements OnInit {
   private expenseService = inject(ExpenseService);
   private cdr = inject(ChangeDetectorRef);
 
-  @ViewChild('readMoreDialog') readMoreDialog!: ElementRef<HTMLDialogElement>;
+  showModal = signal<boolean>(false);
 
   public aiSummary = '';
   public aiLoading = false;

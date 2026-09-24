@@ -1,13 +1,19 @@
-import { ChangeDetectorRef, Component, ElementRef, inject, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, inject, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ExpenseService } from '../../services/expense.service';
 import { IncomeService } from '../../services/income.service';
+import { SicButtonComponent, SicDialogComponent } from 'sic-ng';
 
 @Component({
   selector: 'app-chat-input',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    SicButtonComponent,
+    SicDialogComponent,
+  ],
   templateUrl: './chat-input.component.html',
   styleUrl: './chat-input.component.css',
 })
@@ -18,6 +24,7 @@ export class ChatInputComponent {
   isIncomeLoading = false;
   isScanning = false;
   activeTab: 'expense' | 'income' = 'expense';
+  showStatusModal = signal<boolean>(false);
 
   setTab(tab: 'expense' | 'income') {
     this.activeTab = tab;
@@ -27,7 +34,6 @@ export class ChatInputComponent {
   private incomeService = inject(IncomeService);
   private cdr = inject(ChangeDetectorRef);
 
-  @ViewChild('statusDialog') statusDialog!: ElementRef<HTMLDialogElement>;
   @ViewChild('receiptInput') receiptInput!: ElementRef<HTMLInputElement>;
 
   statusData = { title: '', message: '', icon: '' };
@@ -189,6 +195,6 @@ export class ChatInputComponent {
   showStatus(title: string, message: string, icon: string) {
     this.statusData = { title, message, icon };
     this.cdr.detectChanges();
-    this.statusDialog.nativeElement.showModal();
+    this.showStatusModal.set(true);
   }
 }

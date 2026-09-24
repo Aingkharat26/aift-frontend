@@ -8,12 +8,14 @@
   <!-- Empty State -->
   <div class="ribbon-empty" *ngIf="!loading && !hasBudgets">
     <div class="empty-left">
-      <span class="ribbon-icon">🎯</span>
+      <span class="ribbon-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="m4.93 4.93 4.24 4.24"></path><path d="m14.83 9.17 4.24-4.24"></path><path d="m14.83 14.83 4.24 4.24"></path><path d="m9.17 14.83-4.24 4.24"></path><circle cx="12" cy="12" r="4"></circle></svg>
+      </span>
       <span class="empty-text">ยังไม่ได้ตั้งงบประมาณประจำเดือน{{ getMonthLabel() }}</span>
     </div>
-    <button class="btn-ribbon-action" (click)="navigateToBudgets()">
+    <sic-button variant="solid" color="primary" size="sm" (click)="navigateToBudgets()">
       ＋ ตั้งงบประมาณเลย
-    </button>
+    </sic-button>
   </div>
 
   <!-- Content State: Slim Ribbon -->
@@ -21,19 +23,20 @@
     <!-- Left: Overall Summary -->
     <div class="ribbon-overall" (click)="navigateToBudgets()" title="คลิกเพื่อดูรายละเอียดงบประมาณ">
       <div class="overall-label-group">
-        <span class="ribbon-icon">🎯</span>
-        <span class="overall-title">งบเดือน{{ getMonthLabel() }}</span>
-        <span class="overall-badge" [ngClass]="getStatusClass(overallStatus)">
-          {{ totalPercent }}%
+        <span class="ribbon-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="m4.93 4.93 4.24 4.24"></path><path d="m14.83 9.17 4.24-4.24"></path><path d="m14.83 14.83 4.24 4.24"></path><path d="m9.17 14.83-4.24 4.24"></path><circle cx="12" cy="12" r="4"></circle></svg>
         </span>
+        <span class="overall-title">งบเดือน{{ getMonthLabel() }}</span>
+        <sic-badge [color]="overallStatus === 'exceeded' ? 'danger' : (overallStatus === 'warning' ? 'warning' : 'success')" size="sm">
+          {{ totalPercent }}%
+        </sic-badge>
       </div>
       <div class="overall-bar-group">
-        <div class="progress-track">
-          <div
-            class="progress-fill"
-            [ngClass]="getStatusClass(overallStatus)"
-            [style.width.%]="overallProgressWidth()"
-          ></div>
+        <div class="sic-progress-wrapper" style="width: 140px; margin-right: 8px;">
+          <sic-progress-bar
+            [value]="overallProgressWidth()"
+            [color]="overallStatus === 'exceeded' ? 'danger' : (overallStatus === 'warning' ? 'warning' : 'primary')"
+          ></sic-progress-bar>
         </div>
         <span class="overall-amounts">
           ฿{{ formatNumber(totalSpent) }} / ฿{{ formatNumber(totalBudget) }}
@@ -55,7 +58,9 @@
       >
         <span class="chip-icon">{{ getCategoryIcon(item.category) }}</span>
         <span class="chip-name">{{ item.category }}</span>
-        <span class="chip-pct">{{ item.percentUsed }}%</span>
+        <sic-badge [color]="item.status === 'exceeded' ? 'danger' : (item.status === 'warning' ? 'warning' : 'primary')" size="sm">
+          {{ item.percentUsed }}%
+        </sic-badge>
       </div>
       <span *ngIf="sortedStatuses.length > 5" class="chip-more" (click)="navigateToBudgets()">
         +{{ sortedStatuses.length - 5 }} หมวด
@@ -64,13 +69,13 @@
 
     <!-- Right: Alert & Manage Button -->
     <div class="ribbon-right">
-      <span *ngIf="alertCount > 0" class="ribbon-alert-pill" (click)="navigateToBudgets()">
-        ⚠️ {{ alertCount }} หมวดเตือน
-      </span>
-      <button class="btn-manage" (click)="navigateToBudgets()" title="ไปที่หน้างบประมาณแบบเต็ม">
-        <span>จัดการงบ</span>
-        <span class="arrow-icon">→</span>
-      </button>
+      <sic-badge *ngIf="alertCount > 0" color="warning" size="sm" (click)="navigateToBudgets()" style="cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+        {{ alertCount }} หมวดเตือน
+      </sic-badge>
+      <sic-button variant="outline" color="primary" size="sm" (click)="navigateToBudgets()" title="ไปที่หน้างบประมาณแบบเต็ม">
+        จัดการงบ →
+      </sic-button>
     </div>
   </div>
 </div>

@@ -7,31 +7,35 @@
     <span>AI กำลังวิเคราะห์การใช้จ่าย...</span>
   </div>
 
-  <button
-    class="ai-summary-btn"
+  <sic-button
     *ngIf="!aiLoading && aiSummary"
-    (click)="readMoreDialog.showModal()"
+    variant="outline"
+    color="primary"
+    size="sm"
+    (click)="showModal.set(true)"
   >
-    <span class="ai-robot">🤖</span>
-    <span class="ai-label">สรุปจาก AI</span>
-    <span class="ai-month">{{ getMonthLabel() }}</span>
-    <span class="ai-arrow">ดู ▸</span>
-  </button>
+    สรุปวิเคราะห์จาก AI ({{ getMonthLabel() }}) ▸
+  </sic-button>
 
   <p class="ai-error" *ngIf="!aiLoading && aiFailed && !aiSummary">
     AI ไม่ว่างในตอนนี้ ลองใหม่อีกครั้งภายหลังครับ
   </p>
 </div>
 
-<!-- Dialog: ข้อความเต็มของสรุป AI -->
-<dialog #readMoreDialog class="modal-dialog">
-  <div class="dialog-content">
-    <div class="dialog-icon">🤖</div>
-    <h3>สรุปจาก AI</h3>
-    <span class="dialog-month">{{ getMonthLabel() }}</span>
-    <p class="full-text">{{ aiSummary }}</p>
-    <div class="dialog-actions">
-      <button class="btn-confirm" (click)="readMoreDialog.close()">ปิด</button>
+<!-- SicDialog: ข้อความเต็มของสรุป AI -->
+<sic-dialog
+  [open]="showModal()"
+  (closed)="showModal.set(false)"
+  title="บทวิเคราะห์การเงินจาก AI"
+  width="520px"
+>
+  <div class="dialog-body" style="padding: 1rem 0;">
+    <div style="margin-bottom: 8px;">
+      <sic-badge color="primary" size="sm">ประจำเดือน {{ getMonthLabel() }}</sic-badge>
     </div>
+    <p class="full-text" style="line-height: 1.6; font-size: 0.95rem; white-space: pre-wrap;">{{ aiSummary }}</p>
   </div>
-</dialog>
+  <div sicDialogFooter style="display: flex; justify-content: flex-end; gap: 8px;">
+    <sic-button variant="solid" color="primary" size="sm" (click)="showModal.set(false)">ปิด</sic-button>
+  </div>
+</sic-dialog>

@@ -1,10 +1,23 @@
 <div class="budget-container">
   <div class="budget-header">
     <div class="header-actions">
-      <button class="btn-recommend" (click)="openRecommendDialog()" title="คำนวณงบจากพฤติกรรมการใช้จ่าย 3 เดือนล่าสุด">
-        ✨ แนะนำจากพฤติกรรม
-      </button>
-      <button class="btn-add" (click)="openAddDialog()">＋ ตั้งงบ</button>
+      <sic-button
+        variant="outline"
+        color="primary"
+        size="sm"
+        (click)="openRecommendDialog()"
+        title="คำนวณงบจากพฤติกรรมการใช้จ่าย 3 เดือนล่าสุด"
+      >
+        แนะนำจากพฤติกรรม
+      </sic-button>
+      <sic-button
+        variant="solid"
+        color="primary"
+        size="sm"
+        (click)="openAddDialog()"
+      >
+        ＋ ตั้งงบประมาณ
+      </sic-button>
     </div>
   </div>
 
@@ -29,34 +42,40 @@
 
     <div class="empty-state" *ngIf="!hasBudgets">
       ยังไม่ได้ตั้งงบประมาณรายหมวด
-      <button class="btn-add" (click)="openAddDialog()">＋ ตั้งงบเลย</button>
+      <div style="margin: 12px 0;">
+        <sic-button variant="solid" color="primary" size="sm" (click)="openAddDialog()">＋ ตั้งงบเลย</sic-button>
+      </div>
       <span class="empty-hint">หรือกด "✨ แนะนำจากพฤติกรรม" ให้ระบบคำนวณจากประวัติการใช้จ่ายให้</span>
     </div>
 
     <div class="budget-list" *ngIf="hasBudgets">
-      <div class="budget-item" *ngFor="let item of statuses">
+      <sic-card [elevated]="true" class="budget-item" *ngFor="let item of statuses" style="margin-bottom: 12px; display: block;">
         <div class="budget-top">
           <span class="cat-icon">{{ getCategoryIcon(item.category) }}</span>
           <span class="cat-name">{{ item.category }}</span>
-          <span class="percent-badge" [ngClass]="getStatusClass(item.status)">
+          <sic-badge [color]="item.status === 'exceeded' ? 'danger' : (item.status === 'warning' ? 'warning' : 'success')" size="sm">
             {{ item.percentUsed }}%
-          </span>
-          <button class="delete-btn" (click)="deleteBudget(item)" title="ลบงบหมวดนี้">
+          </sic-badge>
+          <button 
+            type="button"
+            class="delete-btn" 
+            (click)="deleteBudget(item)" 
+            title="ลบงบหมวดนี้"
+          >
             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M3 6h18"></path>
-              <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
-              <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
-              <line x1="10" y1="11" x2="10" y2="17"></line>
-              <line x1="14" y1="11" x2="14" y2="17"></line>
+              <path d="M3 6h18"/>
+              <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+              <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+              <line x1="10" y1="11" x2="10" y2="17"/>
+              <line x1="14" y1="11" x2="14" y2="17"/>
             </svg>
           </button>
         </div>
-        <div class="progress-track">
-          <div
-            class="progress-fill"
-            [ngClass]="getStatusClass(item.status)"
-            [style.width.%]="progressWidth(item)"
-          ></div>
+        <div style="margin: 10px 0;">
+          <sic-progress-bar
+            [value]="progressWidth(item)"
+            [color]="item.status === 'exceeded' ? 'danger' : (item.status === 'warning' ? 'warning' : 'primary')"
+          ></sic-progress-bar>
         </div>
         <div class="budget-bottom">
           <span>ใช้ไป ฿{{ formatNumber(item.spent) }} / ฿{{ formatNumber(item.limit) }}</span>
@@ -64,58 +83,63 @@
             เหลือ ฿{{ formatNumber(item.remaining) }}
           </span>
         </div>
-      </div>
+      </sic-card>
     </div>
   </div>
 </div>
 
-<!-- Dialog: ตั้งงบประมาณ -->
-<dialog #addDialog class="modal-dialog">
-  <div class="dialog-content">
-    <div class="dialog-icon">🎯</div>
-    <h3>ตั้งงบประมาณรายหมวด</h3>
+<!-- SicDialog: ตั้งงบประมาณ -->
+<sic-dialog
+  [open]="showAddDialog()"
+  (closed)="showAddDialog.set(false)"
+  title="ตั้งงบประมาณรายหมวด"
+  width="440px"
+>
+  <form (ngSubmit)="onAddBudget()" style="padding: 0.5rem 0; display: flex; flex-direction: column; gap: 12px;">
+    <div class="form-group">
+      <label style="display: block; font-size: 0.85rem; font-weight: 500; margin-bottom: 4px; color: var(--sic-color-text);">หมวดหมู่</label>
+      <select [(ngModel)]="newBudget.category" name="budgetCategory" style="width: 100%; padding: 8px 12px; border: 1px solid var(--sic-color-border); border-radius: 8px; background: var(--sic-color-surface); color: var(--sic-color-text);">
+        <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+      </select>
+    </div>
 
-    <form class="edit-form" (ngSubmit)="onAddBudget()">
-      <div class="form-group">
-        <label class="form-label">หมวดหมู่</label>
-        <select [(ngModel)]="newBudget.category" name="budgetCategory" class="form-input">
-          <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
-        </select>
-      </div>
+    <div class="form-group">
+      <label style="display: block; font-size: 0.85rem; font-weight: 500; margin-bottom: 4px; color: var(--sic-color-text);">งบประมาณต่อเดือน (บาท)</label>
+      <input
+        type="number"
+        [(ngModel)]="newBudget.limit"
+        name="budgetLimit"
+        min="1"
+        step="50"
+        style="width: 100%; padding: 8px 12px; border: 1px solid var(--sic-color-border); border-radius: 8px; background: var(--sic-color-surface); color: var(--sic-color-text);"
+        placeholder="เช่น 3000"
+      />
+    </div>
 
-      <div class="form-group">
-        <label class="form-label">งบประมาณต่อเดือน (บาท)</label>
-        <input
-          type="number"
-          [(ngModel)]="newBudget.limit"
-          name="budgetLimit"
-          min="1"
-          step="50"
-          class="form-input"
-          placeholder="เช่น 3000"
-        />
-      </div>
+    <div sicDialogFooter style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px;">
+      <sic-button type="button" variant="outline" color="primary" size="sm" (click)="showAddDialog.set(false)">ยกเลิก</sic-button>
+      <sic-button
+        type="submit"
+        variant="solid"
+        color="primary"
+        size="sm"
+        [disabled]="!newBudget.category || !newBudget.limit || newBudget.limit <= 0"
+      >
+        บันทึกงบประมาณ
+      </sic-button>
+    </div>
+  </form>
+</sic-dialog>
 
-      <div class="dialog-actions">
-        <button type="button" class="btn-cancel" (click)="addDialog.close()">ยกเลิก</button>
-        <button
-          type="submit"
-          class="btn-save"
-          [disabled]="!newBudget.category || !newBudget.limit || newBudget.limit <= 0"
-        >
-          บันทึกงบประมาณ
-        </button>
-      </div>
-    </form>
-  </div>
-</dialog>
-
-<!-- Dialog: แนะนำงบจากพฤติกรรม -->
-<dialog #recommendDialog class="modal-dialog">
-  <div class="dialog-content recommend-content">
-    <div class="dialog-icon">✨</div>
-    <h3>แนะนำงบประมาณจากพฤติกรรม</h3>
-    <p class="recommend-desc">
+<!-- SicDialog: แนะนำงบจากพฤติกรรม -->
+<sic-dialog
+  [open]="showRecommendDialog()"
+  (closed)="showRecommendDialog.set(false)"
+  title="แนะนำงบประมาณจากพฤติกรรม"
+  width="560px"
+>
+  <div style="padding: 0.5rem 0;">
+    <p style="color: var(--sic-color-text-muted); font-size: 0.88rem; margin-bottom: 12px;">
       คำนวณจากค่าเฉลี่ยการใช้จ่ายจริงย้อนหลัง 3 เดือนล่าสุด ปัดขึ้นเป็นเลขกลม ๆ
     </p>
 
@@ -141,41 +165,39 @@
             (ปัจจุบัน ฿{{ formatNumber(rec.currentBudget) }})
           </span>
         </div>
-        <button
-          class="btn-apply"
+        <sic-button
+          variant="outline"
+          color="primary"
+          size="sm"
           (click)="applyRecommendation(rec)"
           [disabled]="rec.currentBudget === rec.recommendedBudget"
         >
           {{ rec.currentBudget === rec.recommendedBudget ? 'ตั้งแล้ว ✓' : 'ใช้ค่านี้' }}
-        </button>
+        </sic-button>
       </div>
     </div>
-
-    <div class="dialog-actions">
-      <button class="btn-confirm" (click)="recommendDialog.close()">ปิด</button>
-    </div>
   </div>
-</dialog>
 
-<!-- Dialog: ยืนยันการลบงบประมาณ -->
-<dialog #confirmDialog class="modal-dialog">
-  <div class="dialog-content">
-    <div class="dialog-icon dialog-icon-red">
-      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-        <line x1="12" y1="9" x2="12" y2="13"></line>
-        <line x1="12" y1="17" x2="12.01" y2="17"></line>
-      </svg>
-    </div>
-    <h3>ยืนยันการลบงบประมาณ</h3>
+  <div sicDialogFooter style="display: flex; justify-content: flex-end;">
+    <sic-button variant="solid" color="primary" size="sm" (click)="showRecommendDialog.set(false)">ปิด</sic-button>
+  </div>
+</sic-dialog>
+
+<!-- SicDialog: ยืนยันการลบงบประมาณ -->
+<sic-dialog
+  [open]="showConfirmDialog()"
+  (closed)="showConfirmDialog.set(false)"
+  title="ยืนยันการลบงบประมาณ"
+  width="420px"
+>
+  <div style="padding: 1rem 0; line-height: 1.6;">
     <p>
-      คุณต้องการลบงบประมาณหมวด <br />
-      <span class="item-highlight">"{{ selectedForDelete?.category }}"</span> <br />
-      ใช่หรือไม่? ยืนยันแล้วจะไม่สามารถย้อนกลับได้
+      คุณต้องการลบงบประมาณหมวด <strong style="color: var(--sic-color-primary);">"{{ selectedForDelete?.category }}"</strong> ใช่หรือไม่?
     </p>
-    <div class="dialog-actions">
-      <button class="btn-cancel" (click)="confirmDialog.close()">ยกเลิก</button>
-      <button class="btn-confirm btn-danger" (click)="onConfirmDelete()">ยืนยันการลบ</button>
-    </div>
+    <p style="color: var(--sic-color-text-muted); font-size: 0.85rem; margin-top: 6px;">หากยืนยันแล้วจะไม่สามารถย้อนกลับได้</p>
   </div>
-</dialog>
+  <div sicDialogFooter style="display: flex; justify-content: flex-end; gap: 8px;">
+    <sic-button variant="outline" color="primary" size="sm" (click)="showConfirmDialog.set(false)">ยกเลิก</sic-button>
+    <sic-button variant="solid" color="danger" size="sm" (click)="onConfirmDelete()">ยืนยันการลบ</sic-button>
+  </div>
+</sic-dialog>
