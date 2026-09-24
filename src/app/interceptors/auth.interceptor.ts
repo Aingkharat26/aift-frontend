@@ -27,7 +27,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         !req.url.includes('/auth/register') &&
         !req.url.includes('/auth/me')
       ) {
-        authService.logout(router.url, 'session_expired');
+        authService.logout(router.url);
       }
       return throwError(() => err);
     }),

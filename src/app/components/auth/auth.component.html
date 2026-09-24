@@ -38,18 +38,6 @@
       </button>
     </div>
 
-    <!-- Session Expired Warning Box -->
-    @if (sessionExpired()) {
-      <div class="alert-box alert-warning">
-        <span class="alert-icon">⏰</span>
-        <span class="alert-text">
-          เซสชันการใช้งานหมดอายุ กรุณาเข้าสู่ระบบอีกครั้งเพื่อดำเนินการต่อ
-          @if (returnUrl() !== '/') {
-            (ระบบจะพากลับไปยังหน้างบประมาณหลังล็อกอิน)
-          }
-        </span>
-      </div>
-    }
 
     <!-- Alert Box -->
     @if (errorMessage()) {
@@ -93,22 +81,6 @@
         </div>
       </div>
 
-      <!-- Display Name (Register only) -->
-      @if (isRegisterMode()) {
-        <div class="form-group animate-fade-in">
-          <label for="displayName">ชื่อเล่น / ชื่อที่ต้องการให้แสดง (ทางเลือก)</label>
-          <div class="input-wrapper">
-            <span class="field-icon">🏷️</span>
-            <input
-              id="displayName"
-              name="displayName"
-              type="text"
-              [(ngModel)]="displayName"
-              placeholder="เช่น พี่สมชาย หรือ มิ้นท์"
-            />
-          </div>
-        </div>
-      }
 
       <!-- Password Field -->
       <div class="form-group">

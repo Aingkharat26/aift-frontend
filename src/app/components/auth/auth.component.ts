@@ -24,23 +24,18 @@ export class AuthComponent implements OnInit {
   errorDetail = signal<string>('');
   showErrorDetail = signal<boolean>(false);
   successMessage = signal<string>('');
-  sessionExpired = signal<boolean>(false);
   returnUrl = signal<string>('/');
 
   // Form Models
   username = '';
   password = '';
   confirmPassword = '';
-  displayName = '';
 
   ngOnInit() {
     this.route.queryParamMap.subscribe((params) => {
       const returnUrlParam = params.get('returnUrl');
       if (returnUrlParam && returnUrlParam !== '/login') {
         this.returnUrl.set(returnUrlParam);
-      }
-      if (params.get('reason') === 'session_expired') {
-        this.sessionExpired.set(true);
       }
       this.cdr.detectChanges();
     });
@@ -107,7 +102,7 @@ export class AuthComponent implements OnInit {
         .register({
           username: u,
           password: p,
-          displayName: this.displayName.trim() || u,
+          displayName: u,
         })
         .pipe(
           finalize(() => {

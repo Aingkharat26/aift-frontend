@@ -14,6 +14,40 @@
 
 ## 🕒 บันทึกรายการเปลี่ยนแปลง (Change History)
 
+### 📅 2026-09-24 11:32:00 (Local Time)
+**ประเภท:** `[UI / Refactor]` `[Frontend / Auth]`  
+**หัวข้อ:** นำฟิลด์ "ชื่อเล่น / ชื่อที่ต้องการให้แสดง" ออกจากฟอร์มสมัครสมาชิก (Register)  
+**ปัญหาหรือความต้องการ (Issue / Requirement):**
+- ผู้ใช้ระบุว่าฟิลด์ชื่อเล่นไม่จำเป็น ต้องการนำออกจากฟอร์มสมัครสมาชิกเพื่อลดขั้นตอนและความซ้ำซ้อน
+**สิ่งที่แก้ไข (Changes Detail):**
+1. **`auth.component.html`:** ลบ Input Field "ชื่อเล่น / ชื่อที่ต้องการให้แสดง (ทางเลือก)" (`displayName`) ออกจากฟอร์มสมัครสมาชิก
+2. **`auth.component.ts`:** ลบตัวแปรโมเดล `displayName` ออก และปรับปรุงขั้นตอน Register ให้ส่ง `displayName: u` (ใช้ username เป็นชื่อแสดงผลเริ่มต้นโดยอัตโนมัติ)
+3. **ทดสอบ Build:** สั่งรัน `npm run build` ตรวจสอบแล้ว Bundle ทำงานได้สมบูรณ์และไม่มี Error (Exit Code 0)
+**ไฟล์ที่แก้ไข (Affected Files):**
+- `src/app/components/auth/auth.component.html`
+- `src/app/components/auth/auth.component.ts`
+- `CHANGELOG.md`
+
+---
+
+### 📅 2026-09-24 11:25:00 (Local Time)
+**ประเภท:** `[Fix / UI]` `[Frontend / Auth]`  
+**หัวข้อ:** นำกล่องข้อความแจ้งเตือนสีส้ม "เซสชันการใช้งานหมดอายุ..." ออกจากหน้าล็อกอิน (Login Page)  
+**ปัญหาหรือความต้องการ (Issue / Requirement):**
+- ผู้ใช้ต้องการนำกล่องข้อความแจ้งเตือน "เซสชันการใช้งานหมดอายุ กรุณาเข้าสู่ระบบอีกครั้งเพื่อดำเนินการต่อ (ระบบจะพากลับไปยังหน้างบประมาณหลังล็อกอิน)" ออก ไม่ต้องแสดงบนหน้าล็อกอินอีกต่อไป
+**สิ่งที่แก้ไข (Changes Detail):**
+1. **`auth.component.html`:** ลบกล่องข้อความแจ้งเตือน `@if (sessionExpired()) { ... }` (Alert Warning สีส้ม) ออกจากหน้าจอ
+2. **`auth.component.ts`:** ลบ Signal `sessionExpired` และ Logic การตรวจจับ Query Param `reason === 'session_expired'` ออก เพื่อความกระชับและคลีนของโค้ด (คง `returnUrl` ไว้ตามเดิม เพื่อให้เมื่อเข้าสู่ระบบสำเร็จระบบยังคงพากลับมายังหน้าที่ค้างอยู่ได้โดยอัตโนมัติ)
+3. **`auth.interceptor.ts`:** ปรับปรุงการเรียก `authService.logout(router.url)` โดยไม่ส่งพารามิเตอร์ `'session_expired'` ไปยัง Query Params เพื่อความสะอาดของ URL
+4. **ทดสอบ Build:** สั่งรัน `npm run build` ตรวจสอบแล้ว Bundle ทำงานได้สมบูรณ์และไม่มี Error
+**ไฟล์ที่แก้ไข (Affected Files):**
+- `src/app/components/auth/auth.component.html`
+- `src/app/components/auth/auth.component.ts`
+- `src/app/interceptors/auth.interceptor.ts`
+- `CHANGELOG.md`
+
+---
+
 ### 📅 2026-09-24 10:52:00 (Local Time)
 **ประเภท:** `[Refactor]` `[Frontend / Config]`  
 **หัวข้อ:** ปรับระบบ Environment ให้เป็นไปตามมาตรฐาน Angular (Build-time Configuration) และยกเลิกการใช้ `env.js`  
