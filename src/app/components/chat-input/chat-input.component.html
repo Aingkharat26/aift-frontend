@@ -8,7 +8,10 @@
       size="sm"
       (click)="setTab('expense')"
     >
-      💸 รายจ่าย (AI)
+      <svg class="tab-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 5v14M5 12l7 7 7-7"/>
+      </svg>
+      รายจ่าย (AI)
     </sic-button>
     <sic-button
       type="button"
@@ -17,15 +20,26 @@
       size="sm"
       (click)="setTab('income')"
     >
-      💰 รายรับ
+      <svg class="tab-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 19V5M5 12l7-7 7-7"/>
+      </svg>
+      รายรับ
     </sic-button>
   </div>
 
   <!-- ส่วนรายจ่าย (AI) -->
   <div class="input-card expense-section" [class.mobile-hidden]="activeTab !== 'expense'">
     <div class="card-header">
-      <span class="icon">💸</span> รายจ่าย (AI)
+      <svg class="section-icon expense-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="5" width="20" height="14" rx="2"/>
+        <line x1="2" y1="10" x2="22" y2="10"/>
+      </svg>
+      <span>รายจ่าย (AI)</span>
+      <span *ngIf="isListening() && listeningTarget === 'expense'" class="listening-badge">
+        <span class="pulse-dot"></span> กำลังฟังเสียง...
+      </span>
     </div>
+
     <div class="chat-input-container">
       <input
         type="file"
@@ -34,25 +48,54 @@
         hidden
         (change)="onReceiptSelected($event)"
       />
+
+      <!-- ปุ่มถ่าย/อัปโหลดใบเสร็จ -->
       <sic-button
         variant="outline"
         color="primary"
         size="md"
         (click)="receiptInput.click()"
-        [disabled]="isLoading || isScanning"
+        [disabled]="isLoading || isScanning || isListening()"
         [loading]="isScanning"
         title="สแกนใบเสร็จด้วยรูปถ่าย"
+        class="action-tool-btn"
       >
-        🧾
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+          <polyline points="10 9 9 9 8 9"/>
+        </svg>
       </sic-button>
+
+      <!-- ปุ่มไมโครโฟนบันทึกด้วยเสียง -->
+      <button
+        type="button"
+        class="mic-btn"
+        [class.is-listening]="isListening() && listeningTarget === 'expense'"
+        (click)="toggleListening('expense')"
+        [disabled]="isLoading || isScanning"
+        [title]="isListening() && listeningTarget === 'expense' ? 'กำลังฟังเสียง... (กดเพื่อหยุด)' : 'พูดเพื่อบันทึกด้วยเสียงภาษาไทย'"
+      >
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+          <line x1="12" y1="19" x2="12" y2="23"/>
+          <line x1="8" y1="23" x2="16" y2="23"/>
+        </svg>
+      </button>
+
       <input
         type="text"
         [(ngModel)]="text"
         (keyup.enter)="onSubmit()"
-        placeholder="พิมพ์รายจ่ายของคุณ (เช่น ข้าวผัด 50)"
+        [placeholder]="isListening() && listeningTarget === 'expense' ? 'กำลังฟังเสียงของคุณ... พูดได้เลย' : 'พิมพ์หรือกดไมค์พูด (เช่น ข้าว 50 กาแฟ 40)'"
         [disabled]="isLoading || isScanning"
         class="chat-input"
+        [class.input-listening]="isListening() && listeningTarget === 'expense'"
       />
+
       <sic-button
         variant="solid"
         color="primary"
@@ -69,17 +112,44 @@
   <!-- ส่วนรายรับ -->
   <div class="input-card income-section" [class.mobile-hidden]="activeTab !== 'income'">
     <div class="card-header">
-      <span class="icon">💰</span> รายรับ
+      <svg class="section-icon income-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="1" x2="12" y2="23"/>
+        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+      </svg>
+      <span>รายรับ</span>
+      <span *ngIf="isListening() && listeningTarget === 'income'" class="listening-badge income-badge">
+        <span class="pulse-dot"></span> กำลังฟังเสียง...
+      </span>
     </div>
+
     <div class="income-input-container">
+      <!-- ปุ่มไมโครโฟนรายรับ -->
+      <button
+        type="button"
+        class="mic-btn income-mic-btn"
+        [class.is-listening]="isListening() && listeningTarget === 'income'"
+        (click)="toggleListening('income')"
+        [disabled]="isIncomeLoading"
+        [title]="isListening() && listeningTarget === 'income' ? 'กำลังฟังเสียง... (กดเพื่อหยุด)' : 'พูดเพื่อบันทึกรายรับด้วยเสียง'"
+      >
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+          <line x1="12" y1="19" x2="12" y2="23"/>
+          <line x1="8" y1="23" x2="16" y2="23"/>
+        </svg>
+      </button>
+
       <input
         type="text"
         [(ngModel)]="incomeText"
         (keyup.enter)="onAddIncome()"
-        placeholder="พิมพ์รายรับของคุณ (เช่น ขายของ 500)"
+        [placeholder]="isListening() && listeningTarget === 'income' ? 'กำลังฟังเสียงของคุณ... พูดได้เลย' : 'พิมพ์หรือกดไมค์พูด (เช่น ขายของ 500)'"
         [disabled]="isIncomeLoading"
         class="chat-input"
+        [class.input-listening]="isListening() && listeningTarget === 'income'"
       />
+
       <sic-button
         variant="solid"
         color="success"
@@ -94,17 +164,157 @@
   </div>
 </div>
 
-<!-- SicDialog สำหรับแจ้งสถานะ AI / Error -->
+<!-- Modal: ตรวจสอบและยืนยันรายการหลายรายการที่สกัดได้จาก AI (Multi-Item Batch Modal) -->
+<sic-dialog
+  [open]="showBatchModal()"
+  (closed)="closeBatchModal()"
+  title="ตรวจสอบรายการที่สกัดได้จาก AI"
+  width="620px"
+>
+  <div class="batch-modal-content">
+    <div class="batch-modal-desc">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" class="info-svg">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="16" x2="12" y2="12"/>
+        <line x1="12" y1="8" x2="12.01" y2="8"/>
+      </svg>
+      <span>AI ตรวจพบ <strong>{{ batchItems().length }} รายการ</strong> ในข้อความของคุณ สามารถแก้ไขชื่อ ยอดเงิน หรือเปลี่ยนหมวดหมู่ก่อนบันทึกได้ครับ</span>
+    </div>
+
+    <div class="batch-items-list">
+      <div class="batch-item-row" *ngFor="let item of batchItems(); let i = index">
+        <div class="item-col name-col">
+          <label class="col-label">ชื่อรายการ</label>
+          <input
+            type="text"
+            class="batch-input"
+            [(ngModel)]="item.item"
+            placeholder="เช่น ข้าวผัด"
+          />
+        </div>
+
+        <div class="item-col amount-col">
+          <label class="col-label">จำนวนเงิน (บาท)</label>
+          <input
+            type="number"
+            class="batch-input"
+            [(ngModel)]="item.amount"
+            min="0"
+            step="0.01"
+            placeholder="0"
+          />
+        </div>
+
+        <div class="item-col category-col">
+          <label class="col-label">หมวดหมู่</label>
+          <select class="batch-select" [(ngModel)]="item.category">
+            <option *ngFor="let cat of availableCategories" [value]="cat">
+              {{ cat }}
+            </option>
+          </select>
+        </div>
+
+        <div class="item-col action-col">
+          <label class="col-label">&nbsp;</label>
+          <button
+            type="button"
+            class="delete-btn"
+            (click)="removeBatchItem(i)"
+            title="ลบรายการนี้ออก"
+          >
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"/>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+              <line x1="10" y1="11" x2="10" y2="17"/>
+              <line x1="14" y1="11" x2="14" y2="17"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- แถบด้านล่างตาราง: ปุ่มเพิ่มรายการ + ยอดรวม -->
+    <div class="batch-footer-info">
+      <button type="button" class="btn-add-item" (click)="addBatchItem()">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        เพิ่มรายการ
+      </button>
+
+      <div class="batch-total-box">
+        <span class="total-label">ยอดรวมทั้งหมด:</span>
+        <span class="total-value">฿{{ getBatchTotal() | number:'1.0-2' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div sicDialogFooter class="batch-dialog-footer">
+    <sic-button
+      variant="outline"
+      color="primary"
+      size="sm"
+      (click)="closeBatchModal()"
+      [disabled]="isBatchSaving()"
+    >
+      ยกเลิก
+    </sic-button>
+
+    <sic-button
+      variant="solid"
+      color="primary"
+      size="sm"
+      (click)="confirmSaveBatch()"
+      [loading]="isBatchSaving()"
+      [disabled]="batchItems().length === 0"
+    >
+      ยืนยันบันทึกทั้งหมด ({{ batchItems().length }} รายการ)
+    </sic-button>
+  </div>
+</sic-dialog>
+
+<!-- SicDialog สำหรับแจ้งสถานะ AI / Error (Zero-Emoji SVG Icons) -->
 <sic-dialog
   [open]="showStatusModal()"
   (closed)="showStatusModal.set(false)"
   [title]="statusData.title"
-  width="400px"
+  width="420px"
 >
-  <div style="padding: 1rem 0; text-align: center;">
-    <div style="font-size: 2.5rem; margin-bottom: 8px;">{{ statusData.icon }}</div>
-    <p style="font-size: 1rem; color: var(--sic-color-text); line-height: 1.5;">{{ statusData.message }}</p>
+  <div class="status-modal-content">
+    <!-- SVG Vector Icons -->
+    <div class="status-icon-wrapper" [ngClass]="'icon-' + statusData.type">
+      <!-- Success Icon -->
+      <svg *ngIf="statusData.type === 'success'" viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+        <polyline points="22 4 12 14.01 9 11.01"/>
+      </svg>
+
+      <!-- Warning Icon -->
+      <svg *ngIf="statusData.type === 'warning'" viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+        <line x1="12" y1="9" x2="12" y2="13"/>
+        <line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+
+      <!-- Error Icon -->
+      <svg *ngIf="statusData.type === 'error'" viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="15" y1="9" x2="9" y2="15"/>
+        <line x1="9" y1="9" x2="15" y2="15"/>
+      </svg>
+
+      <!-- Info Icon -->
+      <svg *ngIf="statusData.type === 'info'" viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="16" x2="12" y2="12"/>
+        <line x1="12" y1="8" x2="12.01" y2="8"/>
+      </svg>
+    </div>
+
+    <p class="status-message">{{ statusData.message }}</p>
   </div>
+
   <div sicDialogFooter style="display: flex; justify-content: flex-end;">
     <sic-button variant="solid" color="primary" size="sm" (click)="showStatusModal.set(false)">ตกลง</sic-button>
   </div>

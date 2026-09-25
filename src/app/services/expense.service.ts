@@ -144,14 +144,32 @@ export class ExpenseService {
   }
 
   processChat(text: string): Observable<any> {
-    return this.http.post<{success: boolean, data: Expense}>(`${this.apiUrl}/chat`, { text }).pipe(
-      tap(() => {
-        const current = this.selectedDateSubject.value;
-        this.loadDailyExpenses(this.formatDate(current));
-        this.loadMonthlySummary(current.getFullYear(), current.getMonth() + 1);
-        this.notifyDataChanged();
+    return this.http.post<{ success: boolean; data: any }>(`${this.apiUrl}/chat`, { text }).pipe(
+      tap((res) => {
+        if (!res?.data?.isBatch) {
+          const current = this.selectedDateSubject.value;
+          this.loadDailyExpenses(this.formatDate(current));
+          this.loadMonthlySummary(current.getFullYear(), current.getMonth() + 1);
+          this.notifyDataChanged();
+        }
       })
     );
+  }
+
+  saveBatch(items: Array<{ item: string; amount: number; category?: string }>): Observable<any> {
+    return this.http
+      .post<{ success: boolean; count: number; data: Expense[] }>(
+        `${this.apiUrl}/batch`,
+        { items }
+      )
+      .pipe(
+        tap(() => {
+          const current = this.selectedDateSubject.value;
+          this.loadDailyExpenses(this.formatDate(current));
+          this.loadMonthlySummary(current.getFullYear(), current.getMonth() + 1);
+          this.notifyDataChanged();
+        })
+      );
   }
 
   updateExpense(id: number, data: { item?: string; amount?: number; category?: string }): Observable<any> {

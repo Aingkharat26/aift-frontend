@@ -14,7 +14,30 @@
 
 ## 🕒 บันทึกรายการเปลี่ยนแปลง (Change History)
 
-### 📅 2026-09-24 16:55:00 (Local Time)
+### 📅 2026-09-25 10:49:00 (Local Time)
+**ประเภท:** `[Feature / AI / UI]` `[Frontend]`  
+**หัวข้อ:** พัฒนาระบบ Smart AI Input: รองรับการบันทึกด้วยเสียงภาษาไทย (Voice-to-Text), หน้าต่าง Preview ยืนยันรายการหลายรายการ (Multi-Item Batch Modal) และ Zero-Emoji UI  
+**ปัญหาหรือความต้องการ (Issue / Requirement):**
+- เพิ่มความสะดวกในการบันทึกให้รวดเร็วด้วยเสียงภาษาไทยผ่าน Web Speech API
+- รองรับการแสดงผล Preview Modal เมื่อผู้ใช้พิมพ์หรือพูดหลายรายการในข้อความเดียว
+- ปรับปรุง Zero-Emoji UI เปลี่ยนไอคอนทั้งหมดเป็น SVG Vector มาตรฐานระบบ
+**สิ่งที่แก้ไข (Changes Detail):**
+1. **`chat-input.component.ts`:**
+   - เชื่อมต่อ Web Speech API รองรับภาษาไทย (`th-TH`) สำหรับทั้งรายจ่ายและรายรับ
+   - เพิ่มระบบจัดการ Batch Preview Modal (`batchItems`, `addBatchItem`, `removeBatchItem`, `getBatchTotal`, `confirmSaveBatch`)
+   - รองรับสถานะ Modal ด้วย SVG Icon ตามประเภท (Success, Warning, Error, Info)
+2. **`chat-input.component.html` & `.css`:**
+   - เพิ่มปุ่มไมโครโฟน SVG Vector พร้อมแอนิเมชัน Pulse วงแหวนสีแดงขณะฟังเสียง
+   - เพิ่มหน้าต่าง `sic-dialog` พรีวิวหลายรายการ สามารถแก้ไขชื่อ ยอดเงิน เปลี่ยนหมวดหมู่ และกดลบรายการได้ในตัว
+   - เปลี่ยนไอคอนทั้งหมดเป็น SVG Vector ไร้ Emoji
+3. **`expense.service.ts`:**
+   - เพิ่มฟังก์ชัน `saveBatch(items)` สำหรับส่งรายการไปบันทึกที่ `POST /expenses/batch`
+**ไฟล์ที่แก้ไข (Affected Files):**
+- `aift-frontend/src/app/services/expense.service.ts`
+- `aift-frontend/src/app/components/chat-input/chat-input.component.ts`
+- `aift-frontend/src/app/components/chat-input/chat-input.component.html`
+- `aift-frontend/src/app/components/chat-input/chat-input.component.css`
+- `aift-frontend/CHANGELOG.md`
 **ประเภท:** `[Fix / UI / Theme]` `[Frontend]`  
 **หัวข้อ:** กู้คืนชุดสีธีมมืดเดิม (Slate Theme: Deep Midnight Navy) แทนที่สีดำสนิท (Pitch Black) ตามความต้องการของผู้ใช้  
 **ปัญหาหรือความต้องการ (Issue / Requirement):**
