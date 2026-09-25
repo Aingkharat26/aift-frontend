@@ -21,7 +21,7 @@
     "chart.js": "^4.5.1",
     "ng2-charts": "^10.0.0",
     "rxjs": "~7.8.0",
-    "sic-ng": "github:softinter-chiangrai/sic-ng#release/22",
+    "sic-ng": "file:./libs/sic-ng-22.2.5.tgz",
     "tslib": "^2.3.0"
   },
   "devDependencies": {

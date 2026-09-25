@@ -14,6 +14,28 @@
 
 ## 🕒 บันทึกรายการเปลี่ยนแปลง (Change History)
 
+### 📅 2026-09-25 13:48:00 (Local Time)
+**ประเภท:** `[Fix / Build / Deploy]` `[Frontend]`  
+**หัวข้อ:** แก้ไขปัญหา Vercel ติดสิทธิ์ Permission denied (publickey) ขณะติดตั้ง sic-ng จาก Private GitHub Repo โดยการ Bundle เป็น Local Tarball Package  
+**ปัญหาหรือความต้องการ (Issue / Requirement):**
+- บน Vercel CI/CD เกิด Error: `npm error git@github.com: Permission denied (publickey). fatal: Could not read from remote repository ssh://git@github.com/softinter-chiangrai/sic-ng.git` (Exit code 128)
+- เนื่องจาก `softinter-chiangrai/sic-ng` เป็น Private Repository ทำให้เซิร์ฟเวอร์ Build ของ Vercel ไม่มี SSH Key เข้าถึง
+**สิ่งที่แก้ไข (Changes Detail):**
+1. **Package Bundling (`libs/sic-ng-22.2.5.tgz`):**
+   - ทำการ Pack ไลบรารี `sic-ng` เวอร์ชันปัจจุบัน (22.2.5) ให้กลายเป็น Compressed Tarball ขนาดกะทัดรัด (เพียง 635 KB) บันทึกไว้ในโฟลเดอร์ `libs/` ของโปรเจกต์
+2. **Update Dependency Definition (`package.json` & `package-lock.json`):**
+   - เปลี่ยนจาก `"sic-ng": "github:softinter-chiangrai/sic-ng#release/22"` เป็น `"sic-ng": "file:./libs/sic-ng-22.2.5.tgz"`
+   - ทำให้ `npm install` บนเครื่องใดๆ รวมถึง Vercel สามารถติดตั้งไลบรารีได้โดยตรงทันที ไม่ต้องพึ่งพา SSH Key หรือ GitHub Personal Access Token (PAT)
+3. **Verification:**
+   - ทดสอบ `npm install` ผ่านฉลุย 100%
+   - ทดสอบ `npm run build` สำเร็จ 100% ได้ไฟล์พร้อม Deploy ใน `dist/frontend/browser`
+**ไฟล์ที่แก้ไข (Affected Files):**
+- `aift-frontend/libs/sic-ng-22.2.5.tgz`
+- `aift-frontend/package.json`
+- `aift-frontend/package-lock.json`
+- `aift-frontend/CHANGELOG.md`
+- `CHANGELOG.md`
+
 ### 📅 2026-09-25 13:25:00 (Local Time)
 **ประเภท:** `[UI / Enhancement]` `[Frontend]`  
 **หัวข้อ:** ปรับการแสดงผลรูปภาพหมวดหมู่ที่อัปโหลดเองให้โปร่งใสและเต็มขนาด ไม่ใส่สีกรอบทับซ้อน (Clean Custom Image Display)  
