@@ -14,6 +14,7 @@ import {
   SicDialogComponent,
   SicInputComponent,
 } from 'sic-ng';
+import { CategoryIconComponent } from '../category-icon/category-icon.component';
 
 @Component({
   selector: 'app-transactions',
@@ -26,6 +27,7 @@ import {
     SicBadgeComponent,
     SicDialogComponent,
     SicInputComponent,
+    CategoryIconComponent,
   ],
   templateUrl: './transactions.component.html',
   styleUrl: './transactions.component.css',

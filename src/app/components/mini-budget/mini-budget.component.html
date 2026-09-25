@@ -56,7 +56,7 @@
         [ngClass]="getStatusClass(item.status)"
         [title]="item.category + ': ใช้ไป ฿' + formatNumber(item.spent) + ' จาก ฿' + formatNumber(item.limit)"
       >
-        <span class="chip-icon">{{ getCategoryIcon(item.category) }}</span>
+        <span class="chip-icon"><app-category-icon [category]="item.category" [size]="14"></app-category-icon></span>
         <span class="chip-name">{{ item.category }}</span>
         <sic-badge [color]="item.status === 'exceeded' ? 'danger' : (item.status === 'warning' ? 'warning' : 'primary')" size="sm">
           {{ item.percentUsed }}%

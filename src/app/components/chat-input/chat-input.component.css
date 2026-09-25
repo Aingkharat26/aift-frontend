@@ -10,7 +10,10 @@
 }
 
 .tab-icon {
-  margin-right: 4px;
+  margin-right: 6px;
+  flex-shrink: 0;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 @media (max-width: 768px) {
@@ -22,11 +25,28 @@
 
   .mobile-tab-switcher {
     display: flex;
-    background: var(--bg-color);
+    background: var(--bg-surface);
     border: 1px solid var(--border-color);
     border-radius: 12px;
-    padding: 3px;
-    gap: 4px;
+    padding: 4px;
+    gap: 6px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .mobile-tab-switcher sic-button {
+    flex: 1;
+    display: flex;
+  }
+
+  .mobile-tab-switcher ::ng-deep .sic-btn {
+    width: 100%;
+    justify-content: center;
+    border-radius: 9px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
   }
 
   .input-card {

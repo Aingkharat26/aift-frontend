@@ -28,6 +28,7 @@ import { SicButtonComponent, SicBadgeComponent, SicThemeService } from 'sic-ng';
             [routerLinkActiveOptions]="{ exact: true }"
           >แดชบอร์ด</a>
           <a routerLink="/budgets" routerLinkActive="nav-active">งบประมาณ</a>
+          <a routerLink="/categories" routerLinkActive="nav-active">หมวดหมู่</a>
           <a routerLink="/transactions" routerLinkActive="nav-active">รายการทั้งหมด</a>
         </div>
 

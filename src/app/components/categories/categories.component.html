@@ -1,0 +1,410 @@
+<div class="categories-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1 class="page-title">
+        <svg class="title-icon" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+          <line x1="7" y1="7" x2="7.01" y2="7"/>
+        </svg>
+        จัดการหมวดหมู่
+      </h1>
+      <p class="page-desc">หมวดหมู่สำหรับจัดสรรค่าใช้จ่าย รายงาน และการแจ้งเตือนงบประมาณของคุณ</p>
+    </div>
+
+    <div class="header-right">
+      <sic-button
+        variant="solid"
+        color="primary"
+        size="md"
+        (click)="openCreateModal()"
+      >
+        <span class="btn-inner">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" class="btn-svg">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          <span>เพิ่มหมวดหมู่</span>
+        </span>
+      </sic-button>
+    </div>
+  </div>
+
+  <!-- Summary Metric Cards -->
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="metric-icon icon-blue">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7"/>
+          <rect x="14" y="3" width="7" height="7"/>
+          <rect x="14" y="14" width="7" height="7"/>
+          <rect x="3" y="14" width="7" height="7"/>
+        </svg>
+      </div>
+      <div class="metric-info">
+        <span class="metric-label">หมวดหมู่ทั้งหมด</span>
+        <span class="metric-value">{{ totalCategories }}</span>
+      </div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-icon icon-cyan">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12 6 12 12 16 14"/>
+        </svg>
+      </div>
+      <div class="metric-info">
+        <span class="metric-label">หมวดหมู่เริ่มต้น</span>
+        <span class="metric-value">{{ defaultCount }}</span>
+      </div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-icon icon-emerald">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="8.5" cy="7" r="4"/>
+          <line x1="20" y1="8" x2="20" y2="14"/>
+          <line x1="23" y1="11" x2="17" y2="11"/>
+        </svg>
+      </div>
+      <div class="metric-info">
+        <span class="metric-label">หมวดหมู่ที่สร้างเอง</span>
+        <span class="metric-value">{{ customCount }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Category Cards Grid -->
+  <div class="categories-grid">
+    <div
+      class="category-card"
+      *ngFor="let cat of categoryService.categories$ | async"
+      [style.border-top-color]="cat.color"
+    >
+      <div class="card-top">
+        <div
+          class="cat-icon-badge"
+          [class.is-image-badge]="isImage(cat.icon)"
+          [style.background-color]="isImage(cat.icon) ? 'transparent' : cat.color + '1a'"
+          [style.color]="cat.color"
+        >
+          <app-category-icon [icon]="cat.icon" [color]="cat.color" [size]="isImage(cat.icon) ? 48 : 24"></app-category-icon>
+        </div>
+
+        <div class="badge-and-actions">
+          <sic-badge [color]="cat.isDefault ? 'success' : 'primary'" size="sm">
+            {{ cat.isDefault ? 'เริ่มต้น' : 'สร้างเอง' }}
+          </sic-badge>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <h3 class="cat-name">{{ cat.name }}</h3>
+
+        <div class="cat-stats">
+          <div class="stat-pill">
+            <span class="stat-num">{{ cat.expenseCount || 0 }}</span>
+            <span class="stat-text">รายการ</span>
+          </div>
+
+          <div class="stat-total" *ngIf="(cat.totalExpense || 0) > 0">
+            ฿{{ cat.totalExpense | number:'1.0-0' }}
+          </div>
+        </div>
+      </div>
+
+      <div class="card-footer">
+        <div class="system-tag" *ngIf="cat.isDefault">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+          <span>ระบบหลัก</span>
+        </div>
+
+        <div class="custom-actions" *ngIf="!cat.isDefault">
+          <button
+            type="button"
+            class="action-btn btn-edit"
+            (click)="openEditModal(cat)"
+            title="แก้ไขหมวดหมู่"
+          >
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+          </button>
+
+          <button
+            type="button"
+            class="action-btn btn-delete"
+            (click)="openDeleteModal(cat)"
+            title="ลบหมวดหมู่"
+          >
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="3 6 5 6 21 6"/>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Create / Edit Category -->
+<sic-dialog
+  [open]="showFormModal()"
+  (closed)="showFormModal.set(false)"
+  width="540px"
+>
+  <div sicDialogHeader class="modal-header">
+    <div class="modal-title-wrap">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" class="modal-icon">
+        <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+        <line x1="7" y1="7" x2="7.01" y2="7"/>
+      </svg>
+      <h2>{{ isEditing() ? 'แก้ไขหมวดหมู่' : 'เพิ่มหมวดหมู่ใหม่' }}</h2>
+    </div>
+  </div>
+
+  <div sicDialogBody class="modal-body">
+    <!-- Category Name Input -->
+    <div class="form-group">
+      <label class="form-label" for="categoryName">ชื่อหมวดหมู่ <span class="required">*</span></label>
+      <input
+        type="text"
+        id="categoryName"
+        class="form-control"
+        [(ngModel)]="formName"
+        placeholder="ชื่อหมวดหมู่"
+        maxlength="30"
+        autocomplete="off"
+      />
+    </div>
+
+    <!-- Color Palette Selection -->
+    <div class="form-group">
+      <label class="form-label">
+        เลือกโทนสี
+        <span class="color-preview-pill" [style.background-color]="formColor"></span>
+      </label>
+      
+      <div class="color-selection-container">
+        <!-- Preset Swatches -->
+        <div class="color-picker-grid">
+          <button
+            type="button"
+            class="color-btn"
+            *ngFor="let c of presetColors"
+            [style.background-color]="c.hex"
+            [class.active]="formColor === c.hex"
+            [title]="c.label"
+            (click)="selectColor(c.hex)"
+          >
+            <svg *ngIf="formColor === c.hex" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#fff" stroke-width="3">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Custom Color Picker Control -->
+        <div class="custom-color-row">
+          <label class="custom-color-picker-btn" [style.background-color]="formColor" title="คลิกเพื่อเปิดเครื่องมือเลือกสีอิสระ">
+            <input
+              type="color"
+              [value]="formColor"
+              (input)="onCustomColorChange($event)"
+              class="native-color-picker"
+            />
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#fff" stroke-width="2.5">
+              <path d="M12 2v20M2 12h20"/>
+            </svg>
+          </label>
+
+          <div class="custom-hex-input-box">
+            <span class="hex-prefix">#</span>
+            <input
+              type="text"
+              [value]="formColor.replace('#', '')"
+              (input)="onHexInput($event)"
+              placeholder="0ea5e9"
+              maxlength="6"
+              class="hex-field"
+            />
+          </div>
+          <span class="custom-color-hint">หรือเลือกสีเองอิสระ</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Icon or Local Image Selection -->
+    <div class="form-group">
+      <div class="icon-section-header">
+        <label class="form-label">เลือกไอคอน หรือรูปภาพจากเครื่อง</label>
+        
+        <!-- Upload local file button -->
+        <button
+          type="button"
+          class="upload-image-btn"
+          (click)="triggerFileInput()"
+          title="เลือกไฟล์รูปภาพจากคอมพิวเตอร์ของคุณ"
+        >
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+            <circle cx="8.5" cy="8.5" r="1.5"/>
+            <polyline points="21 15 16 10 5 21"/>
+          </svg>
+          <span>เลือกรูปจากเครื่อง</span>
+        </button>
+        <input
+          #fileInput
+          type="file"
+          accept="image/*"
+          (change)="onFileSelected($event)"
+          style="display: none;"
+        />
+      </div>
+
+      <!-- If Custom Image is Uploaded -->
+      <div class="custom-uploaded-card" *ngIf="isCustomImage()">
+        <div class="uploaded-thumb" [style.border-color]="formColor">
+          <img [src]="formIcon" alt="Custom category icon" />
+        </div>
+        <div class="uploaded-details">
+          <span class="uploaded-title">ใช้รูปภาพจากเครื่องเรียบร้อย</span>
+          <span class="uploaded-sub">ปรับขนาด 128x128 เหมาะสมพร้อมใช้งาน</span>
+        </div>
+        <div class="uploaded-actions">
+          <button type="button" class="btn-change-img" (click)="triggerFileInput()">เปลี่ยนรูป</button>
+          <button type="button" class="btn-remove-img" (click)="removeCustomImage()">กลับไปใช้ไอคอน</button>
+        </div>
+      </div>
+
+      <!-- Preset Icons Grid -->
+      <div class="icon-picker-grid" [class.dimmed]="isCustomImage()">
+        <button
+          type="button"
+          class="icon-btn"
+          *ngFor="let ic of presetIcons"
+          [class.active]="!isCustomImage() && formIcon === ic.id"
+          [title]="ic.label"
+          (click)="selectIcon(ic.id)"
+        >
+          <app-category-icon [icon]="ic.id" [color]="formIcon === ic.id && !isCustomImage() ? formColor : 'currentColor'" [size]="20"></app-category-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Live Preview Card -->
+    <div class="preview-box">
+      <span class="preview-label">ตัวอย่างการแสดงผล:</span>
+      <div class="preview-card" [style.border-top-color]="formColor">
+        <div class="cat-icon-badge" [class.is-image-badge]="isCustomImage()" [style.background-color]="isCustomImage() ? 'transparent' : formColor + '1a'" [style.color]="formColor">
+          <app-category-icon [icon]="formIcon" [color]="formColor" [size]="isCustomImage() ? 48 : 24"></app-category-icon>
+        </div>
+        <div class="preview-info">
+          <div class="preview-title">{{ formName.trim() || 'ชื่อหมวดหมู่' }}</div>
+          <sic-badge color="primary" size="sm">สร้างเอง</sic-badge>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div sicDialogFooter class="modal-footer">
+    <sic-button
+      variant="outline"
+      color="primary"
+      size="sm"
+      (click)="showFormModal.set(false)"
+    >
+      ยกเลิก
+    </sic-button>
+
+    <sic-button
+      variant="solid"
+      color="primary"
+      size="sm"
+      (click)="submitForm()"
+      [disabled]="isSubmitting() || !formName.trim()"
+    >
+      {{ isSubmitting() ? 'กำลังบันทึก...' : (isEditing() ? 'บันทึกการแก้ไข' : 'สร้างหมวดหมู่') }}
+    </sic-button>
+  </div>
+</sic-dialog>
+
+<!-- Modal: Confirm Delete Category -->
+<sic-dialog
+  [open]="showDeleteModal()"
+  (closed)="showDeleteModal.set(false)"
+  width="460px"
+>
+  <div sicDialogHeader class="modal-header">
+    <div class="modal-title-wrap danger-title">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <h2>ยืนยันการลบหมวดหมู่</h2>
+    </div>
+  </div>
+
+  <div sicDialogBody class="modal-body">
+    <p class="delete-confirm-text">
+      คุณแน่ใจหรือไม่ว่าต้องการลบหมวดหมู่ <strong>"{{ selectedCategory?.name }}"</strong>?
+    </p>
+    <p class="delete-warning-sub">การดำเนินการนี้จะไม่สามารถย้อนกลับได้</p>
+  </div>
+
+  <div sicDialogFooter class="modal-footer">
+    <sic-button
+      variant="outline"
+      color="primary"
+      size="sm"
+      (click)="showDeleteModal.set(false)"
+    >
+      ยกเลิก
+    </sic-button>
+
+    <sic-button
+      variant="solid"
+      color="danger"
+      size="sm"
+      (click)="confirmDelete()"
+      [disabled]="isDeleting()"
+    >
+      {{ isDeleting() ? 'กำลังลบ...' : 'ลบหมวดหมู่นี้' }}
+    </sic-button>
+  </div>
+</sic-dialog>
+
+<!-- Modal: Notice / Warning (Safety check) -->
+<sic-dialog
+  [open]="showNoticeModal()"
+  (closed)="showNoticeModal.set(false)"
+  width="460px"
+>
+  <div sicDialogHeader class="modal-header">
+    <div class="modal-title-wrap warning-title">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+        <line x1="12" y1="9" x2="12" y2="13"/>
+        <line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+      <h2>ข้อควรทราบ</h2>
+    </div>
+  </div>
+
+  <div sicDialogBody class="modal-body">
+    <p class="notice-text">{{ noticeMessage }}</p>
+  </div>
+
+  <div sicDialogFooter class="modal-footer">
+    <sic-button variant="solid" color="primary" size="sm" (click)="showNoticeModal.set(false)">
+      เข้าใจแล้ว
+    </sic-button>
+  </div>
+</sic-dialog>

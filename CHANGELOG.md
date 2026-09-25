@@ -14,6 +14,140 @@
 
 ## 🕒 บันทึกรายการเปลี่ยนแปลง (Change History)
 
+### 📅 2026-09-25 13:25:00 (Local Time)
+**ประเภท:** `[UI / Enhancement]` `[Frontend]`  
+**หัวข้อ:** ปรับการแสดงผลรูปภาพหมวดหมู่ที่อัปโหลดเองให้โปร่งใสและเต็มขนาด ไม่ใส่สีกรอบทับซ้อน (Clean Custom Image Display)  
+**ปัญหาหรือความต้องการ (Issue / Requirement):**
+- เมื่อผู้ใช้อัปโหลดรูปภาพจากเครื่องตนเองมาใช้เป็นไอคอนหมวดหมู่ ตัวรูปจะถูกลดขนาดเหลือ 22px และถูกตีกรอบสี่เหลี่ยมสีพื้นหลังทับ (`background-color` และ `border-color`) ทำให้รูปภาพมีขนาดเล็กมากจนมองไม่เห็นรายละเอียดของภาพ
+- ผู้ใช้ต้องการให้กรณีที่เป็นรูปภาพจากเครื่อง ไม่ต้องมีสีกรอบหรือสีพื้นหลังมาทับซ้อน เพื่อให้เห็นรูปภาพได้อย่างชัดเจนและสวยงาม
+**สิ่งที่แก้ไข (Changes Detail):**
+1. **`CategoryIconComponent` (`src/app/components/category-icon/category-icon.component.ts`):**
+   - เมื่อตรวจพบว่าเป็นรูปภาพจากเครื่อง (`isCustomImage = true`):
+     - ปลด `background-color` และ `border-color` ออกทั้งหมด (`transparent`)
+     - กำหนดให้รูปภาพขยายเต็มขนาดคอนเทนเนอร์ (`containerDimension` 38px - 48px) พร้อม `border-radius: 10px` แทนการถูกบีบให้เล็กลงในกรอบ
+     - เพิ่มเงาละมุน (subtle shadow) เพื่อให้รูปภาพเด่นชัดบนทั้งธีมมืดและธีมสว่าง
+2. **หน้าหมวดหมู่และพรีวิว (`src/app/components/categories/`):**
+   - ในการ์ดหมวดหมู่และการ์ดพรีวิว ปรับ `.cat-icon-badge` ให้มีพื้นหลังโปร่งใสเมื่อเป็นรูปภาพอัปโหลด และขยายขนาดรูปเป็น 48x48 เต็มพื้นที่
+**ไฟล์ที่แก้ไข (Affected Files):**
+- `src/app/components/category-icon/category-icon.component.ts`
+- `src/app/components/categories/categories.component.ts`
+- `src/app/components/categories/categories.component.html`
+- `src/app/components/categories/categories.component.css`
+- `CHANGELOG.md`
+
+
+### 📅 2026-09-25 12:30:00 (Local Time)
+**ประเภท:** `[Fix / UI]` `[Frontend]`  
+**หัวข้อ:** แก้ไขไอคอนและรูปภาพถูกบีบเพี้ยนบน Responsive Mobile (ลูกศรแท็บรายรับเพี้ยนเป็นตัวคล้าย '亻' และป้องกันไอคอนรูปภาพถูกบีบสัดส่วน)  
+**ปัญหาหรือความต้องการ (Issue / Requirement):**
+1. บนหน้าจอมือถือ ไอคอนลูกศรบนแท็บ "รายรับ" เพี้ยน แบน บิดเบี้ยวจนดูเหมือนตัวอักษร '亻'
+2. ตรวจสอบ Responsive ทั้งระบบ ป้องกันไม่ให้รูปภาพและไอคอนถูกบีบหรือผิดสัดส่วน (Aspect Ratio Distortion)
+**สิ่งที่แก้ไข (Changes Detail):**
+1. **SVG Path & Layout Fix (`src/app/components/chat-input/chat-input.component.html` & `.css`):**
+   - แก้ไขโค้ดเวกเตอร์ลูกศร `รายรับ` (จากเดิมเขียน Path `l7-7 7-7` สองทอดผิดพิกัด ทำให้เส้นทะแยงพุ่งขึ้นสองครั้งกลายเป็นรูปคล้าย '亻') มาใช้ SVG `<line>` + `<polyline>` มาตรฐานพร้อม `stroke-linecap="round"` และ `stroke-linejoin="round"`
+   - แก้ไขลูกศร `รายจ่าย (AI)` ให้เป็นลูกศรชี้ลงที่มีสมมาตรสวยงามระดับพิกเซล
+   - ใส่ `flex-shrink: 0` ให้กับ `.tab-icon` และปรับ `.mobile-tab-switcher` ให้กระจายปุ่มด้วย `flex: 1` และจัดกึ่งกลาง
+2. **Category Icon Anti-Distortion (`src/app/components/category-icon/category-icon.component.ts`):**
+   - เพิ่ม `aspect-ratio: 1 / 1`, `object-fit: cover`, `max-width: 100%`, `max-height: 100%` และ `flex-shrink: 0` ให้กับ `:host`, `.cat-icon-container`, `.custom-cat-img` และ `svg`
+   - การันตีว่ารูปภาพอัปโหลดและไอคอนหมวดหมู่จะรักษาสัดส่วนจัตุรัส 1:1 เสมอ ไม่มีวันโดน Parent Flex บีบหรือยืด
+3. **Daily Log & Categories Responsive (`src/app/components/daily-log/` & `src/app/components/categories/`):**
+   - กำหนด `min-width: 0` และ `text-overflow: ellipsis` ให้ชื่อรายการ เพื่อป้องกันไม่ให้ข้อความยาวดันและบีบไอคอนหรือปุ่มจัดการ
+   - เพิ่ม Mobile Breakpoint (`@media (max-width: 600px)`) ให้หน้าหมวดหมู่จัดคอลัมน์แบบ 1 คอลัมน์ และปุ่มเพิ่มหมวดหมู่ยืดเต็มความกว้างอย่างสวยงาม
+**ไฟล์ที่แก้ไข (Affected Files):**
+- `src/app/components/chat-input/chat-input.component.html`
+- `src/app/components/chat-input/chat-input.component.css`
+- `src/app/components/category-icon/category-icon.component.ts`
+- `src/app/components/daily-log/daily-log.component.css`
+- `src/app/components/categories/categories.component.css`
+- `CHANGELOG.md`
+
+
+### 📅 2026-09-25 12:20:00 (Local Time)
+**ประเภท:** `[Fix / Bug]` `[Frontend]`  
+**หัวข้อ:** แก้ไขบั๊กตัวอักษรภาษาไทยเพี้ยนในช่องแชต (คำว่า "กาชา" กลายเป็น "กา=า" และ "ข้าว" กลายเป็น "-้าว")  
+**ปัญหาหรือความต้องการ (Issue / Requirement):**
+- ผู้ใช้พิมพ์ "กาชา 200" หรือ "กาชา 300" แล้วได้ชื่อรายการเป็น "กา=า" และจัดเข้าหมวดหมู่ "อื่นๆ"
+- ผู้ใช้พิมพ์ "ข้าว 50" แล้วได้ชื่อรายการเป็น "-้าว" และจัดเข้าหมวดหมู่ "อื่นๆ"
+- เกิดจากฟังก์ชัน `fixThaiKeyboard` เดิมแปลงตัวอักษรแบบทั้งสตริง (global map) โดยแมปตัว 'ช' เป็น '=' และ 'ข' เป็น '-' ทำให้คำภาษาไทยที่มีพยัญชนะเหล่านี้พังเสียหาย
+**สิ่งที่แก้ไข (Changes Detail):**
+1. **`ChatInputComponent` (`src/app/components/chat-input/chat-input.component.ts`):**
+   - แก้ไข `fixThaiKeyboard` ให้ตรวจจับและแปลงเฉพาะกลุ่มตัวอักษรตัวเลขที่พิมพ์ผิดแถวบนแป้นพิมพ์ไทย (Pure numeric tokens เช่น `ถจ` -> `50`, `คจจ` -> `800`) เท่านั้น
+   - ยกเลิกการแมปพยัญชนะ 'ช' และ 'ข' อย่างเด็ดขาด และไม่แปลงตัวอักษรที่อยู่ในคำภาษาไทย (เช่น "กาชา", "ข้าว", "ค่าน้ำ", "ต้มยำ", "จิ้มจุ่ม" ยังคงรูปเดิม 100%)
+   - เมื่อส่งข้อความ "กาชา 200" ตัว AI จะได้รับข้อความที่ถูกต้อง และจัดหมวดหมู่เข้า "กาชาปอง" หรือ "บันเทิง" ได้อย่างสมบูรณ์
+**ไฟล์ที่แก้ไข (Affected Files):**
+- `src/app/components/chat-input/chat-input.component.ts`
+- `CHANGELOG.md`
+
+
+### 📅 2026-09-25 11:52:00 (Local Time)
+**ประเภท:** `[UI / Enhancement]` `[Frontend]`  
+**หัวข้อ:** ปรับปรุงหน้าระบบจัดการหมวดหมู่และเชื่อมต่อไอคอน/สีเข้าสู่หน้า Dashboard: จัดตำแหน่งปุ่ม เพิ่มฟังก์ชันอัปโหลดรูปภาพจากเครื่อง ตัวเลือกสีอิสระ อัปเดตไอคอนอาหาร และแสดงผลบนหน้า Dashboard ทั่วทั้งระบบ  
+**ปัญหาหรือความต้องการ (Issue / Requirement):**
+1. ปุ่ม "+ เพิ่มหมวดหมู่" เครื่องหมายบวกไม่ตรงกับข้อความ
+2. ต้องการให้ผู้ใช้สามารถเลือก/อัปโหลดรูปภาพหรือไอคอนจากเครื่องตัวเองได้
+3. ต้องการให้ผู้ใช้สามารถเลือกสีเองได้อย่างอิสระ (Custom Color Picker)
+4. ปรับเปลี่ยนไอคอนหมวดหมู่อาหารให้ดูสวยงาม เป็นสากล ไม่แปลกตา
+5. ให้นำไอคอนและสีสันของหมวดหมู่ไปแสดงผลบนหน้า Dashboard (Daily Log, Mini Budget Ribbon, Summary Donut Chart)
+**สิ่งที่แก้ไข (Changes Detail):**
+1. **`CategoryIconComponent` (`src/app/components/category-icon/`):**
+   - พัฒนา Reusable Component แสดงผลไอคอนเวกเตอร์ SVG, รูปภาพจากเครื่องที่อัปโหลด (Data URL), และไอคอนสถานะรายรับ
+   - รองรับกรอบ Container สีกำกับแบบโปร่งแสงตามหมวดหมู่
+2. **`CategoriesComponent` (`src/app/components/categories/`):**
+   - จัดตำแหน่งไอคอนและตัวอักษรบนปุ่ม "+ เพิ่มหมวดหมู่" ด้วย flexbox vertical-align ที่สมบูรณ์
+   - เพิ่มปุ่มและระบบอัปโหลดไฟล์รูปภาพจากเครื่อง (`PNG`, `JPG`, `WebP`, `SVG`) พร้อม auto-resize เป็น 128x128
+   - เพิ่มเครื่องมือเลือกสีอิสระ Native Color Picker + Hex Input ทำงานคู่กับจานสี Preset
+   - เปลี่ยนไอคอนอาหารเป็นรูปมีดส้อม (Fork & Knife) และเพิ่มไอคอนชามซุป (Soup bowl)
+3. **เชื่อมต่อเข้ากับ Dashboard และหน้ารายการ:**
+   - `DailyLogComponent`: เปลี่ยนไอคอน Emoji เป็นไอคอนเวกเตอร์/รูปภาพของแต่ละหมวดหมู่พร้อมกรอบสีตรงหมวด
+   - `MiniBudgetComponent`: แถบ Ribbon แสดงไอคอนเวกเตอร์แทน Emoji
+   - `SummaryChartComponent`: ซิงค์สี Donut Chart ตามโทนสีหมวดหมู่จริง
+   - `TransactionsComponent`: แสดงไอคอนหมวดหมู่ในตารางธุรกรรม
+**ไฟล์ที่แก้ไข (Affected Files):**
+- `src/app/components/category-icon/category-icon.component.ts`
+- `src/app/services/category.service.ts`
+- `src/app/components/categories/categories.component.ts`
+- `src/app/components/categories/categories.component.html`
+- `src/app/components/categories/categories.component.css`
+- `src/app/components/daily-log/daily-log.component.ts`
+- `src/app/components/daily-log/daily-log.component.html`
+- `src/app/components/daily-log/daily-log.component.css`
+- `src/app/components/summary-chart/summary-chart.component.ts`
+- `src/app/components/mini-budget/mini-budget.component.ts`
+- `src/app/components/mini-budget/mini-budget.component.html`
+- `src/app/components/transactions/transactions.component.ts`
+- `src/app/components/transactions/transactions.component.html`
+- `src/app/components/transactions/transactions.component.css`
+- `CHANGELOG.md`
+
+### 📅 2026-09-25 11:35:00 (Local Time)
+**ประเภท:** `[Feature / UI]` `[Frontend]`  
+**หัวข้อ:** เพิ่มหน้าระบบจัดการหมวดหมู่ค่าใช้จ่าย (`/categories`) พร้อมไดอะล็อกเพิ่ม/แก้ไข, ตัวเลือกไอคอน SVG และจานสี, ระบบพรีวิว Real-time และไดอะล็อกแจ้งเตือนความปลอดภัย  
+**ปัญหาหรือความต้องการ (Issue / Requirement):**
+- ผู้ใช้ต้องการหน้าเพิ่มและบริหารจัดการหมวดหมู่ค่าใช้จ่าย (Custom Categories) ที่เข้าถึงได้ผ่าน Navbar
+- รองรับการเลือกไอคอนและเลือกสีสันสำหรับหมวดหมู่ โดยคงมาตรฐาน Zero-Emoji และ Purple Ban
+- แสดงสรุปสถิติจำนวนรายการและยอดค่าใช้จ่ายที่เกิดขึ้นจริงในแต่ละหมวดหมู่
+- ป้องกันการลบหมวดหมู่เริ่มต้น และแจ้งเตือนพร้อมจำนวนรายการหากพยายามลบหมวดหมู่ที่มีการใช้งาน
+**สิ่งที่แก้ไข (Changes Detail):**
+1. **`CategoryService` (`src/app/services/category.service.ts`):**
+   - API client สำหรับดึง สร้าง แก้ไข ลบหมวดหมู่
+   - กำหนดชุด Preset Colors 11 สีสวยงาม (ไม่ใช้สีม่วง) และ Preset Icons 16 ไอคอน SVG
+2. **`CategoriesComponent` (`src/app/components/categories/`):**
+   - Summary Cards สรุปหมวดหมู่ทั้งหมด, ระบบเริ่มต้น, สร้างเอง
+   - Grid การ์ดหมวดหมู่พร้อม Color Stripe ด้านบน, แสดงไอคอน SVG และสถิติจำนวนรายการ/ยอดเงิน
+   - Dialog สร้าง/แก้ไขหมวดหมู่ (`sic-dialog`) พร้อม Live Preview การ์ดจำลองแบบ Real-Time
+   - Dialog ยืนยันการลบ และ Dialog แจ้งเตือนความปลอดภัยกรณีมีรายการค่าใช้จ่ายผูกอยู่
+3. **Routing & Navbar (`src/app/app.routes.ts`, `src/app/app.ts`):**
+   - เพิ่ม Route `/categories` กำกับด้วย `authGuard`
+   - เพิ่มลิงก์เมนู "หมวดหมู่" บน Navbar
+**ไฟล์ที่แก้ไข (Affected Files):**
+- `aift-frontend/src/app/services/category.service.ts`
+- `aift-frontend/src/app/components/categories/categories.component.ts`
+- `aift-frontend/src/app/components/categories/categories.component.html`
+- `aift-frontend/src/app/components/categories/categories.component.css`
+- `aift-frontend/src/app/app.routes.ts`
+- `aift-frontend/src/app/app.ts`
+- `aift-frontend/CHANGELOG.md`
+
 ### 📅 2026-09-25 10:49:00 (Local Time)
 **ประเภท:** `[Feature / AI / UI]` `[Frontend]`  
 **หัวข้อ:** พัฒนาระบบ Smart AI Input: รองรับการบันทึกด้วยเสียงภาษาไทย (Voice-to-Text), หน้าต่าง Preview ยืนยันรายการหลายรายการ (Multi-Item Batch Modal) และ Zero-Emoji UI  

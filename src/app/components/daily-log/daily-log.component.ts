@@ -11,6 +11,8 @@ import {
   SicDialogComponent,
   SicInputComponent,
 } from 'sic-ng';
+import { CategoryService } from '../../services/category.service';
+import { CategoryIconComponent } from '../category-icon/category-icon.component';
 
 @Component({
   selector: 'app-daily-log',
@@ -23,6 +25,7 @@ import {
     SicButtonComponent,
     SicDialogComponent,
     SicInputComponent,
+    CategoryIconComponent,
   ],
   templateUrl: './daily-log.component.html',
   styleUrl: './daily-log.component.css',
@@ -30,6 +33,7 @@ import {
 export class DailyLogComponent implements OnInit {
   expenseService = inject(ExpenseService);
   incomeService = inject(IncomeService);
+  categoryService = inject(CategoryService);
   private cdr = inject(ChangeDetectorRef);
 
   showEditDialog = signal<boolean>(false);
@@ -52,6 +56,13 @@ export class DailyLogComponent implements OnInit {
     // Refresh when expenses change (e.g. after adding via chat)
     this.expenseService.expenses$.subscribe(() => {
       this.loadCombinedLogs();
+    });
+
+    // Subscribe to dynamic categories
+    this.categoryService.categories$.subscribe((cats) => {
+      if (cats && cats.length > 0) {
+        this.categories = cats.map((c) => c.name);
+      }
     });
   }
 

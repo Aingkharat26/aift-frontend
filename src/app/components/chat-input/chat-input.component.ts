@@ -201,23 +201,28 @@ export class ChatInputComponent implements OnInit, OnDestroy {
   }
 
   private fixThaiKeyboard(val: string): string {
-    const thaiToEngMap: { [key: string]: string } = {
-      ๅ: '1',
-      '/-': '2',
-      ภ: '4',
-      ถ: '5',
+    if (!val) return '';
+    // Fix only mistyped Thai number row keys when used as a pure number token (e.g. "ถจ" -> "50", "คจจ" -> "800")
+    // NEVER convert consonants inside words like "ข้าว" or "กาชา" or "ค่าน้ำ" or "ต้มยำ"
+    // And NEVER map 'ข' or 'ช' because they are Thai consonants matching '-' and '=' keys, NOT digits.
+    const thaiNumMap: Record<string, string> = {
+      'ๅ': '1',
+      'ภ': '4',
+      'ถ': '5',
       'ุ': '6',
       'ึ': '7',
-      ค: '8',
-      ต: '9',
-      จ: '0',
-      ข: '-',
-      ช: '=',
+      'ค': '8',
+      'ต': '9',
+      'จ': '0',
     };
-    return val
-      .split('')
-      .map((char) => thaiToEngMap[char] || char)
-      .join('');
+
+    return val.replace(/(^|\s)([ๅภถุึคตจ]+)(?=\s|$|บาท|บ\.)/g, (match, prefix, numToken) => {
+      const converted = numToken
+        .split('')
+        .map((c: string) => thaiNumMap[c] || c)
+        .join('');
+      return prefix + converted;
+    });
   }
 
   onSubmit() {

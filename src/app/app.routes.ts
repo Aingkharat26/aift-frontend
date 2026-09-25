@@ -5,6 +5,8 @@ import { TransactionsComponent } from './components/transactions/transactions.co
 import { AuthComponent } from './components/auth/auth.component';
 import { authGuard, guestGuard } from './guards/auth.guard';
 
+import { CategoriesComponent } from './components/categories/categories.component';
+
 export const routes: Routes = [
   {
     path: 'login',
@@ -24,6 +26,11 @@ export const routes: Routes = [
   {
     path: 'transactions',
     component: TransactionsComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'categories',
+    component: CategoriesComponent,
     canActivate: [authGuard],
   },
   {

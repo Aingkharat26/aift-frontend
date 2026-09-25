@@ -15,8 +15,13 @@
 
   <div class="expense-list" *ngIf="combinedLogs.length > 0 && !loading">
     <div class="expense-item" *ngFor="let item of combinedLogs">
-      <div class="item-icon" [ngClass]="item.type === 'income' ? 'cat-income' : getCategoryClass(item.category)">
-        {{ item.type === 'income' ? '💰' : getCategoryIcon(item.category) }}
+      <div class="item-icon">
+        <app-category-icon
+          [category]="item.category"
+          [type]="item.type"
+          [size]="22"
+          [showContainer]="true"
+        ></app-category-icon>
       </div>
       <div class="item-details">
         <div class="item-name">{{ item.type === 'income' ? item.source : item.item }}</div>

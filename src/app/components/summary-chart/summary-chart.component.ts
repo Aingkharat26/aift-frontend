@@ -6,6 +6,7 @@ import { ExpenseService } from '../../services/expense.service';
 import { IncomeService } from '../../services/income.service';
 import { AiInsightComponent } from '../ai-insight/ai-insight.component';
 import { SicCardComponent } from 'sic-ng';
+import { CategoryService } from '../../services/category.service';
 
 @Component({
   selector: 'app-summary-chart',
@@ -22,6 +23,7 @@ import { SicCardComponent } from 'sic-ng';
 export class SummaryChartComponent implements OnInit {
   expenseService = inject(ExpenseService);
   incomeService = inject(IncomeService);
+  categoryService = inject(CategoryService);
   private cdr = inject(ChangeDetectorRef);
   
   @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
@@ -97,7 +99,7 @@ export class SummaryChartComponent implements OnInit {
 
       const chartLabels = summary.map(s => s.category);
       const chartData = summary.map(s => s.total);
-      const chartColors = chartLabels.map(label => this.categoryColors[label as string] || '#94a3b8');
+      const chartColors = chartLabels.map(label => this.categoryService.getCategoryColor(label as string));
       
       this.pieChartData = {
         labels: chartLabels,

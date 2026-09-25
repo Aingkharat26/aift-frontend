@@ -15,6 +15,7 @@ import {
   SicBadgeComponent,
   SicProgressBarComponent,
 } from 'sic-ng';
+import { CategoryIconComponent } from '../category-icon/category-icon.component';
 
 @Component({
   selector: 'app-mini-budget',
@@ -24,6 +25,7 @@ import {
     SicButtonComponent,
     SicBadgeComponent,
     SicProgressBarComponent,
+    CategoryIconComponent,
   ],
   templateUrl: './mini-budget.component.html',
   styleUrls: ['./mini-budget.component.scss'],

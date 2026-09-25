@@ -270,9 +270,10 @@
         </div>
 
         <div class="col-category">
-          <sic-badge color="primary" size="sm">
-            {{ item.category }}
-          </sic-badge>
+          <span class="table-cat-badge">
+            <app-category-icon [category]="item.category" [type]="item.type" [size]="14"></app-category-icon>
+            <span>{{ item.category }}</span>
+          </span>
         </div>
 
         <div class="col-title">

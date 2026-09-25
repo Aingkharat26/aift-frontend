@@ -358,8 +358,11 @@
 .type-pill.income { background: rgba(16, 185, 129, 0.15); color: #10b981; }
 .type-pill.expense { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
 
-.category-badge {
-  display: inline-block;
+.category-badge,
+.table-cat-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   background: var(--bg-color);
   border: 1px solid var(--border-color);
   padding: 3px 8px;
@@ -370,7 +373,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 120px;
+  max-width: 125px;
 }
 .item-title { font-size: 0.95rem; font-weight: 600; color: var(--text-color); }
 .col-amount { font-size: 1.05rem; font-weight: 800; text-align: right; }
