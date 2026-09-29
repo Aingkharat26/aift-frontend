@@ -31,6 +31,7 @@
 @media (max-width: 768px) {
   .budget-page {
     padding: 10px 12px;
+    padding-bottom: calc(64px + max(12px, env(safe-area-inset-bottom, 12px)));
     gap: 12px;
   }
 
@@ -53,3 +54,4 @@
     width: 100%;
   }
 }
+

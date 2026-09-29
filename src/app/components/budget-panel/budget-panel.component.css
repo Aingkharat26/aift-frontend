@@ -594,4 +594,30 @@
     grid-template-columns: 1fr;
     gap: 10px;
   }
+
+  .recommend-item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .rec-cat {
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .rec-detail {
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .recommend-item sic-button {
+    width: 100%;
+  }
+
+  .recommend-item ::ng-deep .sic-btn {
+    width: 100%;
+    justify-content: center;
+  }
 }
+

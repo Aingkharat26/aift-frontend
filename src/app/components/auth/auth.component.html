@@ -21,25 +21,29 @@
     </div>
 
     <!-- Mode Switch Tabs -->
-    <div class="tab-switcher">
-      <sic-button
+    <div class="tab-switcher" role="tablist">
+      <button
         type="button"
-        [variant]="!isRegisterMode() ? 'solid' : 'ghost'"
-        [color]="!isRegisterMode() ? 'primary' : 'primary'"
-        size="sm"
+        role="tab"
+        [attr.aria-selected]="!isRegisterMode()"
+        class="tab-btn"
+        [class.active]="!isRegisterMode()"
         (click)="switchMode(false)"
       >
-        🔑 เข้าสู่ระบบ
-      </sic-button>
-      <sic-button
+        <span class="tab-icon">🔑</span>
+        <span>เข้าสู่ระบบ</span>
+      </button>
+      <button
         type="button"
-        [variant]="isRegisterMode() ? 'solid' : 'ghost'"
-        [color]="isRegisterMode() ? 'primary' : 'primary'"
-        size="sm"
+        role="tab"
+        [attr.aria-selected]="isRegisterMode()"
+        class="tab-btn"
+        [class.active]="isRegisterMode()"
         (click)="switchMode(true)"
       >
-        ✨ สมัครสมาชิก
-      </sic-button>
+        <span class="tab-icon">✨</span>
+        <span>สมัครสมาชิก</span>
+      </button>
     </div>
 
     <!-- Alert Box -->
@@ -48,20 +52,6 @@
         <span class="alert-icon">⚠️</span>
         <div class="alert-content">
           <span class="alert-text">{{ errorMessage() }}</span>
-          @if (errorDetail()) {
-            <div class="error-detail-wrapper">
-              <button
-                type="button"
-                class="error-detail-toggle"
-                (click)="toggleErrorDetail()"
-              >
-                {{ showErrorDetail() ? '▲ ซ่อนรายละเอียดทางเทคนิค' : '▼ ดูสาเหตุ / รายละเอียดทางเทคนิค' }}
-              </button>
-              @if (showErrorDetail()) {
-                <pre class="error-detail-text">{{ errorDetail() }}</pre>
-              }
-            </div>
-          }
         </div>
       </div>
     }
@@ -127,7 +117,7 @@
       @if (!isRegisterMode()) {
         <span>
           ยังไม่มีบัญชีใช่หรือไม่?
-          <a href="javascript:void(0)" (click)="switchMode(true)">สมัครใช้งานฟรี</a>
+          <a href="javascript:void(0)" (click)="switchMode(true)">สมัครสมาชิก</a>
         </span>
       } @else {
         <span>

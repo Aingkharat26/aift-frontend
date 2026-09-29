@@ -538,10 +538,36 @@
 }
 
 @media (max-width: 640px) {
+  .modal-backdrop {
+    padding: 10px;
+  }
+
+  .modal-dialog {
+    max-height: 90vh;
+    border-radius: 14px;
+  }
+
+  .modal-header {
+    padding: 12px 14px;
+
+    .title-row h2 {
+      font-size: 1.1rem;
+    }
+  }
+
+  .modal-body {
+    padding: 12px;
+  }
+
+  .modal-footer {
+    padding: 10px 12px;
+  }
+
   .quota-ribbon {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
+    padding: 10px 12px;
   }
 
   .quota-divider {
@@ -550,6 +576,7 @@
 
   .row-main {
     flex-wrap: wrap;
+    gap: 8px;
   }
 
   .row-actions {
@@ -558,3 +585,4 @@
     margin-top: 6px;
   }
 }
+

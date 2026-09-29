@@ -830,23 +830,88 @@
 
 /* Mobile */
 @media (max-width: 850px) {
-  .transactions-container { padding: 14px 12px; gap: 14px; }
-  .page-header { flex-direction: column; align-items: stretch; }
-  .export-btn { width: 100%; justify-content: center; }
-  .list-header { display: none; }
-  .transaction-row {
-    display: flex; flex-wrap: wrap; align-items: center;
-    padding: 14px; gap: 8px;
+  .transactions-container {
+    padding: 12px 10px;
+    padding-bottom: calc(72px + max(12px, env(safe-area-inset-bottom, 12px)));
+    gap: 12px;
   }
-  .col-date { width: 100%; flex-direction: row; justify-content: space-between; margin-bottom: 2px; }
-  .col-type, .col-category { width: auto; }
-  .col-title { width: 100%; font-size: 1.05rem; }
-  .col-amount { margin-left: auto; font-size: 1.15rem; }
-  .col-actions { width: 100%; justify-content: flex-end; margin-top: 6px; border-top: 1px dotted var(--border-color); padding-top: 8px; }
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .page-header h1 {
+    font-size: 1.35rem;
+  }
+  .export-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  .filter-card {
+    padding: 12px;
+    gap: 10px;
+  }
+  .filter-row-primary {
+    gap: 8px;
+  }
+  .search-box {
+    min-width: 100%;
+  }
+  .type-pills {
+    width: 100%;
+  }
+  .type-pills button {
+    flex: 1;
+    text-align: center;
+    padding: 6px 6px;
+    font-size: 0.82rem;
+  }
+  .category-select-wrapper {
+    width: 100%;
+  }
+  .category-select-wrapper select,
+  .category-select {
+    width: 100%;
+  }
+  .list-header {
+    display: none;
+  }
+  .transaction-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 10px 12px;
+    gap: 6px;
+    border-radius: 12px;
+  }
+  .col-date {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 2px;
+  }
+  .col-type, .col-category {
+    width: auto;
+  }
+  .col-title {
+    width: 100%;
+    font-size: 0.95rem;
+  }
+  .col-amount {
+    margin-left: auto;
+    font-size: 1.05rem;
+  }
+  .col-actions {
+    width: 100%;
+    justify-content: flex-end;
+    margin-top: 4px;
+    border-top: 1px dotted var(--border-color);
+    padding-top: 6px;
+  }
   .pagination-bar {
     flex-direction: column;
     align-items: stretch;
-    gap: 12px;
+    gap: 10px;
   }
   .pagination-info {
     justify-content: center;
@@ -859,3 +924,4 @@
     justify-content: center;
   }
 }
+

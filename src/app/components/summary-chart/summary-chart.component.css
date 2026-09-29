@@ -137,3 +137,45 @@
   }
 }
 
+@media (max-width: 600px) {
+  :host ::ng-deep .summary-card > .sic-card__content {
+    padding: 12px 14px;
+  }
+
+  .chart-header {
+    margin-bottom: 8px;
+  }
+
+  .title {
+    font-size: 1.1rem;
+  }
+
+  .stats-grid {
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+
+  .stat-card {
+    padding: 6px 4px;
+    border-radius: 8px;
+  }
+
+  .stat-card .label {
+    font-size: 0.68rem;
+  }
+
+  .stat-card .value {
+    font-size: 0.85rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+
+  .chart-wrapper {
+    min-height: 130px;
+    max-height: 180px;
+  }
+}
+
+

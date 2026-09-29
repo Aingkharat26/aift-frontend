@@ -36,9 +36,13 @@ export class AdminModelLimitsComponent implements OnInit {
         this.loading.set(false);
       },
       error: (err) => {
-        this.error.set(
-          err.error?.message || 'ไม่สามารถโหลดข้อมูลจำกัดโมเดลได้ (อาจไม่มีสิทธิ์ Admin)',
-        );
+        if (err.status === 403) {
+          this.error.set('คุณไม่มีสิทธิ์เข้าถึงข้อมูลส่วนนี้ (ต้องการสิทธิ์ระดับ Admin)');
+        } else if (err.status === 401) {
+          this.error.set('เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่อีกครั้ง');
+        } else {
+          this.error.set('ไม่สามารถโหลดข้อมูลจำกัดโมเดลได้ กรุณาลองใหม่อีกครั้งในภายหลัง');
+        }
         this.loading.set(false);
       },
     });

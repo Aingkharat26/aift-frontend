@@ -679,18 +679,27 @@
 
 @media (max-width: 600px) {
   .categories-page {
-    padding: 16px 12px 36px;
+    padding: 14px 12px;
+    padding-bottom: calc(72px + max(12px, env(safe-area-inset-bottom, 12px)));
   }
   .categories-grid {
     grid-template-columns: 1fr;
-    gap: 12px;
+    gap: 10px;
   }
   .metrics-grid {
     grid-template-columns: 1fr;
-    gap: 10px;
+    gap: 8px;
+  }
+  .metric-card {
+    padding: 12px 14px;
+    gap: 12px;
+  }
+  .metric-icon {
+    width: 40px;
+    height: 40px;
   }
   .page-title {
-    font-size: 1.4rem;
+    font-size: 1.35rem;
   }
   .header-right {
     width: 100%;
@@ -702,5 +711,14 @@
     width: 100%;
     justify-content: center;
   }
+  .icon-picker-grid {
+    grid-template-columns: repeat(auto-fill, minmax(38px, 1fr));
+    gap: 6px;
+  }
+  .icon-btn {
+    height: 38px;
+    font-size: 1.15rem;
+  }
 }
+
 
