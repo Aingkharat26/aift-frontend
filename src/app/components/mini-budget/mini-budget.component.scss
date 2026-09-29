@@ -401,6 +401,16 @@
     border-radius: 8px;
   }
 
+  .btn-ribbon-action {
+    padding: 4px 10px;
+    font-size: 0.74rem;
+    height: 32px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   .ribbon-alert-pill {
     font-size: 0.65rem;
     padding: 2px 6px;

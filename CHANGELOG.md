@@ -14,6 +14,174 @@
 
 ## 🕒 บันทึกรายการเปลี่ยนแปลง (Change History)
 
+### 📅 2026-09-29 12:00:00 (Local Time)
+**ประเภท:** `[Fix / UI / Responsive]` `[Frontend]`  
+**หัวข้อ:** ปรับแต่งขนาดและความสูงของปุ่มบนมือถือให้เท่ากันและสมดุล (ปุ่มออกจากระบบ, ปุ่มสแกนใบเสร็จ, ไมค์, บันทึก, และแท็บสลับโหมด)  
+**ปัญหาหรือความต้องการ (Issue / Requirement):**
+- ผู้ใช้แจ้งว่าปุ่มบนมุมมองมือถือบางปุ่มมีขนาดไม่เท่ากัน โดยเฉพาะปุ่มออกจากระบบและปุ่มแนบไฟล์ที่ดูใหญ่เทอะทะและไม่สมดุลกับองค์ประกอบข้างเคียง
+**สิ่งที่แก้ไข (Changes Detail):**
+1. **ปุ่มออกจากระบบในแถบนำทางด้านบน (`app.ts`, `app.scss`):**
+   - ปรับปุ่มออกจากระบบบนมือถือเป็น Compact Icon Button ขนาด 34x34px (รัศมี 8px) ซ่อนข้อความยาวที่ไม่จำเป็น ทำให้มีความสูงระดับเดียวกับปุ่มสลับธีม (`☀️`/`🌙`) และ User Badge พอดี
+   - บนหน้าจอเดสก์ท็อปคงความสูงมาตรฐาน 40px พร้อมข้อความ "ออกจากระบบ" ไว้อย่างสวยงาม
+2. **ปุ่มแนบ/สแกนใบเสร็จ และปุ่มไมโครโฟน (`chat-input.component.html`, `chat-input.component.css`):**
+   - เปลี่ยนปุ่มสแกนใบเสร็จจากการใช้ `<sic-button>` (ซึ่งมี padding หนาและถูกโอเวอร์ไรด์จนกลายเป็นกล่องสี่เหลี่ยมผืนผ้าขนาดใหญ่) มาเป็นคลาส `.tool-btn` ที่ใช้สเปกเดียวกับปุ่มไมค์
+   - ปุ่มทั้งสองเป็น Square Tool Button ขนาด 38x38px (รัศมี 8px) บนมือถือ และ 40x40px บนเดสก์ท็อป มีขนาดเท่ากันทุกประการ
+3. **กล่องข้อความและปุ่มบันทึก (`chat-input.component.html`, `chat-input.component.css`):**
+   - ปรับความสูงของ `.chat-input` และปุ่ม `[ บันทึก ]` บนมือถือให้เป็น 38px พอดี ทำให้แถบอินพุตทั้งแถว (ปุ่มแนบไฟล์, ปุ่มไมค์, กล่องพิมพ์, ปุ่มบันทึก) เรียงตัวด้วยความสูง 38px เท่ากันทั้งหมดอย่างไร้รอยต่อ
+4. **แท็บสลับ รายจ่าย (AI) / รายรับ บนมือถือ (`chat-input.component.html`, `chat-input.component.css`):**
+   - เปลี่ยนจากปุ่ม ghost/solid ที่ขนาดไม่เท่ากันและไม่สมมาตร มาเป็น Segmented Control แบบ Grid 50/50 ความสูง 34px มีแถบรางครอบคลุมและ Active Pill คมชัด
+5. **ปุ่มตั้งงบประมาณในแถบแจ้งเตือน (`mini-budget.component.html`, `mini-budget.component.scss`):**
+   - ปรับปุ่ม `＋ ตั้งงบประมาณเลย` ให้เป็น `.btn-ribbon-action` ความสูง 32px พอเหมาะ ไม่ล้นหรือบดบังข้อความบนหน้าจอมือถือ
+6. **Verification:**
+   - ทดสอบรัน `cmd.exe /c "npm run build"` สำเร็จสมบูรณ์ (Exit code 0)
+**ไฟล์ที่แก้ไข (Affected Files):**
+- `aift-frontend/src/app/app.ts`
+- `aift-frontend/src/app/app.scss`
+- `aift-frontend/src/app/components/chat-input/chat-input.component.html`
+- `aift-frontend/src/app/components/chat-input/chat-input.component.css`
+- `aift-frontend/src/app/components/mini-budget/mini-budget.component.html`
+- `aift-frontend/src/app/components/mini-budget/mini-budget.component.scss`
+- `aift-frontend/CHANGELOG.md`
+- `CHANGELOG.md`
+
+### 📅 2026-09-29 11:43:00 (Local Time)
+**ประเภท:** `[Fix / UI / Layout]` `[Frontend]`  
+**หัวข้อ:** ปรับปรุง Mode Switch Tab (เข้าสู่ระบบ / สมัครสมาชิก) ให้เป็นแบบ Full-Width 50/50 Segmented Control สมบูรณ์แบบ  
+**ปัญหาหรือความต้องการ (Issue / Requirement):**
+- แท็บสลับโหมดระหว่าง "เข้าสู่ระบบ" และ "สมัครสมาชิก" บนหน้าจอ Auth แสดงผลไม่เต็มความกว้าง โดยปุ่มทั้งสองเบียดไปชิดด้านซ้าย และเหลือช่องว่างว่างเปล่าขนาดใหญ่ทางด้านขวา ส่งผลให้หน้าตาไม่สมดุลและดูขัดใจ
+**สิ่งที่แก้ไข (Changes Detail):**
+1. **ปรับโครงสร้างใน `auth.component.html`:**
+   - เปลี่ยนจากการใช้ `<sic-button>` (ซึ่งมีพฤติกรรม fit-content และไม่ขยายเต็มแถว) มาใช้โครงสร้าง Accessible Tab `<button type="button" class="tab-btn" role="tab">`
+2. **ปรับแต่งสไตล์ใน `auth.component.scss`:**
+   - เปลี่ยน `.tab-switcher` ให้เป็นเลย์เอาต์ `display: grid; grid-template-columns: 1fr 1fr;` เต็มความกว้าง 100%
+   - ทั้ง 2 แท็บแบ่งพื้นที่คนละ 50% พอดี จัดวางไอคอนและข้อความให้อยู่ตรงกลางอย่างสวยงาม
+   - ออกแบบ Active State เป็น Smooth Pill ที่มีเงาความลึกระดับพรีเมียม สอดคล้องทั้ง Light Mode และ Dark Mode
+3. **Verification:**
+   - สั่ง `cmd.exe /c "npm run build"` สำเร็จสมบูรณ์ 100%
+**ไฟล์ที่แก้ไข (Affected Files):**
+- `aift-frontend/src/app/components/auth/auth.component.html`
+- `aift-frontend/src/app/components/auth/auth.component.scss`
+- `aift-frontend/CHANGELOG.md`
+- `CHANGELOG.md`
+
+### 📅 2026-09-29 11:38:00 (Local Time)
+**ประเภท:** `[Fix / UI / Error Handling]` `[Frontend]`  
+**หัวข้อ:** ถอดปุ่มและแถบ "ดูสาเหตุ / รายละเอียดทางเทคนิค" ออกจากระบบแจ้งเตือนข้อผิดพลาดทั้งหมดอย่างสมบูรณ์  
+**ปัญหาหรือความต้องการ (Issue / Requirement):**
+- ผู้ใช้ไม่ต้องการให้มีลิงก์หรือปุ่ม "▼ ดูสาเหตุ / รายละเอียดทางเทคนิค" ปรากฏบนหน้าจอ Error ทั้งในหน้าเข้าสู่ระบบ (Login/Register) และคอมโพเนนต์แจ้งเตือน โดยต้องการให้แสดงเฉพาะข้อความภาษาไทยที่สุภาพ กระชับ และเข้าใจง่ายเท่านั้น
+**สิ่งที่แก้ไข (Changes Detail):**
+1. **หน้าเข้าสู่ระบบและสมัครสมาชิก (`auth.component.html`, `.ts`, `.scss`):**
+   - ถอดปุ่ม toggle `▼ ดูสาเหตุ / รายละเอียดทางเทคนิค` และบล็อกแสดงผล Technical Detail (`error-detail-wrapper`) ออกทั้งหมด
+   - ลบสัญญาณ `errorDetail`, `showErrorDetail`, เมธอด `toggleErrorDetail()` และ CSS สไตล์ที่เกี่ยวข้อง
+   - ปรับฟังก์ชัน `parseAuthError` ให้คืนค่าข้อความภาษาไทยที่เรียบง่าย ชัดเจน โดยไม่มีข้อมูลเทคนิคหรือ Stack Trace ปนเปื้อน
+2. **คอมโพเนนต์ `ErrorBannerComponent` (`error-banner.component.ts`):**
+   - ถอดแถบปุ่ม `▼ ดูรายละเอียดทางเทคนิค` และโค้ดบ็อกซ์ `raw-code-box` ออกทั้งหมด
+   - ถอดป้ายแสดงผลรหัส HTTP (`status-pill`) ออก เพื่อไม่ให้มีรหัสทางเทคนิคแสดงต่อผู้ใช้ทั่วไป
+3. **Verification:**
+   - ทดสอบรัน `cmd.exe /c "npm run build"` สำเร็จสมบูรณ์ ไร้ข้อผิดพลาด
+**ไฟล์ที่แก้ไข (Affected Files):**
+- `aift-frontend/src/app/components/auth/auth.component.html`
+- `aift-frontend/src/app/components/auth/auth.component.ts`
+- `aift-frontend/src/app/components/auth/auth.component.scss`
+- `aift-frontend/src/app/components/error-banner/error-banner.component.ts`
+- `aift-frontend/CHANGELOG.md`
+- `CHANGELOG.md`
+
+### 📅 2026-09-29 11:35:00 (Local Time)
+**ประเภท:** `[Feature / UX / Error Handling]` `[Frontend]`  
+**หัวข้อ:** ปรับปรุงระบบแสดงผล Error Response ทั่วทั้งแอปพลิเคชันให้เป็นมิตรและเข้าใจง่ายในภาษาไทย พร้อมคำแนะนำแก้ไข (User-Friendly Error Handling & Actionable Suggestions)  
+**ปัญหาหรือความต้องการ (Issue / Requirement):**
+- ผู้ใช้ต้องการให้ข้อความแสดงข้อผิดพลาด (Error Response) ทั่วทั้งระบบอ่านเข้าใจง่ายเหมือนหน้าเข้าสู่ระบบตอนใส่รหัสผ่านผิด ไม่ส่งข้อความภาษาอังกฤษดิบหรือ HTTP Status Code ดิบจาก Backend (เช่น "Http failure response for http://... 0 Unknown Error", "Cannot GET /...", "Unauthorized", "Validation failed") มาแสดงต่อผู้ใช้
+**สิ่งที่แก้ไข (Changes Detail):**
+1. **สร้างบริการกลาง `ErrorHandlerService` (`error-handler.service.ts`):**
+   - แปลงทุก HTTP Error Status Code (0 Network Offline/Backend Down, 400 ข้อมูลไม่ถูกต้อง, 401 เซสชันหมดอายุ, 403 ไม่มีสิทธิ์, 404 ไม่พบข้อมูล, 409 ข้อมูลซ้ำ, 413 รูปใหญ่เกิน, 429 AI คิวเต็ม, 500 ระบบขัดข้อง)
+   - รองรับแยกตามบริบทการทำงาน: `transactions`, `categories`, `budgets`, `chat`, `receipt`, `voice`, `general`
+   - คืนค่าออบเจกต์ `AppErrorInfo` มี `title`, `message`, `suggestion` (💡 คำแนะนำแก้ไขปัญหา), `canRetry`, และ `technical` (ซ่อน Error ดิบไว้ใน Accordion รายละเอียดทางเทคนิค ให้กดเปิดดูได้เฉพาะเมื่อต้องการ)
+2. **สร้าง Standalone Component `ErrorBannerComponent` (`error-banner/`):**
+   - การ์ดแจ้งเตือน Error ออกแบบสไตล์ Modern Glassmorphism สอดคล้องกับ Sic Theme และ Dark Mode
+   - รองรับโหมดปกติ และโหมด `compact` สำหรับแสดงใน Form Dialog
+   - มีปุ่ม "🔄 ลองใหม่อีกครั้ง" (Retry) และ Accordion "รายละเอียดทางเทคนิค"
+3. **ปรับปรุงหน้ารวมรายการ (`transactions.component.ts` & `.html`):**
+   - แสดง `<app-error-banner>` ด้านบนตารางเมื่อเกิดข้อผิดพลาดในการโหลดรายการ พร้อมปุ่มโหลดใหม่
+   - แสดง Error Banner ใน Modal แก้ไขรายการ และใน Modal ยืนยันการลบรายการ
+4. **ปรับปรุงหน้าจัดการหมวดหมู่ (`categories.component.ts` & `.html`):**
+   - แสดง Error Banner ใน Create/Edit Category Dialog
+   - ปรับปรุง Notice Warning Modal กรณีหมวดหมู่เริ่มต้น หรือมีรายการผูกค้างอยู่ ให้เข้าใจง่ายพร้อมคำแนะนำ
+5. **ปรับปรุงหน้างบประมาณ (`budget-panel.component.ts` & `.html`):**
+   - ยกเลิกการใช้คำสั่ง `alert(...)` ทั้งหมด แทนที่ด้วย Error Banner
+   - เพิ่มการจัดการ Error ในหน้าแสดงผล, Dialog ตั้งงบ, Dialog แนะนำงบจากพฤติกรรม และ Dialog ยืนยันการลบ
+6. **ปรับปรุงแถบป้อนข้อมูล AI, เสียง, และใบเสร็จ (`chat-input.component.ts` & `.html`):**
+   - Speech Recognition: แสดงคำแนะนำการเปิดสิทธิ์ไมโครโฟนในเบราว์เซอร์เมื่อถูกบล็อก
+   - AI Chat (รายจ่าย/รายรับ/ชุดรายการ) & ใบเสร็จ: แปลง Error ทั้งหมดเป็นคำแนะนำที่ชัดเจน
+7. **ปรับปรุงรายการวันนี้ (`daily-log.component.ts` & `.html`):**
+   - ยกเลิกการใช้คำสั่ง `alert(...)` ทั้งหมดในการแก้ไขและลบรายการ
+   - เพิ่ม Error Banner พร้อมปุ่ม Retry
+8. **ปรับปรุงหน้า Admin Model Limits (`admin-model-limits.component.ts`):**
+   - แสดงข้อความสิทธิ์ Admin และข้อผิดพลาดเป็นภาษาไทยอย่างชัดเจน
+**ไฟล์ที่แก้ไข (Affected Files):**
+- `aift-frontend/src/app/services/error-handler.service.ts`
+- `aift-frontend/src/app/components/error-banner/error-banner.component.ts`
+- `aift-frontend/src/app/components/error-banner/error-banner.component.html`
+- `aift-frontend/src/app/components/error-banner/error-banner.component.css`
+- `aift-frontend/src/app/components/transactions/transactions.component.ts`
+- `aift-frontend/src/app/components/transactions/transactions.component.html`
+- `aift-frontend/src/app/components/categories/categories.component.ts`
+- `aift-frontend/src/app/components/categories/categories.component.html`
+- `aift-frontend/src/app/components/budget-panel/budget-panel.component.ts`
+- `aift-frontend/src/app/components/budget-panel/budget-panel.component.html`
+- `aift-frontend/src/app/components/chat-input/chat-input.component.ts`
+- `aift-frontend/src/app/components/chat-input/chat-input.component.html`
+- `aift-frontend/src/app/components/daily-log/daily-log.component.ts`
+- `aift-frontend/src/app/components/daily-log/daily-log.component.html`
+- `aift-frontend/src/app/components/admin-model-limits/admin-model-limits.component.ts`
+- `aift-frontend/CHANGELOG.md`
+- `CHANGELOG.md`
+
+### 📅 2026-09-29 10:50:00 (Local Time)
+**ประเภท:** `[Feature / UI / Responsive]` `[Frontend]`  
+**หัวข้อ:** ปรับปรุง Responsive สำหรับหน้าจอมือถือ (Focus: iPhone 17 & Modern Mobile Viewport) รองรับ iOS Safe Area และ Mobile Bottom Tab Bar  
+**ปัญหาหรือความต้องการ (Issue / Requirement):**
+- การแสดงผลบนมือถือ (โดยเฉพาะ iPhone 17 / iPhone รุ่นใหม่ กว้าง 393px-402px) ไม่สวยงามและใช้งานยาก:
+  - Header ด้านบนกินพื้นที่ 2 แถว บดบังเนื้อหา
+  - แถบพิมพ์ AI ด้านล่างของ Dashboard บังรายการ Daily Log ด้านล่างสุด
+  - ปุ่มบนการ์ด Daily Log และตัวเลขเบียดกันจนชื่อรายการถูกตัดทอนมากเกินไป
+  - ไม่มี Safe Area รองรับ Dynamic Island และ Home Indicator Bar
+**สิ่งที่แก้ไข (Changes Detail):**
+1. **Mobile Bottom Navigation Bar (iOS Tab Bar Style):**
+   - เพิ่มแถบนำทาง 4 แท็บด้านล่างใน `app.ts` และ `app.scss`: แดชบอร์ด, งบประมาณ, หมวดหมู่, รายการทั้งหมด พร้อมไอคอน SVG คมชัด และสไตล์ Glassmorphism
+   - ย้ายเมนูนำทาง 4 หน้าออกจาก Header ด้านบนบนมือถือ เหลือเฉพาะ Logo, สลับธีม, และ User Profile / Logout ทำให้ Header สูงเพียง ~52px
+   - รองรับ `padding-top: max(4px, env(safe-area-inset-top, 0px))` ด้านบน และ `padding-bottom: max(8px, env(safe-area-inset-bottom, 12px))` ด้านล่าง
+2. **Main Dashboard & Docked AI Chat Bar:**
+   - ปรับ `dashboard-wrapper` ใช้ `min-height: calc(100dvh - 54px)` และ `-webkit-overflow-scrolling: touch`
+   - ปรับตำแหน่ง Docking ของ Chat Input ให้ลอยอยู่เหนือ Bottom Nav Bar พอดี: `bottom: calc(54px + max(6px, env(safe-area-inset-bottom, 12px)))`
+   - เพิ่ม `padding-bottom: calc(160px + env(safe-area-inset-bottom, 16px))` บน `.main-content` เพื่อให้เลื่อนดูรายการธุรกรรมได้ครบถ้วนโดยไม่ถูกแถบพิมพ์บัง
+   - ปรับ Chat Input และ Tab Switcher ให้กระชับ ปุ่มควบคุม 38px เข้าถึงง่ายบนจอสัมผัส
+3. **Daily Log & Summary Chart:**
+   - ปรับลด padding การ์ดในจอเล็ก เพิ่มพื้นที่ให้ชื่อรายการแสดงผลได้ยาวขึ้น
+   - จัดระเบียบปุ่ม Edit และ Delete ขนาด 32px ไม่แย่งพื้นที่ยอดเงิน
+   - ปรับ Donut Chart และ Stats Grid ใน `summary-chart` ให้พอดีกับหน้าจอมือถือ
+4. **Budget, Categories & Transactions Pages:**
+   - เพิ่ม Bottom Safe Area Padding ในทุกหน้า เพื่อให้คอนเทนต์และการแบ่งหน้า (Pagination) ไม่ถูก Bottom Tab Bar ทับ
+   - ปรับปรุง Filter bar, search input, type pills และ category dropdown บนมือถือ
+5. **Verification:**
+   - รัน `npm run build` ผ่านสมบูรณ์ (Exit code 0)
+**ไฟล์ที่แก้ไข (Affected Files):**
+- `aift-frontend/src/app/app.ts`
+- `aift-frontend/src/app/app.scss`
+- `aift-frontend/src/app/components/main-dashboard/main-dashboard.component.css`
+- `aift-frontend/src/app/components/chat-input/chat-input.component.css`
+- `aift-frontend/src/app/components/summary-chart/summary-chart.component.css`
+- `aift-frontend/src/app/components/daily-log/daily-log.component.css`
+- `aift-frontend/src/app/components/budget-page/budget-page.component.css`
+- `aift-frontend/src/app/components/budget-panel/budget-panel.component.css`
+- `aift-frontend/src/app/components/categories/categories.component.css`
+- `aift-frontend/src/app/components/transactions/transactions.component.css`
+- `aift-frontend/src/app/components/admin-model-limits/admin-model-limits.component.scss`
+- `aift-frontend/src/app/components/auth/auth.component.scss`
+- `mobile-responsive-redesign.md`
+- `aift-frontend/CHANGELOG.md`
+- `CHANGELOG.md`
+
 ### 📅 2026-09-25 13:48:00 (Local Time)
 **ประเภท:** `[Fix / Build / Deploy]` `[Frontend]`  
 **หัวข้อ:** แก้ไขปัญหา Vercel ติดสิทธิ์ Permission denied (publickey) ขณะติดตั้ง sic-ng จาก Private GitHub Repo โดยการ Bundle เป็น Local Tarball Package  
