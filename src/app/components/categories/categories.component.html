@@ -171,6 +171,13 @@
   </div>
 
   <div sicDialogBody class="modal-body">
+    <!-- Form Error Banner -->
+    <app-error-banner
+      *ngIf="formError()"
+      [error]="formError()"
+      [compact]="true"
+    ></app-error-banner>
+
     <!-- Category Name Input -->
     <div class="form-group">
       <label class="form-label" for="categoryName">ชื่อหมวดหมู่ <span class="required">*</span></label>
@@ -385,7 +392,7 @@
 <sic-dialog
   [open]="showNoticeModal()"
   (closed)="showNoticeModal.set(false)"
-  width="460px"
+  width="480px"
 >
   <div sicDialogHeader class="modal-header">
     <div class="modal-title-wrap warning-title">
@@ -394,12 +401,17 @@
         <line x1="12" y1="9" x2="12" y2="13"/>
         <line x1="12" y1="17" x2="12.01" y2="17"/>
       </svg>
-      <h2>ข้อควรทราบ</h2>
+      <h2>{{ noticeInfo()?.title || 'ข้อควรทราบ' }}</h2>
     </div>
   </div>
 
   <div sicDialogBody class="modal-body">
-    <p class="notice-text">{{ noticeMessage }}</p>
+    <app-error-banner
+      *ngIf="noticeInfo()"
+      [error]="noticeInfo()"
+      [dismissible]="false"
+    ></app-error-banner>
+    <p *ngIf="!noticeInfo()" class="notice-text">{{ noticeMessage }}</p>
   </div>
 
   <div sicDialogFooter class="modal-footer">

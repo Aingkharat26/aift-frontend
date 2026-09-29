@@ -4,12 +4,20 @@
     <sic-badge color="primary" size="sm">{{ combinedLogs.length }} รายการ</sic-badge>
   </div>
 
+  <!-- แสดง Error Banner เมื่อโหลดรายการไม่สำเร็จ -->
+  <app-error-banner
+    *ngIf="fetchError()"
+    [error]="fetchError()"
+    (retry)="loadCombinedLogs()"
+    (dismiss)="fetchError.set(null)"
+  ></app-error-banner>
+
   <div class="loading-state" *ngIf="loading">
     <div class="spinner"></div>
     <span>กำลังโหลดรายการ...</span>
   </div>
 
-  <div class="empty-state" *ngIf="!loading && combinedLogs.length === 0">
+  <div class="empty-state" *ngIf="!loading && !fetchError() && combinedLogs.length === 0">
     ยังไม่มีรายการสำหรับวันนี้ พิมพ์ด้านล่างเพื่อเริ่มบันทึกเลย!
   </div>
 
@@ -69,12 +77,27 @@
   width="420px"
 >
   <div style="padding: 1rem 0; line-height: 1.6;">
+    <app-error-banner
+      *ngIf="deleteError()"
+      [error]="deleteError()"
+      [compact]="true"
+      (dismiss)="deleteError.set(null)"
+    ></app-error-banner>
+
     <p>คุณต้องการลบรายการ <strong style="color: var(--sic-color-primary);">"{{ selectedItem?.type === 'income' ? selectedItem?.source : selectedItem?.item }}"</strong> ใช่หรือไม่?</p>
     <p style="color: var(--sic-color-text-muted); font-size: 0.85rem; margin-top: 6px;">หากยืนยันแล้วจะไม่สามารถย้อนกลับได้</p>
   </div>
   <div sicDialogFooter style="display: flex; justify-content: flex-end; gap: 8px;">
     <sic-button variant="outline" color="primary" size="sm" (click)="showDeleteDialog.set(false)">ยกเลิก</sic-button>
-    <sic-button variant="solid" color="danger" size="sm" (click)="onConfirmDelete()">ยืนยันการลบ</sic-button>
+    <sic-button
+      variant="solid"
+      color="danger"
+      size="sm"
+      (click)="onConfirmDelete()"
+      [disabled]="isDeleting()"
+    >
+      {{ isDeleting() ? 'กำลังลบ...' : 'ยืนยันการลบ' }}
+    </sic-button>
   </div>
 </sic-dialog>
 
@@ -86,6 +109,13 @@
   width="460px"
 >
   <form (ngSubmit)="onConfirmEdit()" style="padding: 0.5rem 0; display: flex; flex-direction: column; gap: 12px;">
+    <app-error-banner
+      *ngIf="editError()"
+      [error]="editError()"
+      [compact]="true"
+      (dismiss)="editError.set(null)"
+    ></app-error-banner>
+
     <sic-input
       name="editName"
       [label]="editingItem?.type === 'income' ? 'แหล่งที่มาของรายรับ' : 'ชื่อรายการ'"
@@ -117,7 +147,15 @@
 
     <div sicDialogFooter style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px;">
       <sic-button variant="outline" color="primary" size="sm" type="button" (click)="showEditDialog.set(false)">ยกเลิก</sic-button>
-      <sic-button variant="solid" color="primary" size="sm" type="submit" [disabled]="!isEditValid()">บันทึก</sic-button>
+      <sic-button
+        variant="solid"
+        color="primary"
+        size="sm"
+        type="submit"
+        [disabled]="isEditing() || !isEditValid()"
+      >
+        {{ isEditing() ? 'กำลังบันทึก...' : 'บันทึก' }}
+      </sic-button>
     </div>
   </form>
 </sic-dialog>

@@ -22,6 +22,14 @@
   </div>
 
   <div class="budget-body">
+    <!-- แสดง Error Banner เมื่อเกิดข้อผิดพลาดในการโหลดงบประมาณ -->
+    <app-error-banner
+      *ngIf="panelError()"
+      [error]="panelError()"
+      (retry)="reloadStatus()"
+      (dismiss)="panelError.set(null)"
+    ></app-error-banner>
+
     <!-- แบนเนอร์แจ้งเตือนเมื่อใกล้เกิน / เกินงบ -->
     <div class="alert-banner" *ngIf="alerts.length > 0">
       <div
@@ -96,6 +104,13 @@
   width="440px"
 >
   <form (ngSubmit)="onAddBudget()" style="padding: 0.5rem 0; display: flex; flex-direction: column; gap: 12px;">
+    <app-error-banner
+      *ngIf="addBudgetError()"
+      [error]="addBudgetError()"
+      [compact]="true"
+      (dismiss)="addBudgetError.set(null)"
+    ></app-error-banner>
+
     <div class="form-group">
       <label style="display: block; font-size: 0.85rem; font-weight: 500; margin-bottom: 4px; color: var(--sic-color-text);">หมวดหมู่</label>
       <select [(ngModel)]="newBudget.category" name="budgetCategory" style="width: 100%; padding: 8px 12px; border: 1px solid var(--sic-color-border); border-radius: 8px; background: var(--sic-color-surface); color: var(--sic-color-text);">
@@ -123,9 +138,9 @@
         variant="solid"
         color="primary"
         size="sm"
-        [disabled]="!newBudget.category || !newBudget.limit || newBudget.limit <= 0"
+        [disabled]="isSaving() || !newBudget.category || !newBudget.limit || newBudget.limit <= 0"
       >
-        บันทึกงบประมาณ
+        {{ isSaving() ? 'กำลังบันทึก...' : 'บันทึกงบประมาณ' }}
       </sic-button>
     </div>
   </form>
@@ -143,12 +158,20 @@
       คำนวณจากค่าเฉลี่ยการใช้จ่ายจริงย้อนหลัง 3 เดือนล่าสุด ปัดขึ้นเป็นเลขกลม ๆ
     </p>
 
+    <app-error-banner
+      *ngIf="recommendError()"
+      [error]="recommendError()"
+      [compact]="true"
+      (retry)="openRecommendDialog()"
+      (dismiss)="recommendError.set(null)"
+    ></app-error-banner>
+
     <div class="recommend-loading" *ngIf="recommendationsLoading">
       <div class="spinner"></div>
       <span>กำลังวิเคราะห์พฤติกรรมการใช้จ่าย...</span>
     </div>
 
-    <div class="recommend-empty" *ngIf="!recommendationsLoading && recommendations.length === 0">
+    <div class="recommend-empty" *ngIf="!recommendationsLoading && !recommendError() && recommendations.length === 0">
       ยังไม่มีข้อมูลการใช้จ่ายเพียงพอ ลองบันทึกรายจ่ายก่อน แล้วกลับมาดูอีกครั้งครับ
     </div>
 
@@ -191,6 +214,13 @@
   width="420px"
 >
   <div style="padding: 1rem 0; line-height: 1.6;">
+    <app-error-banner
+      *ngIf="deleteError()"
+      [error]="deleteError()"
+      [compact]="true"
+      (dismiss)="deleteError.set(null)"
+    ></app-error-banner>
+
     <p>
       คุณต้องการลบงบประมาณหมวด <strong style="color: var(--sic-color-primary);">"{{ selectedForDelete?.category }}"</strong> ใช่หรือไม่?
     </p>
@@ -198,6 +228,14 @@
   </div>
   <div sicDialogFooter style="display: flex; justify-content: flex-end; gap: 8px;">
     <sic-button variant="outline" color="primary" size="sm" (click)="showConfirmDialog.set(false)">ยกเลิก</sic-button>
-    <sic-button variant="solid" color="danger" size="sm" (click)="onConfirmDelete()">ยืนยันการลบ</sic-button>
+    <sic-button
+      variant="solid"
+      color="danger"
+      size="sm"
+      (click)="onConfirmDelete()"
+      [disabled]="isDeleting()"
+    >
+      {{ isDeleting() ? 'กำลังลบ...' : 'ยืนยันการลบ' }}
+    </sic-button>
   </div>
 </sic-dialog>

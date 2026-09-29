@@ -3,6 +3,11 @@ import { CommonModule, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ExpenseService } from '../../services/expense.service';
 import { IncomeService } from '../../services/income.service';
+import {
+  ErrorHandlerService,
+  AppErrorInfo,
+} from '../../services/error-handler.service';
+import { ErrorBannerComponent } from '../error-banner/error-banner.component';
 import { forkJoin, map, Observable, of } from 'rxjs';
 import {
   SicCardComponent,
@@ -20,6 +25,7 @@ import { CategoryIconComponent } from '../category-icon/category-icon.component'
   imports: [
     CommonModule,
     FormsModule,
+    ErrorBannerComponent,
     SicCardComponent,
     SicBadgeComponent,
     SicButtonComponent,
@@ -34,10 +40,17 @@ export class DailyLogComponent implements OnInit {
   expenseService = inject(ExpenseService);
   incomeService = inject(IncomeService);
   categoryService = inject(CategoryService);
+  private errorHandler = inject(ErrorHandlerService);
   private cdr = inject(ChangeDetectorRef);
 
   showEditDialog = signal<boolean>(false);
   showDeleteDialog = signal<boolean>(false);
+
+  fetchError = signal<AppErrorInfo | null>(null);
+  editError = signal<AppErrorInfo | null>(null);
+  deleteError = signal<AppErrorInfo | null>(null);
+  isEditing = signal<boolean>(false);
+  isDeleting = signal<boolean>(false);
 
   combinedLogs: any[] = [];
   selectedItem: any = null;
@@ -68,6 +81,7 @@ export class DailyLogComponent implements OnInit {
 
   loadCombinedLogs() {
     this.loading = true;
+    this.fetchError.set(null);
 
     // Use local date parts instead of toISOString() to avoid UTC shift
     const y = this.currentDate.getFullYear();
@@ -98,6 +112,9 @@ export class DailyLogComponent implements OnInit {
       error: (err: any) => {
         console.error('Error loading logs:', err);
         this.loading = false;
+        if (err?.status !== 401) {
+          this.fetchError.set(this.errorHandler.parse(err, 'transactions'));
+        }
         this.cdr.detectChanges();
       },
     });
@@ -123,6 +140,7 @@ export class DailyLogComponent implements OnInit {
   }
 
   editItem(item: any) {
+    this.editError.set(null);
     this.editingItem = item;
     this.editForm = {
       name: item.type === 'income' ? item.source : item.item,
@@ -144,6 +162,9 @@ export class DailyLogComponent implements OnInit {
   onConfirmEdit() {
     if (!this.editingItem || !this.isEditValid()) return;
 
+    this.editError.set(null);
+    this.isEditing.set(true);
+
     const isIncome = this.editingItem.type === 'income';
     const data = isIncome
       ? { source: this.editForm.name.trim(), amount: this.editForm.amount }
@@ -159,6 +180,7 @@ export class DailyLogComponent implements OnInit {
 
     updateObs.subscribe({
       next: () => {
+        this.isEditing.set(false);
         this.showEditDialog.set(false);
 
         // Refresh summary if it was an income (balance changed)
@@ -172,19 +194,26 @@ export class DailyLogComponent implements OnInit {
         this.loadCombinedLogs();
       },
       error: (err: any) => {
+        this.isEditing.set(false);
         console.error('Error updating item:', err);
-        alert('เกิดข้อผิดพลาดในการแก้ไขรายการ');
+        if (err?.status !== 401) {
+          this.editError.set(this.errorHandler.parse(err, 'transactions'));
+        }
       },
     });
   }
 
   deleteItem(item: any) {
+    this.deleteError.set(null);
     this.selectedItem = item;
     this.showDeleteDialog.set(true);
   }
 
   onConfirmDelete() {
     if (!this.selectedItem) return;
+
+    this.deleteError.set(null);
+    this.isDeleting.set(true);
 
     const isIncome = this.selectedItem.type === 'income';
     const deleteObs = isIncome
@@ -193,6 +222,7 @@ export class DailyLogComponent implements OnInit {
 
     deleteObs.subscribe({
       next: () => {
+        this.isDeleting.set(false);
         this.showDeleteDialog.set(false);
 
         // Refresh summary if it was an income (balance changed)
@@ -206,8 +236,11 @@ export class DailyLogComponent implements OnInit {
         this.loadCombinedLogs();
       },
       error: (err: any) => {
+        this.isDeleting.set(false);
         console.error('Error deleting item:', err);
-        alert('เกิดข้อผิดพลาดในการลบรายการ');
+        if (err?.status !== 401) {
+          this.deleteError.set(this.errorHandler.parse(err, 'transactions'));
+        }
       },
     });
   }

@@ -219,6 +219,13 @@
 
   <!-- Transactions Table / List -->
   <section class="transactions-content">
+    <!-- Error State Banner -->
+    <app-error-banner
+      *ngIf="fetchError()"
+      [error]="fetchError()"
+      (retry)="loadTransactions()"
+    ></app-error-banner>
+
     <!-- Loading State -->
     <div *ngIf="loading()" class="loading-state">
       <div class="spinner"></div>
@@ -407,6 +414,12 @@
     width="460px"
   >
     <div style="padding: 0.5rem 0; display: flex; flex-direction: column; gap: 12px;">
+      <app-error-banner
+        *ngIf="modalError()"
+        [error]="modalError()"
+        [compact]="true"
+      ></app-error-banner>
+
       <sic-input
         name="editTitle"
         [label]="editingItem()?.type === 'income' ? 'แหล่งที่มาของรายรับ' : 'ชื่อรายการ'"
@@ -463,6 +476,11 @@
     width="420px"
   >
     <div style="padding: 1rem 0; line-height: 1.6;">
+      <app-error-banner
+        *ngIf="modalError()"
+        [error]="modalError()"
+        [compact]="true"
+      ></app-error-banner>
       <p>
         คุณต้องการลบรายการ <strong style="color: var(--sic-color-primary);">"{{ deletingItem()?.title }}"</strong> ใช่หรือไม่?
       </p>

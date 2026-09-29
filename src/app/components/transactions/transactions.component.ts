@@ -15,6 +15,8 @@ import {
   SicInputComponent,
 } from 'sic-ng';
 import { CategoryIconComponent } from '../category-icon/category-icon.component';
+import { ErrorBannerComponent } from '../error-banner/error-banner.component';
+import { ErrorHandlerService, AppErrorInfo } from '../../services/error-handler.service';
 
 @Component({
   selector: 'app-transactions',
@@ -28,12 +30,14 @@ import { CategoryIconComponent } from '../category-icon/category-icon.component'
     SicDialogComponent,
     SicInputComponent,
     CategoryIconComponent,
+    ErrorBannerComponent,
   ],
   templateUrl: './transactions.component.html',
   styleUrl: './transactions.component.css',
 })
 export class TransactionsComponent implements OnInit {
   private transactionService = inject(TransactionService);
+  private errorHandler = inject(ErrorHandlerService);
 
   // Data states
   loading = signal<boolean>(true);
@@ -43,6 +47,8 @@ export class TransactionsComponent implements OnInit {
   page = signal<number>(1);
   limit = signal<number>(20);
   totalPages = signal<number>(1);
+  fetchError = signal<AppErrorInfo | null>(null);
+  modalError = signal<AppErrorInfo | null>(null);
   categories = signal<string[]>([]);
 
   // Summary
@@ -93,6 +99,8 @@ export class TransactionsComponent implements OnInit {
       limit: this.limit(),
     };
 
+    this.fetchError.set(null);
+
     this.transactionService.getTransactions(filter).subscribe({
       next: (res: TransactionResponse) => {
         this.transactions.set(res.items);
@@ -106,7 +114,9 @@ export class TransactionsComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error loading transactions:', err);
-        this.showToast('ไม่สามารถโหลดข้อมูลรายการได้ กรุณาลองใหม่อีกครั้ง', 'error');
+        const info = this.errorHandler.parse(err, 'transactions');
+        this.fetchError.set(info);
+        this.showToast(info.message, 'error');
         this.loading.set(false);
       },
     });
@@ -261,17 +271,21 @@ export class TransactionsComponent implements OnInit {
         error: (err) => {
           console.error('Error updating transaction:', err);
           this.isSavingEdit.set(false);
-          this.showToast('เกิดข้อผิดพลาดในการบันทึก กรุณาลองใหม่', 'error');
+          const info = this.errorHandler.parse(err, 'transactions');
+          this.modalError.set(info);
+          this.showToast(info.message, 'error');
         },
       });
   }
 
   // Delete Handlers
   openDeleteModal(item: TransactionItem) {
+    this.modalError.set(null);
     this.deletingItem.set(item);
   }
 
   closeDeleteModal() {
+    this.modalError.set(null);
     this.deletingItem.set(null);
   }
 
@@ -279,6 +293,7 @@ export class TransactionsComponent implements OnInit {
     const item = this.deletingItem();
     if (!item) return;
 
+    this.modalError.set(null);
     this.isDeleting.set(true);
     this.transactionService.deleteTransaction(item.type, item.id).subscribe({
       next: () => {
@@ -290,7 +305,9 @@ export class TransactionsComponent implements OnInit {
       error: (err) => {
         console.error('Error deleting transaction:', err);
         this.isDeleting.set(false);
-        this.showToast('เกิดข้อผิดพลาดในการลบรายการ', 'error');
+        const info = this.errorHandler.parse(err, 'transactions');
+        this.modalError.set(info);
+        this.showToast(info.message, 'error');
       },
     });
   }
@@ -325,7 +342,8 @@ export class TransactionsComponent implements OnInit {
       error: (err) => {
         console.error('Export error:', err);
         this.exporting.set(false);
-        this.showToast('เกิดข้อผิดพลาดในการส่งออกไฟล์ CSV', 'error');
+        const info = this.errorHandler.parse(err, 'transactions');
+        this.showToast(info.message, 'error');
       },
     });
   }

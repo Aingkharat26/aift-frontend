@@ -13,6 +13,8 @@ import {
   SicDialogComponent,
 } from 'sic-ng';
 import { CategoryIconComponent } from '../category-icon/category-icon.component';
+import { ErrorBannerComponent } from '../error-banner/error-banner.component';
+import { ErrorHandlerService, AppErrorInfo } from '../../services/error-handler.service';
 
 @Component({
   selector: 'app-categories',
@@ -24,12 +26,14 @@ import { CategoryIconComponent } from '../category-icon/category-icon.component'
     SicBadgeComponent,
     SicDialogComponent,
     CategoryIconComponent,
+    ErrorBannerComponent,
   ],
   templateUrl: './categories.component.html',
   styleUrl: './categories.component.css',
 })
 export class CategoriesComponent {
   categoryService = inject(CategoryService);
+  private errorHandler = inject(ErrorHandlerService);
 
   @ViewChild('fileInput') fileInput?: ElementRef<HTMLInputElement>;
 
@@ -42,6 +46,9 @@ export class CategoriesComponent {
   showDeleteModal = signal<boolean>(false);
   selectedCategory: Category | null = null;
   isDeleting = signal<boolean>(false);
+
+  formError = signal<AppErrorInfo | null>(null);
+  noticeInfo = signal<AppErrorInfo | null>(null);
 
   showNoticeModal = signal<boolean>(false);
   noticeMessage = '';
@@ -68,6 +75,7 @@ export class CategoriesComponent {
   }
 
   openCreateModal(): void {
+    this.formError.set(null);
     this.isEditing.set(false);
     this.editingId = null;
     this.formName = '';
@@ -79,10 +87,16 @@ export class CategoriesComponent {
 
   openEditModal(category: Category): void {
     if (category.isDefault) {
-      this.noticeMessage = 'ไม่สามารถแก้ไขหมวดหมู่เริ่มต้นของระบบได้';
+      this.noticeInfo.set({
+        title: 'ไม่สามารถแก้ไขได้',
+        message: 'ไม่สามารถแก้ไขหมวดหมู่เริ่มต้นของระบบได้',
+        suggestion: 'คุณสามารถสร้างหมวดหมู่ใหม่ที่กำหนดสีและไอคอนได้อิสระ',
+        canRetry: false,
+      });
       this.showNoticeModal.set(true);
       return;
     }
+    this.formError.set(null);
     this.isEditing.set(true);
     this.editingId = category.id;
     this.formName = category.name;
@@ -177,11 +191,17 @@ export class CategoriesComponent {
   submitForm(): void {
     const name = this.formName.trim();
     if (!name) {
-      this.noticeMessage = 'กรุณากรอกชื่อหมวดหมู่';
+      this.noticeInfo.set({
+        title: 'กรุณากรอกชื่อหมวดหมู่',
+        message: 'หมวดหมู่จำเป็นต้องมีชื่อเพื่อใช้ในการจัดประเภทค่าใช้จ่าย',
+        suggestion: 'เช่น ค่าอาหาร, กาแฟ, ท่องเที่ยว',
+        canRetry: false,
+      });
       this.showNoticeModal.set(true);
       return;
     }
 
+    this.formError.set(null);
     this.isSubmitting.set(true);
 
     if (this.isEditing() && this.editingId) {
@@ -198,9 +218,8 @@ export class CategoriesComponent {
           },
           error: (err) => {
             this.isSubmitting.set(false);
-            this.noticeMessage =
-              err.error?.message || 'ไม่สามารถแก้ไขหมวดหมู่ได้';
-            this.showNoticeModal.set(true);
+            const info = this.errorHandler.parse(err, 'categories');
+            this.formError.set(info);
           },
         });
     } else {
@@ -217,17 +236,22 @@ export class CategoriesComponent {
           },
           error: (err) => {
             this.isSubmitting.set(false);
-            this.noticeMessage =
-              err.error?.message || 'ไม่สามารถสร้างหมวดหมู่ได้';
-            this.showNoticeModal.set(true);
+            const info = this.errorHandler.parse(err, 'categories');
+            this.formError.set(info);
           },
         });
     }
   }
 
   openDeleteModal(category: Category): void {
+    this.noticeInfo.set(null);
     if (category.isDefault) {
-      this.noticeMessage = 'ไม่สามารถลบหมวดหมู่เริ่มต้นของระบบได้';
+      this.noticeInfo.set({
+        title: 'ไม่สามารถลบได้',
+        message: 'ไม่สามารถลบหมวดหมู่เริ่มต้นของระบบได้',
+        suggestion: 'หมวดหมู่เริ่มต้นถูกสงวนไว้สำหรับระบบความปลอดภัย',
+        canRetry: false,
+      });
       this.showNoticeModal.set(true);
       return;
     }
@@ -236,7 +260,12 @@ export class CategoriesComponent {
 
     // Strict requirement: If there are existing expenses, disallow deletion with explicit explanation!
     if ((category.expenseCount || 0) > 0) {
-      this.noticeMessage = `ไม่สามารถลบหมวดหมู่ "${category.name}" ได้ เนื่องจากยังมี ${category.expenseCount} รายการใช้จ่ายที่ผูกอยู่กับหมวดหมู่นี้ กรุณาแก้ไขหรือลบรายการเหล่านั้นก่อน`;
+      this.noticeInfo.set({
+        title: 'ไม่สามารถลบหมวดหมู่นี้ได้',
+        message: `ยังมี ${category.expenseCount} รายการใช้จ่ายที่ผูกอยู่กับหมวดหมู่ "${category.name}"`,
+        suggestion: 'กรุณาแก้ไขหรือลบรายการเหล่านั้นในหน้ารวมรายการก่อน จึงจะสามารถลบหมวดหมู่นี้ได้',
+        canRetry: false,
+      });
       this.showNoticeModal.set(true);
       return;
     }
@@ -256,8 +285,8 @@ export class CategoriesComponent {
       },
       error: (err) => {
         this.isDeleting.set(false);
-        this.noticeMessage =
-          err.error?.message || 'เกิดข้อผิดพลาดในการลบหมวดหมู่';
+        const info = this.errorHandler.parse(err, 'categories');
+        this.noticeInfo.set(info);
         this.showNoticeModal.set(true);
       },
     });

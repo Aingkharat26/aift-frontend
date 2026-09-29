@@ -12,6 +12,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ExpenseService } from '../../services/expense.service';
 import { IncomeService } from '../../services/income.service';
+import {
+  ErrorHandlerService,
+  AppErrorInfo,
+} from '../../services/error-handler.service';
+import { ErrorBannerComponent } from '../error-banner/error-banner.component';
 import { SicButtonComponent, SicDialogComponent } from 'sic-ng';
 
 export interface BatchItem {
@@ -28,6 +33,7 @@ export type StatusType = 'success' | 'warning' | 'error' | 'info';
   imports: [
     CommonModule,
     FormsModule,
+    ErrorBannerComponent,
     SicButtonComponent,
     SicDialogComponent,
   ],
@@ -53,9 +59,15 @@ export class ChatInputComponent implements OnInit, OnDestroy {
   batchItems = signal<BatchItem[]>([]);
   isBatchSaving = signal<boolean>(false);
 
-  // Status Modal State
+  // Status & Error Modal State
   showStatusModal = signal<boolean>(false);
-  statusData: { title: string; message: string; type: StatusType } = {
+  errorInfo = signal<AppErrorInfo | null>(null);
+  statusData: {
+    title: string;
+    message: string;
+    type: StatusType;
+    suggestion?: string;
+  } = {
     title: '',
     message: '',
     type: 'info',
@@ -75,6 +87,7 @@ export class ChatInputComponent implements OnInit, OnDestroy {
 
   private expenseService = inject(ExpenseService);
   private incomeService = inject(IncomeService);
+  private errorHandler = inject(ErrorHandlerService);
   private cdr = inject(ChangeDetectorRef);
 
   @ViewChild('receiptInput') receiptInput!: ElementRef<HTMLInputElement>;
@@ -142,14 +155,9 @@ export class ChatInputComponent implements OnInit, OnDestroy {
 
         this.recognition.onerror = (event: any) => {
           this.isListening.set(false);
-          if (event.error === 'not-allowed') {
-            this.showStatus(
-              'ไมโครโฟนถูกปิดกั้น',
-              'กรุณากดอนุญาตสิทธิ์การใช้งานไมโครโฟนในเบราว์เซอร์ เพื่อใช้งานระบบบันทึกด้วยเสียง',
-              'warning',
-            );
-          } else if (event.error !== 'no-speech') {
-            console.warn('SpeechRecognition error:', event.error);
+          if (event.error !== 'no-speech') {
+            const info = this.errorHandler.parse(event.error, 'voice');
+            this.showErrorInfo(info, 'warning');
           }
           this.cdr.detectChanges();
         };
@@ -169,11 +177,8 @@ export class ChatInputComponent implements OnInit, OnDestroy {
 
   toggleListening(target: 'expense' | 'income' = 'expense') {
     if (!this.speechSupported()) {
-      this.showStatus(
-        'เบราว์เซอร์ไม่รองรับเสียง',
-        'เบราว์เซอร์นี้ยังไม่รองรับระบบแปลงเสียงเป็นข้อความ แนะนำให้ใช้งานผ่าน Google Chrome, Microsoft Edge หรือ Safari',
-        'info',
-      );
+      const info = this.errorHandler.parse('SpeechRecognition is not supported', 'voice');
+      this.showErrorInfo(info, 'info');
       return;
     }
 
@@ -262,34 +267,8 @@ export class ChatInputComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         this.isLoading = false;
-        const errorMessage = err.error?.message || err.message;
-        const status = err.status;
-
-        if (errorMessage === 'AI_COULD_NOT_UNDERSTAND') {
-          this.showStatus(
-            'อ่านไม่ออก',
-            'รบกวนพิมพ์ใหม่อีกครั้ง เช่น "ข้าวผัด 50" หรือ "ข้าว 50 กาแฟ 40" นะครับ',
-            'warning',
-          );
-        } else if (status === 429) {
-          this.showStatus(
-            'โควตาเต็ม',
-            'ตอนนี้ AI ยุ่งมาก รบกวนรอสักครู่แล้วลองใหม่ครับ',
-            'warning',
-          );
-        } else if (status === 500) {
-          this.showStatus(
-            'ระบบขัดข้อง',
-            'AI ไม่สามารถประมวลผลข้อความนี้ได้ หรือระบบขัดข้องชั่วคราว',
-            'error',
-          );
-        } else {
-          this.showStatus(
-            'เกิดข้อผิดพลาด',
-            'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้ กรุณาลองใหม่อีกครั้ง',
-            'error',
-          );
-        }
+        const info = this.errorHandler.parse(err, 'chat');
+        this.showErrorInfo(info, 'error');
       },
     });
   }
@@ -326,6 +305,7 @@ export class ChatInputComponent implements OnInit, OnDestroy {
         'ข้อมูลไม่ครบถ้วน',
         'กรุณาระบุชื่อรายการและจำนวนเงินที่มากกว่า 0 อย่างน้อย 1 รายการ',
         'warning',
+        'ตรวจสอบช่องชื่อรายการและยอดเงินในตารางด้านบน'
       );
       return;
     }
@@ -345,11 +325,8 @@ export class ChatInputComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         this.isBatchSaving.set(false);
-        this.showStatus(
-          'เกิดข้อผิดพลาด',
-          'ไม่สามารถบันทึกชุดรายการนี้ได้ กรุณาลองใหม่อีกครั้ง',
-          'error',
-        );
+        const info = this.errorHandler.parse(err, 'transactions');
+        this.showErrorInfo(info, 'error');
       },
     });
   }
@@ -386,6 +363,7 @@ export class ChatInputComponent implements OnInit, OnDestroy {
               'อ่านได้บางส่วน',
               'ไม่พบยอดรวมในใบเสร็จนี้ สามารถแก้ไขในรายการวันนี้ได้ครับ',
               'warning',
+              'ตรวจสอบภาพถ่ายว่าแสดงตัวเลขยอดเงินชัดเจนหรือไม่'
             );
           } else {
             this.showStatus(
@@ -397,40 +375,15 @@ export class ChatInputComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           this.isScanning = false;
-          const errorMessage = err.error?.message || err.message;
-          const status = err.status;
-
-          if (errorMessage === 'AI_COULD_NOT_UNDERSTAND') {
-            this.showStatus(
-              'อ่านไม่ออก',
-              'ไม่พบข้อมูลที่ชัดเจนในรูปนี้ กรุณาถ่ายภาพใบเสร็จให้ชัดเจนขึ้นแล้วลองใหม่ครับ',
-              'warning',
-            );
-          } else if (status === 413) {
-            this.showStatus(
-              'รูปใหญ่เกินไป',
-              'กรุณาใช้รูปถ่ายที่มีขนาดเล็กลง (ไม่เกิน ~10MB)',
-              'warning',
-            );
-          } else if (status === 429) {
-            this.showStatus(
-              'โควตาเต็ม',
-              'ตอนนี้ AI ยุ่งมาก รบกวนรอสักครู่แล้วลองใหม่ครับ',
-              'warning',
-            );
-          } else {
-            this.showStatus(
-              'เกิดข้อผิดพลาด',
-              'ไม่สามารถอ่านใบเสร็จได้ กรุณาลองใหม่อีกครั้ง',
-              'error',
-            );
-          }
+          const info = this.errorHandler.parse(err, 'receipt');
+          this.showErrorInfo(info, 'error');
         },
       });
     };
     reader.onerror = () => {
       this.isScanning = false;
-      this.showStatus('เกิดข้อผิดพลาด', 'ไม่สามารถอ่านไฟล์รูปได้', 'error');
+      const info = this.errorHandler.parse('FILE_READ_ERROR', 'receipt');
+      this.showErrorInfo(info, 'error');
     };
     reader.readAsDataURL(file);
   }
@@ -454,6 +407,7 @@ export class ChatInputComponent implements OnInit, OnDestroy {
               'บันทึกเรียบร้อย',
               'แต่ระบบไม่พบจำนวนเงินในข้อความนี้ สามารถแก้ไขในรายการวันนี้ได้ครับ',
               'warning',
+              'ลองระบุเป็น เช่น "เงินเดือน 30000" หรือ "ขายของได้ 500"'
             );
           } else {
             this.showStatus('บันทึกเรียบร้อย', 'เพิ่มรายรับเรียบร้อยแล้ว', 'success');
@@ -461,30 +415,27 @@ export class ChatInputComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           this.isIncomeLoading = false;
-          const errorMessage = err.error?.message || err.message;
-          const status = err.status;
-
-          if (errorMessage === 'AI_COULD_NOT_UNDERSTAND') {
-            this.showStatus(
-              'อ่านไม่ออก',
-              'รบกวนพิมพ์ใหม่อีกครั้ง เช่น "เงินเดือน 50000" หรือ "ขายของ 800" นะครับ',
-              'warning',
-            );
-          } else if (status === 429) {
-            this.showStatus(
-              'โควตาเต็ม',
-              'ตอนนี้ AI ยุ่งมาก รบกวนรอสักครู่แล้วลองใหม่ครับ',
-              'warning',
-            );
-          } else {
-            this.showStatus('เกิดข้อผิดพลาด', 'ไม่สามารถบันทึกรายรับได้', 'error');
-          }
+          const info = this.errorHandler.parse(err, 'chat');
+          this.showErrorInfo(info, 'error');
         },
       });
   }
 
-  showStatus(title: string, message: string, type: StatusType) {
-    this.statusData = { title, message, type };
+  showErrorInfo(info: AppErrorInfo, type: StatusType = 'error') {
+    this.errorInfo.set(info);
+    this.statusData = {
+      title: info.title,
+      message: info.message,
+      type,
+      suggestion: info.suggestion,
+    };
+    this.cdr.detectChanges();
+    this.showStatusModal.set(true);
+  }
+
+  showStatus(title: string, message: string, type: StatusType, suggestion?: string) {
+    this.errorInfo.set(null);
+    this.statusData = { title, message, type, suggestion };
     this.cdr.detectChanges();
     this.showStatusModal.set(true);
   }

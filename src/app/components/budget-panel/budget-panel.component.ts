@@ -14,6 +14,11 @@ import {
 } from '../../services/budget.service';
 import { ExpenseService } from '../../services/expense.service';
 import {
+  ErrorHandlerService,
+  AppErrorInfo,
+} from '../../services/error-handler.service';
+import { ErrorBannerComponent } from '../error-banner/error-banner.component';
+import {
   SicButtonComponent,
   SicBadgeComponent,
   SicProgressBarComponent,
@@ -27,6 +32,7 @@ import {
   imports: [
     CommonModule,
     FormsModule,
+    ErrorBannerComponent,
     SicButtonComponent,
     SicBadgeComponent,
     SicProgressBarComponent,
@@ -39,11 +45,19 @@ import {
 export class BudgetPanelComponent implements OnInit {
   private budgetService = inject(BudgetService);
   private expenseService = inject(ExpenseService);
+  private errorHandler = inject(ErrorHandlerService);
   private cdr = inject(ChangeDetectorRef);
 
   showAddDialog = signal<boolean>(false);
   showRecommendDialog = signal<boolean>(false);
   showConfirmDialog = signal<boolean>(false);
+
+  panelError = signal<AppErrorInfo | null>(null);
+  addBudgetError = signal<AppErrorInfo | null>(null);
+  recommendError = signal<AppErrorInfo | null>(null);
+  deleteError = signal<AppErrorInfo | null>(null);
+  isDeleting = signal<boolean>(false);
+  isSaving = signal<boolean>(false);
 
   categories = [
     'อาหาร',
@@ -97,6 +111,7 @@ export class BudgetPanelComponent implements OnInit {
   reloadStatus() {
     const y = this.currentDate.getFullYear();
     const m = this.currentDate.getMonth() + 1;
+    this.panelError.set(null);
     this.budgetService.getStatus(y, m).subscribe({
       next: (res) => {
         this.statuses = Array.isArray(res) ? res : [];
@@ -104,8 +119,11 @@ export class BudgetPanelComponent implements OnInit {
         this.prevStatuses = this.statuses;
         this.cdr.detectChanges();
       },
-      error: () => {
+      error: (err) => {
         this.statuses = [];
+        if (err?.status !== 401) {
+          this.panelError.set(this.errorHandler.parse(err, 'budgets'));
+        }
         this.cdr.detectChanges();
       },
     });
@@ -178,6 +196,7 @@ export class BudgetPanelComponent implements OnInit {
   }
 
   openAddDialog() {
+    this.addBudgetError.set(null);
     // ตั้งค่าเริ่มต้นเป็นหมวดที่ยังไม่มีงบ
     const list = Array.isArray(this.statuses) ? this.statuses : [];
     const used = new Set(list.map((s) => s.category));
@@ -193,20 +212,25 @@ export class BudgetPanelComponent implements OnInit {
     const limit = Number(this.newBudget.limit);
     if (!this.newBudget.category || isNaN(limit) || limit <= 0) return;
 
+    this.addBudgetError.set(null);
+    this.isSaving.set(true);
     this.budgetService.saveBudget(this.newBudget.category, limit).subscribe({
       next: () => {
+        this.isSaving.set(false);
         this.showAddDialog.set(false);
         this.reloadStatus();
       },
       error: (err) => {
+        this.isSaving.set(false);
         if (err?.status !== 401) {
-          alert('เกิดข้อผิดพลาดในการตั้งงบประมาณ');
+          this.addBudgetError.set(this.errorHandler.parse(err, 'budgets'));
         }
       },
     });
   }
 
   deleteBudget(item: BudgetStatus) {
+    this.deleteError.set(null);
     this.selectedForDelete = item;
     this.showConfirmDialog.set(true);
   }
@@ -215,19 +239,27 @@ export class BudgetPanelComponent implements OnInit {
     if (!this.selectedForDelete) return;
 
     const id = this.selectedForDelete.id;
-    this.selectedForDelete = null;
-    this.showConfirmDialog.set(false);
+    this.deleteError.set(null);
+    this.isDeleting.set(true);
+
     this.budgetService.deleteBudget(id).subscribe({
-      next: () => this.reloadStatus(),
+      next: () => {
+        this.isDeleting.set(false);
+        this.selectedForDelete = null;
+        this.showConfirmDialog.set(false);
+        this.reloadStatus();
+      },
       error: (err) => {
+        this.isDeleting.set(false);
         if (err?.status !== 401) {
-          alert('เกิดข้อผิดพลาดในการลบงบประมาณ');
+          this.deleteError.set(this.errorHandler.parse(err, 'budgets'));
         }
       },
     });
   }
 
   openRecommendDialog() {
+    this.recommendError.set(null);
     this.showRecommendDialog.set(true);
     this.recommendationsLoading = true;
     this.recommendations = [];
@@ -239,15 +271,19 @@ export class BudgetPanelComponent implements OnInit {
         this.recommendationsLoading = false;
         this.cdr.detectChanges();
       },
-      error: () => {
+      error: (err) => {
         this.recommendations = [];
         this.recommendationsLoading = false;
+        if (err?.status !== 401) {
+          this.recommendError.set(this.errorHandler.parse(err, 'budgets'));
+        }
         this.cdr.detectChanges();
       },
     });
   }
 
   applyRecommendation(rec: BudgetRecommendation) {
+    this.recommendError.set(null);
     this.budgetService
       .saveBudget(rec.category, rec.recommendedBudget)
       .subscribe({
@@ -257,7 +293,7 @@ export class BudgetPanelComponent implements OnInit {
         },
         error: (err) => {
           if (err?.status !== 401) {
-            alert('เกิดข้อผิดพลาดในการบันทึกงบประมาณ');
+            this.recommendError.set(this.errorHandler.parse(err, 'budgets'));
           }
         },
       });
