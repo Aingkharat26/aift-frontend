@@ -5,7 +5,7 @@
   <title>AIFT</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#0f172a">
+  <meta name="theme-color" content="#0a0f1a" id="meta-theme-color">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="AIFT">
@@ -15,7 +15,7 @@
   <script>
     // ตั้งธีมก่อนแอปโหลด เพื่อไม่ให้จอวาบ (อ่านค่าที่ผู้ใช้เคยเลือกไว้)
     (function () {
-      var t = localStorage.getItem('sic-ng-theme-mode') || localStorage.getItem('aift-theme');
+      var t = localStorage.getItem('sic-ng-theme') || localStorage.getItem('aift-theme');
       if (t !== 'dark' && t !== 'light') {
         t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
       }
@@ -24,6 +24,10 @@
         document.documentElement.classList.add('dark');
       } else {
         document.documentElement.classList.remove('dark');
+      }
+      var metaTheme = document.getElementById('meta-theme-color');
+      if (metaTheme) {
+        metaTheme.setAttribute('content', t === 'dark' ? '#0a0f1a' : '#f8fafc');
       }
     })();
   </script>

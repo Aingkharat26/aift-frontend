@@ -1,0 +1,32 @@
+<div
+  class="splash-overlay"
+  *ngIf="isVisible()"
+  [class.dark-mode]="themeService.isDark()"
+  [class.light-mode]="!themeService.isDark()"
+  [class.fading-out]="isFadingOut()"
+  (click)="dismissImmediately()"
+  role="presentation"
+>
+  <div class="splash-ambient-glow"></div>
+  <div class="splash-content">
+    <div class="splash-icon-wrapper">
+      <div class="splash-halo"></div>
+      <img
+        src="aift_logo/aift_logo.png"
+        alt="AIFT Logo"
+        class="splash-logo-img"
+      />
+    </div>
+
+    <div class="splash-text-group">
+      <h1 class="splash-title">AI Finance Tracker</h1>
+      <p class="splash-subtitle">Smart Financial AI</p>
+    </div>
+
+    <div class="splash-loader" aria-label="Loading">
+      <span class="splash-dot dot-1"></span>
+      <span class="splash-dot dot-2"></span>
+      <span class="splash-dot dot-3"></span>
+    </div>
+  </div>
+</div>

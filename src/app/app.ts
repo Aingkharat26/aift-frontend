@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from './services/auth.service';
 import { AdminModelLimitsComponent } from './components/admin-model-limits/admin-model-limits.component';
+import { SplashScreenComponent } from './components/splash-screen/splash-screen.component';
 import { SicBadgeComponent, SicThemeService } from 'sic-ng';
 
 @Component({
@@ -15,8 +16,10 @@ import { SicBadgeComponent, SicThemeService } from 'sic-ng';
     RouterLinkActive,
     AdminModelLimitsComponent,
     SicBadgeComponent,
+    SplashScreenComponent,
   ],
   template: `
+    <app-splash-screen></app-splash-screen>
     <nav class="top-nav">
       <div class="nav-inner">
         <div class="nav-logo" routerLink="/" title="AI Finance Tracker">
@@ -168,7 +171,12 @@ export class App {
         document.documentElement.setAttribute('data-theme', mode);
         document.documentElement.classList.toggle('dark', isDark);
         localStorage.setItem('aift-theme', mode);
+        localStorage.setItem('sic-ng-theme', mode);
         localStorage.setItem('sic-ng-theme-mode', mode);
+        const metaTheme = document.getElementById('meta-theme-color');
+        if (metaTheme) {
+          metaTheme.setAttribute('content', isDark ? '#0a0f1a' : '#f8fafc');
+        }
       }
     });
   }

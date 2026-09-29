@@ -14,6 +14,64 @@
 
 ## 🕒 บันทึกรายการเปลี่ยนแปลง (Change History)
 
+### 📅 2026-09-29 16:50:00 (Local Time)
+**ประเภท:** `[Feature / UI / Theme]` `[Frontend]`  
+**หัวข้อ:** รองรับ Dynamic Theme ใน Animated Splash Screen (ปรับสีหน้าจอต้อนรับและ Status Bar ตาม Dark Mode / Light Mode อัตโนมัติ)  
+**ปัญหาหรือความต้องการ (Issue / Requirement):**
+- ผู้ใช้ต้องการให้หน้าจอ Splash Screen เปลี่ยนสีตามธีมที่เลือกไว้ เพื่อความกลมกลืน (หากใช้ธีมสว่าง เมื่อเปิดแอปจะเป็นพื้นหลังสีขาวนวล `#f8fafc` สะอาดตา หากใช้ธีมมืด จะเป็นโทน Obsidian `#0a0f1a` เรืองแสงพรีเมียม)
+**สิ่งที่แก้ไข (Changes Detail):**
+1. **เพิ่ม Dynamic Theme Binding ใน `SplashScreenComponent` (`splash-screen.component.ts` & `.html`):**
+   - Inject `SicThemeService` เพื่ออ่านสถานะธีมแบบเรียลไทม์
+   - ผูกคลาส `[class.dark-mode]="themeService.isDark()"` และ `[class.light-mode]="!themeService.isDark()"` บน overlay
+2. **ออกแบบและปรับแต่งสไตล์ Light Mode ใน `splash-screen.component.scss`:**
+   - พื้นหลังสีขาวนวล `#f8fafc`
+   - เอฟเฟกต์รัศมีและแสงกึ่งกลางจอ (Ambient Glow & Halo) โทนฟ้านุ่มนวลระดับ 12-18%
+   - เงาและขอบโลโก้ทรงกลมปรับโทนให้คมชัดบนพื้นสว่าง (`box-shadow: 0 12px 28px rgba(14, 165, 233, 0.22)`)
+   - ข้อความชื่อระบบ "AI Finance Tracker" เปลี่ยนเป็นข้อความไล่เฉดเข้ม Dark Slate (`#0f172a` ถึง `#334155`) และสโลแกนสี `#64748b`
+   - จุดโหลด 3 จุด (Pulsing Dots) ปรับสีเป็น Deep Blue `#0284c7` พร้อมแอนิเมชัน `dotPulseLight`
+3. **ปรับแต่งแถบสถานะมือถือ (Status Bar Meta Theme Color) ใน `index.html` และ `app.ts`:**
+   - ซิงก์ค่า `<meta name="theme-color">` อัตโนมัติตามโหมดธีมที่เลือก (`#0a0f1a` สำหรับ Dark Mode และ `#f8fafc` สำหรับ Light Mode) ตั้งแต่ก่อนแอปโหลดเสร็จ
+   - ซิงก์ค่าคีย์ `sic-ng-theme` ใน `localStorage` อย่างถูกต้อง
+4. **การตรวจสอบและทดสอบ (Verification & Testing):**
+   - รันคำสั่ง `npm run build` ผ่านสมบูรณ์ 100% (Exit code 0)
+   - ทดสอบจับภาพหน้าจอจริงด้วย Playwright บนทั้ง Mobile และ Desktop ในทั้งสองโหมด ยืนยันการสลับสีและการแสดงผลที่คมชัดระดับพรีเมียม
+**ไฟล์ที่แก้ไข (Affected Files):**
+- `aift-frontend/src/app/components/splash-screen/splash-screen.component.ts`
+- `aift-frontend/src/app/components/splash-screen/splash-screen.component.html`
+- `aift-frontend/src/app/components/splash-screen/splash-screen.component.scss`
+- `aift-frontend/src/app/app.ts`
+- `aift-frontend/src/index.html`
+- `aift-frontend/CHANGELOG.md`
+- `CHANGELOG.md`
+
+### 📅 2026-09-29 16:30:00 (Local Time)
+**ประเภท:** `[Feature / UI / Mobile]` `[Frontend]`  
+**หัวข้อ:** เพิ่มระบบ Full Brand Animated Splash Screen (แบบที่ 3) และแก้ไขปัญหาไอคอนโดนตีกรอบตัดขอบบน PWA Splash Screen ของมือถือ  
+**ปัญหาหรือความต้องการ (Issue / Requirement):**
+- ผู้ใช้เลือกแบบที่ 3 (Full Brand Splash Screen) เพื่อให้หน้าจอตอนกดเข้าแอปบนมือถือมีความหรูหรา เป็นมืออาชีพ สไตล์ FinTech ระดับสากล
+- แก้ปัญหาที่ระบบ Android นำกรอบสี่เหลี่ยมมน (Squircle) มาครอบทับไอคอนและตัดขอบวงแหวนนีออนด้านข้าง
+**สิ่งที่แก้ไข (Changes Detail):**
+1. **สร้างคอมโพเนนต์หน้าจอต้อนรับแบบแอนิเมชัน (`SplashScreenComponent`):**
+   - ออกแบบหน้าจอ Overlay พื้นหลังโทน Obsidian Dark (`#0a0f1a`) พร้อมเอฟเฟกต์แสง Ambient Glow สีฟ้าเรืองแสงกึ่งกลางจอ
+   - แสดงไอคอนทรงกลมพร้อมวงแหวนรัศมีส่องแสง (Halo Pulse)
+   - แสดงชื่อระบบ "AI Finance Tracker" และสโลแกน "Smart Financial AI" อย่างประณีต
+   - แสดงจุดโหลดนีออนสีฟ้า (Pulsing Dots) ที่มีแอนิเมชันเคลื่อนไหวนุ่มนวล
+   - มีระบบ Transition Fade-out ออกอย่างนุ่มนวลหลังแสดง 2.0 วินาที (พร้อมฟังก์ชันแตะหน้าจอเพื่อข้ามทันที) และแสดงผลในทุกการเปิดแอป/รีเฟรชหน้าจอ Desktop & Mobile โดยไม่รบกวนการสลับหน้าระหว่างใช้งาน
+2. **แก้ไขการแสดงผล Native PWA Splash Screen ใน Web Manifest (`manifest.webmanifest` & `index.html`):**
+   - เปลี่ยน `purpose: "any maskable"` เป็น `purpose: "any"` เพื่อไม่ให้ Android บังคับครอบตัดกรอบสี่เหลี่ยมมนตัดขอบวงแหวน
+   - ปรับ `background_color` และ `theme_color` เป็น `#0a0f1a` ให้กลืนเป็นเนื้อเดียวกับหน้าจอแอป
+3. **การตรวจสอบและทดสอบ (Verification & Testing):**
+   - รันคำสั่ง `npm run build` ผ่านสมบูรณ์ 100% (Exit code 0)
+   - ทดสอบจับภาพหน้าจอจริงด้วย Playwright ทั้ง Desktop และ Mobile 360px ยืนยันว่าหน้าจอต้อนรับและแอนิเมชัน Fade-out ทำงานได้อย่างสมบูรณ์แบบ
+**ไฟล์ที่แก้ไข (Affected Files):**
+- `aift-frontend/src/app/components/splash-screen/splash-screen.component.ts`
+- `aift-frontend/src/app/components/splash-screen/splash-screen.component.html`
+- `aift-frontend/src/app/components/splash-screen/splash-screen.component.scss`
+- `aift-frontend/src/app/app.ts`
+- `aift-frontend/public/manifest.webmanifest`
+- `aift-frontend/CHANGELOG.md`
+- `CHANGELOG.md`
+
 ### 📅 2026-09-29 15:45:00 (Local Time)
 **ประเภท:** `[Feature / UI / Brand]` `[Frontend]`  
 **หัวข้อ:** ปรับรูปทรงไอคอนแอปและโลโก้ใน Header Nav เป็นทรงกลม (Circular Mobile App Icon) สไตล์แอปมือถือ  
