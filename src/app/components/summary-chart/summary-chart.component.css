@@ -137,27 +137,28 @@
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   :host ::ng-deep .summary-card > .sic-card__content {
-    padding: 12px 14px;
+    padding: 10px 10px;
   }
 
   .chart-header {
-    margin-bottom: 8px;
+    margin-bottom: 6px;
   }
 
   .title {
-    font-size: 1.1rem;
+    font-size: 1.05rem;
   }
 
   .stats-grid {
-    gap: 6px;
+    gap: 4px;
     margin-bottom: 6px;
   }
 
   .stat-card {
     padding: 6px 4px;
     border-radius: 8px;
+    min-width: 0;
   }
 
   .stat-card .label {
@@ -173,8 +174,38 @@
   }
 
   .chart-wrapper {
-    min-height: 130px;
-    max-height: 180px;
+    min-height: 160px;
+    height: 180px;
+    max-height: 220px;
+    width: 100%;
+    position: relative;
+  }
+}
+
+@media (max-width: 380px) {
+  :host ::ng-deep .summary-card > .sic-card__content {
+    padding: 8px 8px;
+  }
+
+  .title {
+    font-size: 0.95rem;
+  }
+
+  .stat-card {
+    padding: 4px 2px;
+  }
+
+  .stat-card .label {
+    font-size: 0.62rem;
+  }
+
+  .stat-card .value {
+    font-size: 0.78rem;
+  }
+
+  .chart-wrapper {
+    min-height: 150px;
+    height: 170px;
   }
 }
 

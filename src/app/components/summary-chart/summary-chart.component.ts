@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, inject, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, inject, OnInit, ViewChild } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
@@ -45,11 +45,12 @@ export class SummaryChartComponent implements OnInit {
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: 'right',
+        position: typeof window !== 'undefined' && window.innerWidth < 640 ? 'bottom' : 'right',
         labels: {
-          padding: 10,
+          padding: 8,
           usePointStyle: true,
-          font: { family: 'Inter, sans-serif', size: 10 }
+          boxWidth: 8,
+          font: { family: 'Kanit, Inter, sans-serif', size: 10 }
         }
       }
     }
@@ -72,7 +73,26 @@ export class SummaryChartComponent implements OnInit {
   private lastLoadedMonth?: number;
   private lastLoadedYear?: number;
 
+  @HostListener('window:resize')
+  onResize() {
+    this.updateLegendPosition();
+  }
+
+  private updateLegendPosition() {
+    if (this.pieChartOptions?.plugins?.legend) {
+      const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+      const targetPos = isMobile ? 'bottom' : 'right';
+      if (this.pieChartOptions.plugins.legend.position !== targetPos) {
+        this.pieChartOptions.plugins.legend.position = targetPos;
+        if (this.chart) {
+          this.chart.update();
+        }
+      }
+    }
+  }
+
   ngOnInit() {
+    this.updateLegendPosition();
     this.expenseService.selectedDate$.subscribe(date => {
       const m = date.getMonth();
       const y = date.getFullYear();

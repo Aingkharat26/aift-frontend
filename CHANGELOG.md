@@ -14,6 +14,46 @@
 
 ## 🕒 บันทึกรายการเปลี่ยนแปลง (Change History)
 
+### 📅 2026-09-29 13:40:00 (Local Time)
+**ประเภท:** `[Fix / UI / Responsive]` `[Frontend]`  
+**หัวข้อ:** ปรับปรุงความยืดหยุ่นของหน้าจอแดชบอร์ดให้รองรับมือถือทุกขนาด (Multi-Screen Responsive Support: 320px – 430px+)  
+**ปัญหาหรือความต้องการ (Issue / Requirement):**
+- ผู้ใช้เปิดใช้งานจริงบนมือถือ Android และพบว่าหน้าจอมือถือขนาด 360px – 380px เกิดปัญหา Horizontal Overflow
+- แถบอินพุต AI ด้านล่างยาวเกินหน้าจอ ดันปุ่ม "บันทึก" ทะลุขอบขวาไป (เห็นเพียงขอบปุ่มตัว "บ...") ผู้ใช้กดบันทึกไม่ได้
+- หัวการ์ด `💳 รายจ่าย (AI)` แสดงผลซ้ำซ้อนกับ Tab Switcher ด้านบน
+- กราฟสรุป Donut Chart ถูกตัดขอบขวาและบดบัง Legend รายการหมวดหมู่ด้านล่าง (เช่น "บิล")
+**สิ่งที่แก้ไข (Changes Detail):**
+1. **จัดโครงสร้าง CSS Cascade ใน `chat-input.component.css` ใหม่:**
+   - ย้าย `@media (max-width: 768px)` ไปไว้ด้านล่างของ Base Styles แก้ปัญหา CSS Cascade ทับกฎของ Mobile
+   - ซ่อน `.card-header` ซ้ำซ้อนบนมือถืออย่างสมบูรณ์ (`display: none !important`)
+   - กำหนดให้ `.chat-input` ใช้ `flex: 1 1 0 !important; width: 0 !important; min-width: 0 !important;` เพื่อให้ย่อ-ขยายตามความกว้างหน้าจอจริงได้อย่างอิสระ ไม่ดันปุ่มบันทึกหลุดขอบ
+   - เพิ่ม Breakpoint พิเศษสำหรับหน้าจอมือถือขนาดเล็ก `<= 380px` (เช่น Android 360px) และ `<= 330px` (หน้าจอแคบพิเศษ) ให้ปรับขนาดปุ่ม Tool-btn เป็น 34px/32px และแปลงเป็นปุ่มส่งแบบไอคอนเมื่อจอแคบมาก
+2. **ปรับปรุงข้อความ Placeholder และเนื้อหาปุ่มบันทึก (`chat-input.component.html`):**
+   - ปรับ Placeholder ให้สั้นกระชับ (`พิมพ์หรือกดไมค์ (เช่น ข้าว 50)`) ลด Intrinsic Width ของ Browser Input
+   - ห่อข้อความปุ่มบันทึกด้วย `<span class="btn-text">` และเพิ่ม SVG `<svg class="btn-send-icon">` รองรับการปรับเปลี่ยน Responsive
+3. **ปรับปรุงกราฟสรุป Donut Chart ให้ตอบสนองความกว้างหน้าจอ (`summary-chart.component.ts`, `summary-chart.component.css`):**
+   - เพิ่มระบบตรวจจับขนาดหน้าจอ (`HostListener('window:resize')`) ปรับตำแหน่ง Legend ของกราฟเป็น `'bottom'` อัตโนมัติเมื่อหน้าจอน้อยกว่า 640px เพื่อไม่ให้เบียดกับตัวกราฟ
+   - ปรับความสูง `.chart-wrapper` ให้พอดี (160px – 180px) ทำให้แสดงผลครบทุกหมวดหมู่ ไม่โดนขอบการ์ดตัดทอน
+4. **ป้องกัน Horizontal Overflow ทั่วทั้งระบบ (`styles.scss`, `main-dashboard.component.css`, `app.scss`):**
+   - เพิ่ม `html, body { max-width: 100%; overflow-x: hidden; }`
+   - ปรับ Padding ของ `.dashboard-wrapper` และ `.bottom-section` ให้กระชับบนหน้าจอเล็ก
+   - เพิ่มการปรับตัวของ Top Navbar User Badge บนหน้าจอขนาด `<= 340px`
+5. **Verification & Testing:**
+   - ทดสอบรัน Automated Playwright Viewport Testing บนขนาด 360px (Standard Android) และ 390px (Standard iPhone)
+   - ผลการวัด: `body.scrollWidth` เท่ากับ `innerWidth` (360px / 390px) พอดี 100% ไม่มี Horizontal Overflow
+   - ปุ่มบันทึกแสดงผลครบถ้วน ขอบขวาอยู่ที่ 347px บนจอ 360px (มีระยะขอบสวยงาม 13px)
+   - ทดสอบทั้ง Light Theme และ Dark Theme สวยงามคมชัด
+   - ตรวจสอบผ่านการ Build ด้วย `cmd.exe /c "npm run build"` สำเร็จสมบูรณ์ (Exit code 0)
+**ไฟล์ที่แก้ไข (Affected Files):**
+- `src/app/components/chat-input/chat-input.component.html`
+- `src/app/components/chat-input/chat-input.component.css`
+- `src/app/components/summary-chart/summary-chart.component.ts`
+- `src/app/components/summary-chart/summary-chart.component.css`
+- `src/app/components/main-dashboard/main-dashboard.component.css`
+- `src/app/app.scss`
+- `src/styles.scss`
+- `CHANGELOG.md`
+
 ### 📅 2026-09-29 12:00:00 (Local Time)
 **ประเภท:** `[Fix / UI / Responsive]` `[Frontend]`  
 **หัวข้อ:** ปรับแต่งขนาดและความสูงของปุ่มบนมือถือให้เท่ากันและสมดุล (ปุ่มออกจากระบบ, ปุ่มสแกนใบเสร็จ, ไมค์, บันทึก, และแท็บสลับโหมด)  

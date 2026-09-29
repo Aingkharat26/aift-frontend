@@ -88,7 +88,7 @@
         type="text"
         [(ngModel)]="text"
         (keyup.enter)="onSubmit()"
-        [placeholder]="isListening() && listeningTarget === 'expense' ? 'กำลังฟังเสียงของคุณ... พูดได้เลย' : 'พิมพ์หรือกดไมค์พูด (เช่น ข้าว 50 กาแฟ 40)'"
+        [placeholder]="isListening() && listeningTarget === 'expense' ? 'กำลังฟังเสียง... พูดได้เลย' : 'พิมพ์หรือกดไมค์ (เช่น ข้าว 50)'"
         [disabled]="isLoading || isScanning"
         class="chat-input"
         [class.input-listening]="isListening() && listeningTarget === 'expense'"
@@ -102,8 +102,13 @@
         (click)="onSubmit()"
         [disabled]="isLoading || isScanning || !text.trim()"
         [loading]="isLoading"
+        title="บันทึกรายจ่าย"
       >
-        บันทึก
+        <span class="btn-text">บันทึก</span>
+        <svg class="btn-send-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"/>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
       </sic-button>
     </div>
   </div>
@@ -143,7 +148,7 @@
         type="text"
         [(ngModel)]="incomeText"
         (keyup.enter)="onAddIncome()"
-        [placeholder]="isListening() && listeningTarget === 'income' ? 'กำลังฟังเสียงของคุณ... พูดได้เลย' : 'พิมพ์หรือกดไมค์พูด (เช่น ขายของ 500)'"
+        [placeholder]="isListening() && listeningTarget === 'income' ? 'กำลังฟังเสียง... พูดได้เลย' : 'พิมพ์หรือกดไมค์ (เช่น ขายของ 500)'"
         [disabled]="isIncomeLoading"
         class="chat-input"
         [class.input-listening]="isListening() && listeningTarget === 'income'"
@@ -157,8 +162,13 @@
         (click)="onAddIncome()"
         [disabled]="isIncomeLoading || !incomeText.trim()"
         [loading]="isIncomeLoading"
+        title="บันทึกรายรับ"
       >
-        บันทึก
+        <span class="btn-text">บันทึก</span>
+        <svg class="btn-send-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"/>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
       </sic-button>
     </div>
   </div>

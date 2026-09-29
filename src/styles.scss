@@ -202,7 +202,10 @@ select,
   padding: 0;
 }
 
+html,
 body {
+  max-width: 100%;
+  overflow-x: hidden;
   font-family: 'Kanit', 'Inter', sans-serif;
   background-color: var(--bg-color);
   color: var(--text-color);
