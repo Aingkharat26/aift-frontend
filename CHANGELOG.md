@@ -14,6 +14,32 @@
 
 ## 🕒 บันทึกรายการเปลี่ยนแปลง (Change History)
 
+### 📅 2026-09-29 15:45:00 (Local Time)
+**ประเภท:** `[Feature / UI / Brand]` `[Frontend]`  
+**หัวข้อ:** ปรับรูปทรงไอคอนแอปและโลโก้ใน Header Nav เป็นทรงกลม (Circular Mobile App Icon) สไตล์แอปมือถือ  
+**ปัญหาหรือความต้องการ (Issue / Requirement):**
+- ผู้ใช้ต้องการให้รูปไอคอนมีลักษณะเป็นทรงกลมเหมือนไอคอนแอปพลิเคชันบนมือถือ (เช่น Android Round Adaptive Icon และแอป FinTech ชั้นนำ)
+**สิ่งที่แก้ไข (Changes Detail):**
+1. **ออกแบบและสร้างรูปไอคอนทรงกลมความละเอียดสูง (`public/aift_logo/`):**
+   - สร้างภาพไอคอนทรงกลมพื้นหลังโปร่งใส (Transparent Circular Badge) ขนาด 1024x1024, 512x512, 192x192 พร้อมขอบไทเทเนียมทรงกลมเงางามและเส้นวงแหวนนีออนเรืองแสง
+   - อัปเดตไฟล์ `aift_logo.png`, `aift_logo_dark.png`, `aift_logo_light.png` และ `favicon.ico`
+2. **ปรับแต่งสไตล์ใน Header Nav (`app.scss`):**
+   - กำหนด `.nav-logo-img` ให้เป็น `border-radius: 50%` บนทุก Breakpoint (Desktop, Tablet, Mobile 360px, 340px)
+   - เพิ่มมิติรัศมีเรืองแสงทรงกลม (`box-shadow: 0 0 10px rgba(14, 165, 233, 0.35)`) และ Hover Animation นุ่มนวล
+3. **การตรวจสอบและทดสอบ (Verification & Testing):**
+   - รันคำสั่ง `npm run build` ผ่านสมบูรณ์ 100% (Exit code 0)
+   - ทดสอบจับภาพหน้าจอผ่าน Playwright ทั้งใน Light Mode, Dark Mode และมุมมองมือถือ 360px
+**ไฟล์ที่แก้ไข (Affected Files):**
+- `aift-frontend/public/aift_logo/aift_logo.png`
+- `aift-frontend/public/aift_logo/aift_logo_192.png`
+- `aift-frontend/public/aift_logo/aift_logo_512.png`
+- `aift-frontend/public/aift_logo/aift_logo_dark.png`
+- `aift-frontend/public/aift_logo/aift_logo_light.png`
+- `aift-frontend/public/favicon.ico`
+- `aift-frontend/src/app/app.scss`
+- `aift-frontend/CHANGELOG.md`
+- `CHANGELOG.md`
+
 ### 📅 2026-09-29 15:30:00 (Local Time)
 **ประเภท:** `[Feature / UI / Brand]` `[Frontend]`  
 **หัวข้อ:** อัปเดตรูปไอคอนแบรนด์ใหม่สไตล์ Futuristic Monogram "A" (แบบที่ 3) พร้อมนำไปแสดงผลบนแถบ Header Nav และปรับแต่ง Web App Manifest  
