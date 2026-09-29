@@ -14,6 +14,31 @@
 
 ## 🕒 บันทึกรายการเปลี่ยนแปลง (Change History)
 
+### 📅 2026-09-29 13:58:00 (Local Time)
+**ประเภท:** `[Fix / UI / Dialog]` `[Frontend]`  
+**หัวข้อ:** แก้ไขบั๊ก Dialog ถูกตัดขอบล่าง จมหาย และปุ่ม "ตกลง" ถูกบดบังบนหน้าจอมือถือ (Containing Block & Stacking Context Fix)  
+**ปัญหาหรือความต้องการ (Issue / Requirement):**
+- ผู้ใช้แจ้งและแนบภาพถ่ายหน้าจอมือถือจริง: เมื่อมี Dialog แจ้งเตือนสถานะขึ้นมา (เช่น "สแกนใบเสร็จสำเร็จ") ตัวกล่อง Dialog แสดงผลจมอยู่ที่ก้นหน้าจอ เนื้อหาด้านล่างถูกตัดขาด และปุ่มกด "ตกลง" หายไปหลังแถบเมนูด้านล่าง
+- พื้นหลังไม่ได้ถูกดิม (Dim) หรือเบลอครอบคลุมทั้งหน้าจอ
+**สิ่งที่แก้ไข (Changes Detail):**
+1. **แก้ปัญหา Containing Block & Stacking Context Trap (`main-dashboard.component.css`, `chat-input.component.css`):**
+   - สืบหาสาเหตุเชิงลึก: พบว่า `.bottom-section` บนมือถือมีการใส่ `backdrop-filter: blur(...)` และ `position: fixed` ซึ่งตามสเปก W3C CSS จะสร้าง New Containing Block กักขังองค์ประกอบลูกที่มี `position: fixed; inset: 0;` (อย่าง `.sic-dialog__backdrop`) ไม่ให้ขยายตัวเต็ม Viewport และจำกัด z-index ไว้ที่ 90 ทำให้ถูก Bottom Tab Bar (z-index 100) ทับ
+   - ย้ายสไตล์ Docking แบบ Fixed ไปผูกไว้ที่ `.inputs-grid` ภายใน `chat-input.component.css` โดยตรง แทนที่จะครอบทั้งคอมโพเนนต์
+   - ปรับ `.bottom-section` ใน `main-dashboard.component.css` ให้เป็น `position: static` ในโฟลว์ปกติ ทำให้ `<sic-dialog>` เป็นอิสระ และอ้างอิงตำแหน่งกับ Viewport จริงของเบราว์เซอร์
+2. **เพิ่ม Universal Dialog Responsiveness ในระดับ Global (`styles.scss`):**
+   - กำหนดให้ `.sic-dialog__backdrop` ใช้ `position: fixed !important; inset: 0 !important; z-index: 9999 !important;` ครอบคลุมทั้งหน้าจอพร้อมม่านเบลอระดับพรีเมียม
+   - กำหนดให้ `.sic-dialog__panel` มีขนาด `max-width: calc(100vw - 24px) !important; max-height: calc(100dvh - 32px) !important;` กึ่งกลางหน้าจออย่างสมบูรณ์แบบ
+   - กำหนดให้ `.sic-dialog__body` รองรับ `overflow-y: auto !important` และ `.sic-dialog__footer` มี `flex-shrink: 0 !important` รับประกันว่าส่วนหัวและปุ่ม "ตกลง" จะมองเห็นและกดได้เสมอ ไม่ว่าจะเปิดบนหน้าจอมือถือขนาดใด
+3. **Verification & Testing:**
+   - ทดสอบจำลองเปิด Status Dialog บนหน้าจอ 360px x 800px (Android) ผ่าน Playwright
+   - ยืนยันผลจากภาพ `dialog_360px_dark.png`: Dialog อยู่กึ่งกลางหน้าจอ 100%, พื้นหลังดิมเบลอทั้งหน้าจอ, ปุ่ม "ตกลง" แสดงผลชัดเจนสวยงาม
+   - ตรวจสอบผ่านการ Build ด้วย `cmd.exe /c "npm run build"` สำเร็จสมบูรณ์ (Exit code 0)
+**ไฟล์ที่แก้ไข (Affected Files):**
+- `src/app/components/main-dashboard/main-dashboard.component.css`
+- `src/app/components/chat-input/chat-input.component.css`
+- `src/styles.scss`
+- `CHANGELOG.md`
+
 ### 📅 2026-09-29 13:40:00 (Local Time)
 **ประเภท:** `[Fix / UI / Responsive]` `[Frontend]`  
 **หัวข้อ:** ปรับปรุงความยืดหยุ่นของหน้าจอแดชบอร์ดให้รองรับมือถือทุกขนาด (Multi-Screen Responsive Support: 320px – 430px+)  
