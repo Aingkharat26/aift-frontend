@@ -14,6 +14,42 @@
 
 ## 🕒 บันทึกรายการเปลี่ยนแปลง (Change History)
 
+### 📅 2026-09-29 15:30:00 (Local Time)
+**ประเภท:** `[Feature / UI / Brand]` `[Frontend]`  
+**หัวข้อ:** อัปเดตรูปไอคอนแบรนด์ใหม่สไตล์ Futuristic Monogram "A" (แบบที่ 3) พร้อมนำไปแสดงผลบนแถบ Header Nav และปรับแต่ง Web App Manifest  
+**ปัญหาหรือความต้องการ (Issue / Requirement):**
+- ผู้ใช้เลือกดีไซน์ไอคอนแบบที่ 3 (Futuristic Monogram "A": ตัวอักษร "A" จาก AIFT ขึ้นรูปด้วยเส้นกราฟนีออนและประกายดาว AI บนฐาน Squircle สีเข้ม)
+- ผู้ใช้ต้องการให้นำรูปไอคอนนี้ไปประดับแสดงผลในแถบนำทางด้านบน (Header Nav) ของโปรเจกต์ด้วย
+**สิ่งที่แก้ไข (Changes Detail):**
+1. **สร้างและแปลงชุด Asset ไอคอนความละเอียดสูง (`public/aift_logo/` และ `public/favicon.ico`):**
+   - นำภาพต้นแบบ Concept 3 (1024x1024) แปลงเป็น `aift_logo.png`, `aift_logo_dark.png`, `aift_logo_light.png`
+   - สร้างไฟล์ความละเอียดเฉพาะ `aift_logo_192.png` (192x192) และ `aift_logo_512.png` (512x512)
+   - สร้างไฟล์ `public/favicon.ico` แบบ Multi-resolution (16px, 32px, 48px, 64px, 128px, 256px)
+   - ปรับแต่ง `public/manifest.webmanifest` ให้ผูกโยงกับชุดไอคอนใหม่และรองรับ Maskable Icon
+2. **เพิ่มการแสดงผลรูปไอคอนใน Header Nav (`app.ts`, `app.scss`):**
+   - แก้ไข `.nav-logo` ใน `app.ts` ให้บรรจุแท็ก `<img>` ชี้ไปยัง `aift_logo/aift_logo.png` ควบคู่กับชื่อระบบ "AI Finance Tracker"
+   - ปรับแต่ง CSS Flexbox และ Micro-interaction (Hover/Active) ของ `.nav-logo` และ `.nav-logo-img` ให้มีเอฟเฟกต์นุ่มนวล พร้อมขอบมน Squircle และเงามิติเรืองแสงสีฟ้า
+   - ปรับแต่ง Responsive Layout ในขนาดหน้าจอต่างๆ:
+     - Desktop: ไอคอนขนาด 32x32px
+     - Tablet / Mobile `<= 768px`: ไอคอนขนาด 28x28px
+     - Mobile `<= 380px`: ไอคอนขนาด 25x25px
+     - Mobile `<= 340px`: ไอคอนขนาด 22x22px
+3. **การตรวจสอบและทดสอบ (Verification & Testing):**
+   - รันคำสั่ง `npm run build` ผ่านสมบูรณ์ 100% (Exit code 0)
+   - ทดสอบจับภาพหน้าจอผ่าน Playwright ทั้งบน Desktop (1280px) และ Mobile (360px) ทั้งใน Light Mode และ Dark Mode ยืนยันว่าไอคอนแสดงผลคมชัด สัดส่วนลงตัว ไม่เบียดองค์ประกอบอื่น และไม่มีปัญหา Overflow
+**ไฟล์ที่แก้ไข (Affected Files):**
+- `aift-frontend/public/aift_logo/aift_logo.png`
+- `aift-frontend/public/aift_logo/aift_logo_192.png`
+- `aift-frontend/public/aift_logo/aift_logo_512.png`
+- `aift-frontend/public/aift_logo/aift_logo_dark.png`
+- `aift-frontend/public/aift_logo/aift_logo_light.png`
+- `aift-frontend/public/favicon.ico`
+- `aift-frontend/public/manifest.webmanifest`
+- `aift-frontend/src/app/app.ts`
+- `aift-frontend/src/app/app.scss`
+- `aift-frontend/CHANGELOG.md`
+- `CHANGELOG.md`
+
 ### 📅 2026-09-29 13:58:00 (Local Time)
 **ประเภท:** `[Fix / UI / Dialog]` `[Frontend]`  
 **หัวข้อ:** แก้ไขบั๊ก Dialog ถูกตัดขอบล่าง จมหาย และปุ่ม "ตกลง" ถูกบดบังบนหน้าจอมือถือ (Containing Block & Stacking Context Fix)  

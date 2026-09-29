@@ -19,7 +19,14 @@ import { SicBadgeComponent, SicThemeService } from 'sic-ng';
   template: `
     <nav class="top-nav">
       <div class="nav-inner">
-        <div class="nav-logo" routerLink="/">AI Finance Tracker</div>
+        <div class="nav-logo" routerLink="/" title="AI Finance Tracker">
+          <img
+            src="aift_logo/aift_logo.png"
+            alt="AIFT Logo"
+            class="nav-logo-img"
+          />
+          <span class="nav-logo-text">AI Finance Tracker</span>
+        </div>
         <div class="nav-links" *ngIf="authService.isLoggedIn()">
           <a
             routerLink="/"
