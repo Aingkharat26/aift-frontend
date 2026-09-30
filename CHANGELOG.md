@@ -14,6 +14,34 @@
 
 ## 🕒 บันทึกรายการเปลี่ยนแปลง (Change History)
 
+### 📅 2026-09-30 15:05:00 (Local Time)
+**ประเภท:** `[Fix / Performance / Resilience]` `[Frontend]`  
+**หัวข้อ:** แก้ไขปัญหา Login/Register Timeout จาก Cold Start บน Production (Render) และปรับปรุง Session Auto-Recovery เมื่อเปิดหน้าจอค้างไว้นาน  
+**ปัญหาหรือความต้องการ (Issue / Requirement):**
+- **ปัญหาที่ 1:** ตอนเข้าสู่ระบบหรือสมัครสมาชิก ระบบหมุนโหลดนานจนเกิด Timeout ในครั้งแรก ต้องกดย้ำอีกรอบถึงจะเข้าได้
+  - *สาเหตุ:* Backend Production บน Render Free Tier จะเข้าสู่โหมดหลับ (Spin-down) อัตโนมัติเมื่อไม่มี Request นานเกิน 15 นาที โดยการตื่นครั้งแรก (Cold Start) ใช้เวลา 35-50 วินาที แต่ Frontend มีการจำกัด `timeout(20000)` (20 วินาที) ทำให้ถูกตัดการเชื่อมต่อก่อนที่เซิร์ฟเวอร์จะบูตเสร็จ
+- **ปัญหาที่ 2:** เมื่อเปิดแอปเข้าระบบค้างไว้สักพักแล้วกลับมาใช้งาน ข้อมูลในหน้าจอไม่ยอมโหลด และต้องกดออกจากระบบแล้วเข้าใหม่จึงจะหาย
+  - *สาเหตุ:* เมื่อแอปเปิดทิ้งไว้นานเกิน 15 นาที Render จะหลับไปอีกครั้ง และเมื่อมี Request เกิดขึ้นแต่เซิร์ฟเวอร์ยังหลับอยู่ Service ของ Frontend จะเคลียร์ข้อมูลทิ้งเป็น `[]` และไม่มีระบบ Auto-retry
+**สิ่งที่แก้ไข (Changes Detail):**
+1. **ขยาย Auth Timeout ใน `AuthService` (`auth.service.ts`):** ปรับ Timeout ของ `login()` และ `register()` จาก 20 วินาทีเป็น 65 วินาที เพื่อให้ครอบคลุมรอบ Cold Start ของ Render
+2. **เพิ่ม UI แจ้งเตือน Cold Start ใน `AuthComponent` (`auth.component.ts`, `.html`, `.scss`):** หากการเชื่อมต่อใช้เวลาเกิน 4 วินาที จะแสดงข้อความแจ้งเตือนสีฟ้านุ่มนวลพร้อมไฟกะพริบแจ้งผู้ใช้ว่าเซิร์ฟเวอร์กำลังตื่นจากการพักระบบ (Cold Start)
+3. **เพิ่ม Auto-Retry ใน `authInterceptor` (`auth.interceptor.ts`):** ดักจับ Error สถานะ 0, 502, 503, 504 และทำ Auto-Retry อัตโนมัติสูงสุด 2 ครั้งพร้อม Exponential Delay (2.5s, 5s) ขณะเซิร์ฟเวอร์กำลังตื่น ช่วยให้คำขอดึงข้อมูลสำเร็จโดยที่หน้าจอไม่พัง
+4. **ปรับปรุง `ExpenseService` (`expense.service.ts`):** ป้องกันการล้างข้อมูลเป็น `[]` เมื่อเกิดข้อผิดพลาดชั่วคราว (Transient error) โดยจะเก็บข้อมูลแคชเดิมไว้แสดงผล
+5. **เพิ่ม Auto-Revalidation เมื่อกลับสู่แอปใน `App` (`app.ts`):** ดักฟัง Event `visibilitychange` และ `focus` หากผู้ใช้กลับมาเปิดหน้าจอหลังจากทิ้งไว้นานกว่า 40 วินาที ระบบจะสั่งรีเฟรชข้อมูลล่าสุด (Daily logs, Categories, Budgets) ให้อัตโนมัติทันที
+6. **การตรวจสอบและทดสอบ (Verification & Testing):**
+   - รันคำสั่ง `npm run build` ผ่านสมบูรณ์ 100% (Exit code 0)
+**ไฟล์ที่แก้ไข (Affected Files):**
+- `src/app/services/auth.service.ts`
+- `src/app/components/auth/auth.component.ts`
+- `src/app/components/auth/auth.component.html`
+- `src/app/components/auth/auth.component.scss`
+- `src/app/interceptors/auth.interceptor.ts`
+- `src/app/services/expense.service.ts`
+- `src/app/app.ts`
+- `CHANGELOG.md`
+
+---
+
 ### 📅 2026-09-29 16:50:00 (Local Time)
 **ประเภท:** `[Feature / UI / Theme]` `[Frontend]`  
 **หัวข้อ:** รองรับ Dynamic Theme ใน Animated Splash Screen (ปรับสีหน้าจอต้อนรับและ Status Bar ตาม Dark Mode / Light Mode อัตโนมัติ)  

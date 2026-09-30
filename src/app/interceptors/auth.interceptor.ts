@@ -1,7 +1,7 @@
 import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { catchError, throwError } from 'rxjs';
+import { catchError, throwError, retry, timer } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
@@ -19,6 +19,21 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   }
 
   return next(authReq).pipe(
+    // Auto-retry transient gateway/network errors (e.g. Render waking up from sleep)
+    retry({
+      count: 2,
+      delay: (error, retryCount) => {
+        const isTransient = [0, 502, 503, 504].includes(error?.status);
+        const isAuthSubmit =
+          req.url.includes('/auth/login') || req.url.includes('/auth/register');
+
+        // Only retry transient cold-start / wake-up errors for normal data requests
+        if (isTransient && !isAuthSubmit) {
+          return timer(retryCount * 2500);
+        }
+        return throwError(() => error);
+      },
+    }),
     catchError((err: HttpErrorResponse) => {
       // If 401 on protected operational routes (excluding login, register, and background me check), log out
       if (

@@ -73,7 +73,7 @@ export class AuthService {
     displayName?: string;
   }): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/register`, data).pipe(
-      timeout(20000),
+      timeout(65000),
       tap((res) => {
         this.handleAuthSuccess(res);
       }),
@@ -85,7 +85,7 @@ export class AuthService {
     password: string;
   }): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, data).pipe(
-      timeout(20000),
+      timeout(65000),
       tap((res) => {
         this.handleAuthSuccess(res);
       }),

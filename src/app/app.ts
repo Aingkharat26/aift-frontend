@@ -1,7 +1,10 @@
-import { Component, inject, signal, effect } from '@angular/core';
+import { Component, inject, signal, effect, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from './services/auth.service';
+import { ExpenseService } from './services/expense.service';
+import { CategoryService } from './services/category.service';
+import { BudgetService } from './services/budget.service';
 import { AdminModelLimitsComponent } from './components/admin-model-limits/admin-model-limits.component';
 import { SplashScreenComponent } from './components/splash-screen/splash-screen.component';
 import { SicBadgeComponent, SicThemeService } from 'sic-ng';
@@ -158,10 +161,16 @@ import { SicBadgeComponent, SicThemeService } from 'sic-ng';
   `,
   styleUrl: './app.scss',
 })
-export class App {
+export class App implements OnInit, OnDestroy {
   authService = inject(AuthService);
   themeService = inject(SicThemeService);
+  private expenseService = inject(ExpenseService);
+  private categoryService = inject(CategoryService);
+  private budgetService = inject(BudgetService);
+
   showModelLimits = signal<boolean>(false);
+  private lastActiveTime = Date.now();
+  private visibilityListener = () => this.handleVisibilityChange();
 
   constructor() {
     effect(() => {
@@ -179,5 +188,33 @@ export class App {
         }
       }
     });
+  }
+
+  ngOnInit() {
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', this.visibilityListener);
+      window.addEventListener('focus', this.visibilityListener);
+    }
+  }
+
+  ngOnDestroy() {
+    if (typeof document !== 'undefined') {
+      document.removeEventListener('visibilitychange', this.visibilityListener);
+      window.removeEventListener('focus', this.visibilityListener);
+    }
+  }
+
+  private handleVisibilityChange() {
+    if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+      const now = Date.now();
+      // If user was away for more than 40 seconds and is logged in, refresh dashboard data
+      if (now - this.lastActiveTime > 40000 && this.authService.isLoggedIn()) {
+        console.log('[App] Resumed from background/sleep, re-syncing data...');
+        this.expenseService.refreshDailyLogs();
+        this.categoryService.loadCategories();
+        this.budgetService.loadBudgets();
+      }
+      this.lastActiveTime = now;
+    }
   }
 }

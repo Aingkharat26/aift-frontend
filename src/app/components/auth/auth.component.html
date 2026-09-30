@@ -92,6 +92,14 @@
         ></sic-input-password>
       }
 
+      <!-- Cold Start Notice (When server is waking up) -->
+      @if (coldStartNotice()) {
+        <div class="cold-start-banner" role="status">
+          <span class="pulse-indicator"></span>
+          <span class="cold-start-text">{{ coldStartNotice() }}</span>
+        </div>
+      }
+
       <!-- Submit Button -->
       <div class="submit-wrapper">
         <sic-button

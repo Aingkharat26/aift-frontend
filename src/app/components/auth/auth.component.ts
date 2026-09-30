@@ -37,7 +37,10 @@ export class AuthComponent implements OnInit {
   isLoading = signal<boolean>(false);
   errorMessage = signal<string>('');
   successMessage = signal<string>('');
+  coldStartNotice = signal<string>('');
   returnUrl = signal<string>('/');
+
+  private coldStartTimer: any = null;
 
   // Form Models
   username = '';
@@ -54,11 +57,36 @@ export class AuthComponent implements OnInit {
     });
   }
 
+  ngOnDestroy() {
+    this.clearColdStartTimer();
+  }
+
   switchMode(isRegister: boolean) {
+    this.clearColdStartTimer();
     this.isRegisterMode.set(isRegister);
     this.errorMessage.set('');
     this.successMessage.set('');
     this.cdr.detectChanges();
+  }
+
+  private startColdStartTimer() {
+    this.clearColdStartTimer();
+    this.coldStartTimer = setTimeout(() => {
+      if (this.isLoading()) {
+        this.coldStartNotice.set(
+          '⚡ กำลังเชื่อมต่อเซิร์ฟเวอร์ (หากเซิร์ฟเวอร์เพิ่งตื่นจากโหมดสลีป อาจใช้เวลาประมาณ 30-50 วินาที โปรดรอสักครู่)...',
+        );
+        this.cdr.detectChanges();
+      }
+    }, 4000);
+  }
+
+  private clearColdStartTimer() {
+    if (this.coldStartTimer) {
+      clearTimeout(this.coldStartTimer);
+      this.coldStartTimer = null;
+    }
+    this.coldStartNotice.set('');
   }
 
   onSubmit() {
@@ -100,6 +128,7 @@ export class AuthComponent implements OnInit {
       }
 
       this.isLoading.set(true);
+      this.startColdStartTimer();
       this.cdr.detectChanges();
 
       this.authService
@@ -110,6 +139,7 @@ export class AuthComponent implements OnInit {
         })
         .pipe(
           finalize(() => {
+            this.clearColdStartTimer();
             this.isLoading.set(false);
             this.cdr.detectChanges();
           }),
@@ -126,6 +156,7 @@ export class AuthComponent implements OnInit {
         });
     } else {
       this.isLoading.set(true);
+      this.startColdStartTimer();
       this.cdr.detectChanges();
 
       this.authService
@@ -135,6 +166,7 @@ export class AuthComponent implements OnInit {
         })
         .pipe(
           finalize(() => {
+            this.clearColdStartTimer();
             this.isLoading.set(false);
             this.cdr.detectChanges();
           }),
@@ -160,7 +192,7 @@ export class AuthComponent implements OnInit {
 
     // Timeout
     if (err.name === 'TimeoutError') {
-      return 'การเชื่อมต่อหมดเวลา กรุณาลองใหม่อีกครั้ง';
+      return 'การเชื่อมต่อหมดเวลา เซิร์ฟเวอร์กำลังเริ่มต้นระบบใหม่ กรุณากดลองอีกครั้ง';
     }
 
     // Status 0: Network Error / CORS / Backend unreachable

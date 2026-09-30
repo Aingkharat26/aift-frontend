@@ -86,8 +86,12 @@ export class ExpenseService {
             this.expensesSubject.next(res.data);
           }
         },
-        error: () => {
-          if (reqId === this.dailyReqCount) this.expensesSubject.next([]);
+        error: (err) => {
+          console.warn('[ExpenseService] Failed to load daily expenses:', err?.status);
+          // Only clear if 404 or unauthenticated, otherwise preserve cached data during cold start
+          if (err?.status === 404 && reqId === this.dailyReqCount) {
+            this.expensesSubject.next([]);
+          }
         }
       });
   }
@@ -102,8 +106,11 @@ export class ExpenseService {
             this.summarySubject.next(res.data);
           }
         },
-        error: () => {
-          if (reqId === this.summaryReqCount) this.summarySubject.next([]);
+        error: (err) => {
+          console.warn('[ExpenseService] Failed to load monthly summary:', err?.status);
+          if (err?.status === 404 && reqId === this.summaryReqCount) {
+            this.summarySubject.next([]);
+          }
         }
       });
   }
